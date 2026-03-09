@@ -3,9 +3,9 @@ import React from 'react'
 import { StarsComponent } from './StarsComponent'
 import { EyeIcon, HeartIcon } from '@heroicons/react/24/outline';
 
-function ProductCard() {
+function ProductCard({className}:{className?:string}) {
     return (
-        <div className=''>
+        <div className={`${className}`}>
             <div className='h-63 relative group'>
                 <img src="/images/photo-1505740420928-5e560c06d30e.jpeg" alt="description" className='w-full h-full object-cover' />
                 <button className='absolute bottom-0 right-0 w-full bg-black text-white px-4 py-2 rounded-none cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity'>Add To Cart</button>
@@ -18,7 +18,7 @@ function ProductCard() {
                 </button>
 
             </div>
-            <div>
+            <div className='pt-3 '>
                 <h3 className='text-[1rem] font-[500]'>HAVIT HV-G92 Gamepad</h3>
                 <p className='text-[1rem] font-[500] space-x-3 py-2'><span className='text-[#DB4444]'>$120</span><span className='line-through text-black opacity-50'>$160</span></p>
                 <StarsComponent rating={4.3} size={16} reviews={100} />

@@ -7,6 +7,10 @@ import CatigoryCard from "@/components/CatigoryCard";
 import StyledButton from "@/components/StyledButton";
 import SectionTitle from "@/components/Section/SectionTitel";
 import Timer from "@/components/Timer";
+import index from "@/components/CatigoryCard";
+import { CarouselItem } from "@/components/ui/carousel";
+import Image from "next/image";
+import CatigoryHero from "@/components/CatigoryHero";
 
 export default function Home() {
   return (
@@ -22,17 +26,17 @@ export default function Home() {
         </Container>
       </section>
 
-      {/* Products Section */}
+      {/* Flash Sales Section */}
       <section className="mb-16 md:mb-20">
         <Container>
-          <div className="section-header flex justify-start items-end space-x-25">
+          <div>
             <SectionTitle Category="Today's" title="Flash Sales" >
               <Timer />
             </SectionTitle>
           </div>
           <div className="pt-5">
             <CardsCarousel type="products" >
-                <ProductCard />
+              <ProductCard />
             </CardsCarousel>
           </div>
           <div className="flex justify-center pt-16">
@@ -41,12 +45,12 @@ export default function Home() {
         </Container>
       </section>
 
-
-      <section>
+      {/* Categories Section  */}
+      <section className="pb-15">
         <Container>
           <hr className="pb-12 md:pb-20" />
 
-          <div className="section-header flex flex-col items-start gap-4 md:gap-6">
+          <div>
             <SectionTitle Category="Categories" title="Browse By Category" />
           </div>
 
@@ -56,6 +60,31 @@ export default function Home() {
             </CardsCarousel>
           </div>
 
+        </Container>
+      </section>
+
+      {/* Best Selling products */}
+      <section>
+        <Container>
+          <hr className="pb-12 md:pb-20" />
+
+          <div className="flex justify-between items-end">
+            <SectionTitle Category="This Month" title="Best Selling Products" />
+            <StyledButton title="View All" ClassName="px-9 py-3.5 h-12" />
+          </div>
+          <div className="pt-5 flex flex-wrap justify-between">
+            {
+              Array.from({ length: 4 }).map((_, index) => (
+                <ProductCard key={index} className="max-w-68 basis-full" />
+              ))
+            }
+          </div>
+        </Container>
+      </section>
+
+      <section className="py-17">
+        <Container>
+          <CatigoryHero />
         </Container>
       </section>
     </div>
