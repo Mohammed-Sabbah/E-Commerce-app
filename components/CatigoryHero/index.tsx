@@ -8,6 +8,7 @@ function CatigoryHero() {
             <div className="w-2/5 flex flex-col space-y-8">
                 <h3 className="text-[1rem] text-[#00FF66] font-semibold ">Categories</h3>
                 <p className="text-5xl text-[#FAFAFA] font-semibold tracking-[4%]">Enhance Your Music Experience</p>
+                <CatigoryHeroTimer/>
                 <StyledButton title="Buy Now" ClassName="hero-button self-start bg-[#00FF66] py-4 px-12 text-white inline-block" />
             </div>
 
@@ -21,6 +22,29 @@ function CatigoryHero() {
                     sizes="(min-width: 768px) 60vw, 100vw"
                 />
             </div>
+        </div>
+    )
+}
+
+export function CatigoryHeroTimer(){
+    
+    return(
+        <div className='flex space-x-6'>
+            <CatigoryHeroTimerItem label="Days" value={5}/>
+            <CatigoryHeroTimerItem label="Hours" value={23}/>
+            <CatigoryHeroTimerItem label="Minutes" value={59}/>
+            <CatigoryHeroTimerItem label="Seconds" value={45}/>
+            
+        </div>
+    )
+}
+
+export function CatigoryHeroTimerItem({value,label}:{value: number; label: string}) {
+    const TheValue = value.toString().padStart(2, '0');
+    return (
+        <div className='w-15.5 h-15.5 rounded-full bg-white text-black flex flex-col justify-center items-center '>
+            <h3 className='text-[1rem] font-[600] '>{TheValue}</h3>
+            <p className='text-[0.7rem] font-[400] '>{label}</p>
         </div>
     )
 }

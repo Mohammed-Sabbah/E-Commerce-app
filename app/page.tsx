@@ -28,7 +28,7 @@ export default function Home() {
 
       {/* Flash Sales Section */}
       <section className="mb-16 md:mb-20">
-        <Container>
+        <Container className="relative">
           <div>
             <SectionTitle Category="Today's" title="Flash Sales" >
               <Timer />
@@ -85,6 +85,20 @@ export default function Home() {
       <section className="py-17">
         <Container>
           <CatigoryHero />
+        </Container>
+      </section>
+
+      {/* Our Products */}
+      <section className="py-17">
+        <Container>
+          <div>
+            <SectionTitle Category="Our Products" title="Explore Our Products" />
+          </div>
+          <div className="pt-5">
+            <CardsCarousel type="products-grid">
+              <ProductCard />
+            </CardsCarousel>
+          </div>
         </Container>
       </section>
     </div>
