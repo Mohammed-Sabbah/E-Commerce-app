@@ -29,8 +29,13 @@ let subCategorySchema = new mongoose.Schema(
 
 let setImageUrl = function (doc) {
     if (doc.photo) {
-        let url = `${process.env.BASE_URL}/subCategories/${doc.photo}`;
-        doc.photo = url;
+        if (doc.photo.includes("/subCategories/https://") || doc.photo.includes("/subCategories/http://")) {
+            doc.photo = doc.photo.split("/subCategories/")[1];
+        }
+        if (!doc.photo.startsWith("http")) {
+            let url = `${process.env.BASE_URL}/subCategories/${doc.photo}`;
+            doc.photo = url;
+        }
     }
 };
 

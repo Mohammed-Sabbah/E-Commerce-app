@@ -1,185 +1,263 @@
-// eslint-disable-next-line import/no-extraneous-dependencies, node/no-unpublished-require
-const { faker } = require('@faker-js/faker');
-const dotenv = require('dotenv');
-const { connectDb } = require('../config/db');
+// =============================================================
+//  seeder.js  –  بيجيب داتا حقيقية من DummyJSON ويحطها في MongoDB
+//  الاستخدام:
+//    node utils/seeder.js -d   ← حذف كل الداتا
+//    node utils/seeder.js -i   ← إدخال الداتا
+// =============================================================
 
-const Brand = require('../models/Brand');
-const Cart = require('../models/Cart');
-const Category = require('../models/Category');
-const Coupon = require('../models/Coupon');
-const Order = require('../models/Order');
-const Product = require('../models/Product');
-const Review = require('../models/Review');
-const SubCategory = require('../models/SubCategory');
-const User = require('../models/User');
+const mongoose = require("mongoose");
+const slugify = require("slugify");
+const bcrypt = require("bcryptjs");
+const dotenv = require("dotenv");
 
-dotenv.config({ path: '../config.env' });
+dotenv.config({ path: "./config.env" });
 
-const deleteAllData = async () => {
-    await Brand.deleteMany({});
-    await Cart.deleteMany({});
-    await Category.deleteMany({});
-    await Coupon.deleteMany({});
-    await Order.deleteMany({});
-    await Product.deleteMany({});
-    await Review.deleteMany({});
-    await SubCategory.deleteMany({});
-    await User.deleteMany({});
-    console.log(`All data deleted.`);
+// ─── helper ─────────────────────────────────────────────────
+const slug = (str) => slugify(str, { lower: true, strict: true, trim: true });
+
+const fetchJson = async (url) => {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Fetch failed: ${url}`);
+    return res.json();
 };
 
-const seedAdmin = async () => {
-    await User.create({
-        name: 'Admin',
-        email: 'admin@ecommerse.com',
-        password: 'admin123',
-        phone: faker.helpers.fromRegExp("05[6-7][0-9]{3}[0-9]{4}"),
-        role: 'admin',
-        profileImage: faker.image.avatar(),
-    });
-    console.log("Admin created.");
+// ─── models ──────────────────────────────────────────────────
+const Category   = require("../models/Category");
+const SubCategory = require("../models/SubCategory");
+const Brand      = require("../models/Brand");
+const Product    = require("../models/Product");
+const User       = require("../models/User");
+const Cart       = require("../models/Cart");
+const Order      = require("../models/Order");
+const Review     = require("../models/Review");
+const Coupon     = require("../models/Coupon");
+
+// ─── data ────────────────────────────────────────────────────
+const CATEGORY_MAP = {
+    "beauty":               ["Beauty Skincare", "Beauty Makeup"],
+    "fragrances":           ["Fragrances Perfumes", "Fragrances Body Sprays"],
+    "furniture":            ["Furniture Living Room", "Furniture Bedroom"],
+    "groceries":            ["Groceries Fruits Vegetables", "Groceries Dairy"],
+    "home-decoration":      ["Home Wall Art", "Home Lighting"],
+    "kitchen-accessories":  ["Kitchen Cookware", "Kitchen Storage"],
+    "laptops":              ["Gaming Laptops", "Business Laptops"],
+    "mens-shirts":          ["Mens Casual Shirts", "Mens Formal Shirts"],
+    "mens-shoes":           ["Mens Sneakers", "Mens Boots"],
+    "mens-watches":         ["Mens Luxury Watches", "Mens Sport Watches"],
+    "mobile-accessories":   ["Mobile Cases", "Mobile Chargers"],
+    "motorcycle":           ["Motorcycle Parts", "Motorcycle Gear"],
+    "skin-care":            ["Skincare Face", "Skincare Body"],
+    "smartphones":          ["Android Phones", "iPhones"],
+    "sports-accessories":   ["Sports Gym", "Sports Outdoor"],
+    "sunglasses":           ["Men Sunglasses", "Women Sunglasses"],
+    "tablets":              ["Android Tablets", "iPads"],
+    "tops-for-women":       ["Women T-Shirts", "Women Blouses"],
+    "vehicle":              ["Vehicle Cars", "Vehicle SUVs"],
+    "womens-bags":          ["Womens Handbags", "Womens Backpacks"],
+    "womens-dresses":       ["Casual Dresses", "Evening Dresses"],
+    "womens-jewellery":     ["Jewellery Necklaces", "Jewellery Rings"],
+    "womens-shoes":         ["Womens Heels", "Womens Flats"],
+    "womens-watches":       ["Womens Luxury Watches", "Womens Sport Watches"],
 };
 
-const seedUsers = async (count = 20) => {
-    const users = [];
-    for (let i = 0; i < count; i += 1) {
-        faker.seed(i + Math.round(Math.random() * 100000));
-        const gender = faker.helpers.arrayElement(['male', 'female']);
-        const firstName = faker.person.firstName({ sex: gender });
-        const lastName = faker.person.lastName({ sex: gender });
-        users.push({
-            name: `${firstName} ${lastName}`,
-            email: faker.internet.email({
-                firstName,
-                lastName
-            }),
-            password: '12345678',
-            phone: faker.helpers.fromRegExp("05[6-7][0-9]{3}[0-9]{4}"),
-            profileImage: faker.image.avatar(),
-            role: 'user',
-            isActive: true
-        });
-    }
-
-    await User.create(users);
-    console.log(`${count} users created.`);
+const CATEGORY_PHOTOS = {
+    "beauty":               "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400",
+    "fragrances":           "https://images.unsplash.com/photo-1541643600914-78b084683702?w=400",
+    "furniture":            "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400",
+    "groceries":            "https://images.unsplash.com/photo-1542838132-92c53300491e?w=400",
+    "home-decoration":      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400",
+    "kitchen-accessories":  "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400",
+    "laptops":              "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400",
+    "mens-shirts":          "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=400",
+    "mens-shoes":           "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400",
+    "mens-watches":         "https://images.unsplash.com/photo-1523170335258-f4f3f4f2fd59?w=400",
+    "mobile-accessories":   "https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=400",
+    "motorcycle":           "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400",
+    "skin-care":            "https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=400",
+    "smartphones":          "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400",
+    "sports-accessories":   "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=400",
+    "sunglasses":           "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400",
+    "tablets":              "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=400",
+    "tops-for-women":       "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400",
+    "vehicle":              "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=400",
+    "womens-bags":          "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400",
+    "womens-dresses":       "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400",
+    "womens-jewellery":     "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400",
+    "womens-shoes":         "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=400",
+    "womens-watches":       "https://images.unsplash.com/photo-1508057198894-247b23fe5ade?w=400",
 };
 
-const seedCategories = async (count = 5) => {
-    const categories = [];
-
-    for (let i = 0; i < count; i += 1) {
-        faker.seed(i + Math.round(Math.random() * 100000));
-        const name = faker.commerce.department();
-        categories.push({
-            name,
-            slug: faker.helpers.slugify(name),
-            photo: faker.image.url(),
-        });
-    }
-
-    const createdCategories = await Category.create(categories);
-    console.log(`${count} categories created.`);
-    return createdCategories;
+// ─── delete ──────────────────────────────────────────────────
+const deleteAll = async () => {
+    await Promise.all([
+        Category.deleteMany({}),
+        SubCategory.deleteMany({}),
+        Brand.deleteMany({}),
+        Product.deleteMany({}),
+        User.deleteMany({}),
+        Cart.deleteMany({}),
+        Order.deleteMany({}),
+        Review.deleteMany({}),
+        Coupon.deleteMany({}),
+    ]);
+    console.log("🗑️  All data deleted");
 };
 
-const seedSubCategories = async (categories, countPerCategory = 2) => {
-    const subCategories = [];
+// ─── seed ────────────────────────────────────────────────────
+const seedAll = async () => {
 
-    categories.forEach(category => {
-        for (let i = 0; i < countPerCategory; i += 1) {
-            faker.seed(i + Math.round(Math.random() * 100000));
-            const name = `${faker.commerce.productAdjective()} ${faker.commerce.productMaterial()}`;
-            subCategories.push({
-                name,
-                slug: faker.helpers.slugify(name),
-                photo: faker.image.url(),
-                category: category._id,
+    // 1. Categories
+    console.log("\n📦 Seeding categories...");
+    const categoryDocs = await Category.insertMany(
+        Object.keys(CATEGORY_MAP).map((key) => ({
+            name: key.split("-").map((w) => w[0].toUpperCase() + w.slice(1)).join(" "),
+            slug: slug(key),
+            photo: CATEGORY_PHOTOS[key] || "https://via.placeholder.com/400",
+        }))
+    );
+    console.log(`   ✅ ${categoryDocs.length} categories`);
+
+    const categoryBySlug = {};
+    categoryDocs.forEach((c) => (categoryBySlug[c.slug] = c._id));
+
+    // 2. SubCategories
+    console.log("📦 Seeding subcategories...");
+    const subCatData = [];
+    Object.entries(CATEGORY_MAP).forEach(([catKey, subs]) => {
+        const catId = categoryBySlug[slug(catKey)];
+        subs.forEach((subName) => {
+            subCatData.push({
+                name: subName,
+                slug: slug(subName),
+                photo: "https://via.placeholder.com/400",
+                category: catId,
             });
-        }
+        });
+    });
+    const subCatDocs = await SubCategory.insertMany(subCatData);
+    console.log(`   ✅ ${subCatDocs.length} subcategories`);
+
+    const subsByCatId = {};
+    subCatDocs.forEach((s) => {
+        const key = s.category.toString();
+        if (!subsByCatId[key]) subsByCatId[key] = [];
+        subsByCatId[key].push(s._id);
     });
 
-    const createdSubCategories = await SubCategory.create(subCategories);
-    console.log(`${subCategories.length} subcategories created.`);
-    return createdSubCategories;
-};
-
-const seedBrands = async (count = 5) => {
-    const brands = [];
-
-    for (let i = 0; i < count; i += 1) {
-        faker.seed(i + Math.round(Math.random() * 100000));
-        const name = faker.company.name();
-        brands.push({
+    // 3. Brands
+    console.log("📦 Seeding brands...");
+    const { products: allProducts } = await fetchJson(
+        "https://dummyjson.com/products?limit=194&select=brand"
+    );
+    const uniqueBrands = [...new Set(allProducts.map((p) => p.brand).filter(Boolean))];
+    const brandDocs = await Brand.insertMany(
+        uniqueBrands.map((name) => ({
             name,
-            slug: faker.helpers.slugify(name),
-            photo: faker.image.url(),
-        });
-    }
+            slug: slug(name),
+            photo: "https://via.placeholder.com/400",
+        }))
+    );
+    console.log(`   ✅ ${brandDocs.length} brands`);
 
-    const createdBrands = await Brand.create(brands);
-    console.log(`${count} brands created.`);
-    return createdBrands;
+    const brandByName = {};
+    brandDocs.forEach((b) => (brandByName[b.name] = b._id));
+
+    // 4. Products
+    console.log("📦 Seeding products...");
+    const { products } = await fetchJson("https://dummyjson.com/products?limit=194");
+
+    const fallbackCatId = categoryDocs[0]._id;
+    const fallbackSubIds = subsByCatId[fallbackCatId.toString()] || [];
+
+    const productData = products.map((p) => {
+        const catSlug = slug(p.category);
+        const matchedCatId = categoryBySlug[catSlug];
+        const catId = matchedCatId || fallbackCatId;
+        const subCatIds = matchedCatId ? subsByCatId[catId.toString()] || [] : fallbackSubIds;
+        const brandId = brandByName[p.brand] || null;
+
+        const description = p.description.length >= 20
+            ? p.description
+            : `${p.description} — ${p.title} is a high quality product.`;
+
+        return {
+            name: p.title,
+            slug: slug(p.title),
+            description,
+            quantity: p.stock,
+            sold: Math.floor(Math.random() * 50),
+            price: p.price,
+            priceAfterDiscount: p.discountPercentage
+                ? parseFloat((p.price * (1 - p.discountPercentage / 100)).toFixed(2))
+                : undefined,
+            coverImage: p.thumbnail,
+            images: p.images || [],
+            category: catId,
+            subCategory: subCatIds.slice(0, 1),
+            brand: brandId,
+            avgRatings: p.rating,
+            ratingsQuantity: Math.floor(Math.random() * 200) + 10,
+        };
+    });
+
+    await Product.insertMany(productData);
+    console.log(`   ✅ ${productData.length} products`);
+
+    // 5. Users
+    console.log("📦 Seeding users...");
+    await User.create({
+        name: "Admin",
+        slug: "admin",
+        email: "admin@ecommerce.com",
+        password: bcrypt.hashSync("admin123", 10),
+        phone: "0569999999",
+        role: "admin",
+        profileImage: "https://i.pravatar.cc/150?img=3",
+        isActive: true,
+    });
+
+    const testUsers = Array.from({ length: 5 }, (_, i) => ({
+        name: `Test User ${i + 1}`,
+        slug: `test-user-${i + 1}`,
+        email: `user${i + 1}@ecommerce.com`,
+        password: bcrypt.hashSync("12345678", 10),
+        phone: `056${String(i).padStart(7, "0")}`,
+        role: "user",
+        profileImage: `https://i.pravatar.cc/150?img=${i + 10}`,
+        isActive: true,
+    }));
+    await User.insertMany(testUsers);
+    console.log(`   ✅ 1 admin + 5 users`);
+
+    console.log("\n🎉 Seeding completed!");
+    console.log("─────────────────────────────────");
+    console.log("   Admin:  admin@ecommerce.com  /  admin123");
+    console.log("   User:   user1@ecommerce.com  /  12345678");
+    console.log("─────────────────────────────────\n");
 };
 
-const seedProducts = async ({ categories, subCategories, brands }, count = 20) => {
-    const products = [];
-
-    for (let i = 0; i < count; i += 1) {
-        faker.seed(i + Math.round(Math.random() * 100000));
-        const category = faker.helpers.arrayElement(categories);
-        const relatedSubCategories = subCategories.filter(sc => sc.category.toString() === category._id.toString());
-        const subCategory = faker.helpers.arrayElement(relatedSubCategories);
-        const brand = faker.helpers.arrayElement(brands);
-
-        const name = faker.commerce.productName();
-
-        products.push({
-            name,
-            slug: faker.helpers.slugify(name),
-            description: faker.commerce.productDescription(),
-            price: faker.commerce.price({ min: 10, max: 100 }),
-            quantity: faker.number.int({ min: 1, max: 100 }),
-            sold: faker.number.int({ min: 0, max: 20 }),
-            coverImage: faker.image.url(),
-            category: category._id,
-            subCategories: [subCategory._id],
-            brand: brand._id,
-        });
-    }
-
-    await Product.create(products);
-    console.log(`${count} products created.`);
-};
-
-(async () => {
+// ─── run ─────────────────────────────────────────────────────
+const run = async () => {
     try {
-        await connectDb(process.env.DB_URI);
+        await mongoose.connect(process.env.DB_URI);
+        console.log("✅ DB connected");
 
         const mode = process.argv[2];
 
-        if (!['-d', '-i'].includes(mode)) {
-            console.error("Please specify '-d' to delete or '-i' to insert.");
+        if (!["-d", "-i"].includes(mode)) {
+            console.error("❌ Please specify '-d' to delete or '-i' to insert.");
             process.exit(1);
         }
 
-        if (mode === '-d') {
-            await deleteAllData();
-            process.exit(0);
-        }
+        if (mode === "-d") await deleteAll();
+        if (mode === "-i") await seedAll();
 
-        if (mode === '-i') {
-            await seedAdmin();
-            await seedUsers(20);
-            const categories = await seedCategories(5);
-            const subCategories = await seedSubCategories(categories, 2);
-            const brands = await seedBrands(5);
-            await seedProducts({ categories, subCategories, brands }, 20);
-            console.log("Seeding completed. You can now login and test the platform.");
-            process.exit(0);
-        }
+        await mongoose.disconnect();
+        process.exit(0);
     } catch (err) {
-        console.error("Seeding failed:", err);
+        console.error("❌ Seeding failed:", err.message);
         process.exit(1);
     }
-})();
+};
+
+run();

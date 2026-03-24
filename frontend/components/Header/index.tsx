@@ -6,7 +6,7 @@ import { ShoppingCartIcon, HeartIcon } from '@heroicons/react/24/outline';
 
 function Header() {
     return (
-        <header>
+        <header className="border-b-[1.5px] border-gray-300">
             <div className="header-banner bg-black">
                 <Container className="relative flex justify-center items-center space-x-86 p-4 text-white">
                     <p className="text-center m-0">Summer Sale For All Swim Suits And Free Express Delivery - OFF 50%! <a className="underline" href="#">ShopNow</a></p>
