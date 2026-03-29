@@ -1,7 +1,7 @@
 import React from 'react'
-import Container from '../Container'
-import { CollapsibleTree } from '../CollapsibleTree'
-import { CarouselPlugin } from '../CarouselPlugin'
+import Container from '../../Container'
+import { CollapsibleTree } from '../../CollapsibleTree'
+import { CarouselPlugin } from '../../CarouselPlugin'
 
 function HeaderCarouselSection() {
     return (

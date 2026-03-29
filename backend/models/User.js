@@ -21,7 +21,7 @@ let userSchema = new mongoose.Schema(
             required: [true, 'Email is required'],
             unique: [true, 'Email already exists'],
             trim: true,
-            lowercase: true,
+            lowercase: true, // بيخلي الايميل يتخزن lowercase دايماً
         },
         phone: {
             type: String,
@@ -30,7 +30,7 @@ let userSchema = new mongoose.Schema(
         profileImage: String,
         password: {
             type: String,
-            trim: true,
+            required: [true, 'Password is required'], // مهم جداً عشان ما يسجلش بدون باسورد
             minlength: [6, 'Password must be at least 6 characters long'],
             select: false,
         },
@@ -67,24 +67,23 @@ let setImageUrl = function (doc) {
     }
 };
 
-userSchema.pre('save', function (next) {
-    if (this.isModified('password')) {
-        this.password = bcryptjs.hashSync(this.password, 10);
-    }
+// استخدام Async/Await هنا أفضل وأضمن في Mongoose
+userSchema.pre('save', async function (next) {
+    if (!this.isModified('password')) return next();
 
+    // تشفير الباسورد
+    this.password = await bcryptjs.hash(this.password, 10);
     next();
 });
 
 userSchema.post('init', doc => setImageUrl(doc));
-
 userSchema.post('save', doc => setImageUrl(doc));
 
 userSchema.post(/delete/, async function (doc, next) {
     if (doc.profileImage) {
         if (!doc.profileImage.startsWith("http")) {
             fs.unlink(doc.profileImage, (err) => {
-                if (err)
-                    console.log(err.message);
+                if (err) console.log(err.message);
             })
         }
     }

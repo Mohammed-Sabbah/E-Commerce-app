@@ -4,6 +4,7 @@ const { createToken } = require('../utils/JWTs');
 const {
     signup,
     login,
+    logout,
     forgetPassword,
     verifyResetCode,
     resetPassword
@@ -72,5 +73,8 @@ router.post("/login", loginValidator, login);
 router.post("/forgetPassword", forgetPasswordValidator, forgetPassword);
 router.post("/verifyResetCode", verifyResetCodeValidator, verifyResetCode);
 router.patch("/resetPassword", resetPasswordValidator, resetPassword);
+
+
+router.post("/logout", logout);
 
 module.exports = router;

@@ -1,15 +1,14 @@
-import React from 'react'
-import Container from '../Container'
-import SectionTitle from './SectionTitel'
-import { CardsCarousel } from '../CarouselPlugin/CardsCarousel'
+import React, { Suspense } from 'react'
+import Container from '../../Container'
+import SectionTitle from '../SectionTitel'
+import { CardsCarousel } from '../../CarouselPlugin/CardsCarousel'
 import StyledButton from "@/components/StyledButton"
 import type { Product } from '@/types/api'
+import OurProductsCarousel from './OurProductsCarousel'
+import SectionSkeleton from '../ProductsSkeleton'
 
-interface OurProductsSectionProps {
-    products: Product[];
-}
 
-function OurProductsSection({ products }: OurProductsSectionProps) {
+function OurProductsSection() {
     return (
         <section className="py-17">
             <Container>
@@ -17,8 +16,9 @@ function OurProductsSection({ products }: OurProductsSectionProps) {
                     <SectionTitle Category="Our Products" title="Explore Our Products" />
                 </div>
                 <div className="pt-5">
-                    <CardsCarousel type="products-grid" data={products} />
-                </div>
+                    <Suspense fallback={<SectionSkeleton />}>
+                        <OurProductsCarousel />
+                    </Suspense>                </div>
                 <div className="flex justify-center pt-16">
                     <StyledButton title="View All Products" />
                 </div>

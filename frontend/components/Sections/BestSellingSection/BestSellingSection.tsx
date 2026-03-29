@@ -1,15 +1,14 @@
-import React from 'react'
-import Container from '../Container'
-import SectionTitle from './SectionTitel'
-import ProductCard from '../ProductCard'
+import React, { Suspense } from 'react'
+import Container from '../../Container'
+import SectionTitle from '../SectionTitel'
+import ProductCard from '../../ProductCard'
 import StyledButton from "@/components/StyledButton"
 import type { Product } from '@/types/api'
+import BestSellingCarousel from './BestSellingCarousel'
+import SectionSkeleton from '../ProductsSkeleton'
 
-interface BestSellingSectionProps {
-    products: Product[];
-}
 
-function BestSellingSection({ products }: BestSellingSectionProps) {
+function BestSellingSection() {
     return (
         <section>
             <Container>
@@ -20,9 +19,9 @@ function BestSellingSection({ products }: BestSellingSectionProps) {
                     <StyledButton title="View All" ClassName="px-9 py-3.5 h-12" />
                 </div>
                 <div className="pt-5 flex flex-wrap justify-between">
-                    {products.slice(0, 4).map((product) => (
-                        <ProductCard key={product._id} product={product} className="max-w-68 basis-full" />
-                    ))}
+                    <Suspense fallback={<SectionSkeleton />}>
+                        <BestSellingCarousel />
+                    </Suspense>
                 </div>
             </Container>
         </section>

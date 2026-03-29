@@ -2,6 +2,9 @@ import Link from "next/link"
 import Container from "../Container"
 import SearchInput from "../SearchInput"
 import { ShoppingCartIcon, HeartIcon } from '@heroicons/react/24/outline';
+import { logout } from "@/services/authService";
+import LogoutButton from "../StyledButton/LogoutButton";
+import UserMenu from "../UserMenu";
 
 
 function Header() {
@@ -23,13 +26,16 @@ function Header() {
                         <li><Link href="/">Sign Up</Link></li>
                     </ul>
                     <div className="flex space-x-5">
-                        <SearchInput/>
+                        <SearchInput />
                         <button className="relative">
                             <HeartIcon className="h-6 w-6" />
                         </button>
                         <button className="relative">
                             <ShoppingCartIcon className="h-6 w-6" />
                         </button>
+                        <UserMenu />
+                        {/* <LogoutButton /> */}
+
                     </div>
                 </Container>
             </nav>

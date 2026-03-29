@@ -8,6 +8,8 @@ const hpp = require('hpp');
 const helmet = require("helmet");
 const sanitizer = require("express-mongo-sanitize");
 const xss = require("xss-clean");
+const cookieParser = require('cookie-parser');
+
 
 // import strategy
 const strategies = require('./config/passport');
@@ -21,6 +23,8 @@ const CustomError = require("./utils/CustomError");
 
 let app = express();
 
+app.use(cookieParser());
+
 // use strategies
 passport.use(strategies.googleStrategy);
 passport.use(strategies.facebookStrategy);
@@ -32,7 +36,7 @@ app.post("/api/v1/webhook", express.raw({ type: "application/json" }), webhook);
 // rate limiter
 const authLimiter = expressLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 3, // limit each IP to 100 requests per windowMs
+    max: 10, // limit each IP to 100 requests per windowMs
     message: "Too many requests, please try again later."
 });
 

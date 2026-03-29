@@ -1,6 +1,6 @@
 import React from 'react'
-import Container from '../Container'
-import CatigoryHero from '../CatigoryHero'
+import Container from '../../Container'
+import CatigoryHero from '../../CatigoryHero'
 
 function CatigoryHeroSection() {
     return (

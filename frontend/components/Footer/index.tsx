@@ -47,8 +47,8 @@ function Footer() {
                     <div>
                         <h3 className="text-lg font-semibold mb-4">Download App</h3>
                         <ul className="space-y-2 text-sm">
-                            <li><a href="#" className="hover:text-gray-300">Women's Fashion</a></li>
-                            <li><a href="#" className="hover:text-gray-300">Men's Fashion</a></li>
+                            <li><a href="#" className="hover:text-gray-300">{"Women's Fashion"}</a></li>
+                            <li><a href="#" className="hover:text-gray-300">{"Men's Fashion"}</a></li>
                             <li><a href="#" className="hover:text-gray-300">Electronics</a></li>
                             <li><a href="#" className="hover:text-gray-300">Accessories</a></li>
                         </ul>

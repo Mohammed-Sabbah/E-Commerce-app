@@ -1,6 +1,6 @@
 import React from 'react'
-import Container from '../Container'
-import Features from '../Features'
+import Container from '../../Container'
+import Features from '../../Features'
 
 function FeaturesSection() {
     return (

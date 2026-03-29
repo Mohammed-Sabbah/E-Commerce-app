@@ -68,12 +68,16 @@ export interface ProductsResponse {
 }
 
 export interface ProductParams {
-    limit?: number;
     page?: number;
-    sort?: string;
+    limit?: number;
+    sort?: string;           // مثال: "-sold" | "-createdAt"
+    select?: string;         // مثال: "name,price,image"
+    keyword?: string;        // بحث في name و description
     category?: string;
-    brand?: string;
-    search?: string;
-    "price[gte]"?: number;
+    "priceAfterDiscount[gt]"?: number;   // فلتر المخفضات
+    "priceAfterDiscount[gte]"?: number;
     "price[lte]"?: number;
+    "price[gte]"?: number;
+    [key: string]: string | number | undefined; // لأي فلتر إضافي
 }
+

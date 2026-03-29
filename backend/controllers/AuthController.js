@@ -54,14 +54,15 @@ let signup = asyncErrorHandler(async function (req, res) {
 let login = asyncErrorHandler(async function (req, res) {
     let { email, password } = req.body;
 
-    // Ensure password is selected
-    let user = await User.findOne({ email }).select('+password');
+    let user = await User.findOne({ email: email.toLowerCase().trim() }).select('+password');
 
-    if (!user || !bcryptjs.compareSync(password, user.password))
+    if (!user || !(await bcryptjs.compare(password, user.password)))
         throw new CustomError("Email or password is wrong", 400);
 
     if (!user.isActive)
         throw new CustomError("Your account has been deactivated", 403);
+
+    user.password = undefined;
 
     sendRes(res, 200, user);
 });
@@ -136,9 +137,25 @@ let resetPassword = asyncErrorHandler(async function (req, res) {
     sendRes(res, 200, user);
 });
 
+
+
+let logout = asyncErrorHandler(async function (req, res) {
+    res.clearCookie("token", {
+        httpOnly: true,
+        sameSite: 'strict',
+        secure: process.env.NODE_ENV === 'production'
+    });
+
+    res.status(200).json({
+        status: "success",
+        message: "Logged out successfully"
+    });
+});
+
 module.exports = {
     signup,
     login,
+    logout,
     forgetPassword,
     verifyResetCode,
     resetPassword

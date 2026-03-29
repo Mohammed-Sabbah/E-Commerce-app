@@ -1,7 +1,7 @@
 import React from 'react'
-import Container from '../Container'
-import SectionTitle from './SectionTitel'
-import NewArrival from '../NewArrival'
+import Container from '../../Container'
+import SectionTitle from '../SectionTitel'
+import NewArrival from '../../NewArrival'
 
 function NewArrivalSection() {
     return (
