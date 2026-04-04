@@ -9,6 +9,7 @@ import {
     ArrowRightOnRectangleIcon,
     Cog6ToothIcon,
 } from "@heroicons/react/24/outline";
+import LogoutButton from "../StyledButton/LogoutButton";
 
 function UserMenu() {
     const [open, setOpen] = useState(false);
@@ -26,50 +27,51 @@ function UserMenu() {
     }, []);
 
     return (
-        <div className="relative" ref={menuRef}>
+        <div className="relative flex items-center" ref={menuRef}>
             {/* زر اليوزر */}
             <button
                 onClick={() => setOpen(!open)}
-                className={`rounded-full p-2 transition ${
-                    open ? "bg-orange-500 text-white" : "bg-red-500 text-white"
-                }`}
+                className={`rounded-full transition p-1 ${open ? "bg-[#DB4444] text-white" : " text-black"
+                    }`}
             >
-                <UserIcon className="h-5 w-5" />
+                <UserIcon className="h-6 w-6" />
             </button>
+
 
             {/* القائمة */}
             {open && (
-                <div className="absolute right-0 mt-3 w-56 rounded-xl p-3
-                bg-black/25 backdrop-blur-xl border border-white/20
-                shadow-2xl text-white">
+                <div className="absolute right-0 mt-3 w-56 top-full rounded-[5px] p-3
+                bg-black/40 backdrop-blur-xl border border-white/20
+                shadow-2xl text-white z-10">
 
                     <ul className="space-y-3 text-sm">
 
-                        <li className="flex items-center gap-2 cursor-pointer hover:text-[#DB4444] transition">
-                            <Cog6ToothIcon className="w-5 h-5" />
+                        <li className="flex items-center gap-2 px-2.5 py-2 rounded-md cursor-pointer
+    text-white/75 hover:text-white hover:bg-white/[0.08] transition-all text-sm">                            <Cog6ToothIcon className="w-5 h-5" />
                             Manage My Account
                         </li>
 
-                        <li className="flex items-center gap-2 cursor-pointer hover:text-[#DB4444] transition">
-                            <ShoppingBagIcon className="w-5 h-5" />
+                        <li className="flex items-center gap-2 px-2.5 py-2 rounded-md cursor-pointer
+    text-white/75 hover:text-white hover:bg-white/[0.08] transition-all text-sm">                            <ShoppingBagIcon className="w-5 h-5" />
                             My Order
                         </li>
 
-                        <li className="flex items-center gap-2 cursor-pointer hover:text-[#DB4444] transition">
-                            <XCircleIcon className="w-5 h-5" />
+                        <li className="flex items-center gap-2 px-2.5 py-2 rounded-md cursor-pointer
+    text-white/75 hover:text-white hover:bg-white/[0.08] transition-all text-sm">                            <XCircleIcon className="w-5 h-5" />
                             My Cancellations
                         </li>
 
-                        <li className="flex items-center gap-2 cursor-pointer hover:text-[#DB4444] transition">
-                            <StarIcon className="w-5 h-5" />
+                        <li className="flex items-center gap-2 px-2.5 py-2 rounded-md cursor-pointer
+    text-white/75 hover:text-white hover:bg-white/[0.08] transition-all text-sm">                            <StarIcon className="w-5 h-5" />
                             My Reviews
                         </li>
 
                         <li className="border-t border-white/20 pt-2 mt-2">
-                            <button className="flex items-center gap-2 w-full text-left hover:text-[#DB4444] transition">
+                            <LogoutButton className="flex items-center cursor-pointer gap-2 w-full text-left px-2.5 py-2 rounded-md
+    text-white/75 hover:text-[rgb(250,40,40)] hover:bg-[#DB4444]/20 transition-all text-sm">
                                 <ArrowRightOnRectangleIcon className="w-5 h-5" />
                                 Logout
-                            </button>
+                            </LogoutButton>
                         </li>
 
                     </ul>

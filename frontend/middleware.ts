@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 // المسارات المحمية (التي تتطلب تسجيل دخول)
-const protectedRoutes = ['/', '/profile', '/orders', '/dashboard'];
+const protectedRoutes = [ '/wishlist', '/profile', '/orders', '/dashboard'];
 // مسارات الضيوف (التي لا يمكن دخولها إذا كنت مسجل دخول)
 const authRoutes = ['/login', '/register'];
 

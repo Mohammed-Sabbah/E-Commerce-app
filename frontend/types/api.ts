@@ -58,6 +58,18 @@ export interface Product {
     createdAt: string;
     updatedAt: string;
 }
+export interface WishlistProduct {
+    _id: string;
+    name: string;
+    price: number;
+    priceAfterDiscount?: number;
+    coverImage: string;
+    category: { name: string } | string;
+    subCategory: { name: string }[] | string[];
+    brand: { name: string } | string | null;
+    avgRatings: number;
+
+}
 
 export interface ProductsResponse {
     status: string;

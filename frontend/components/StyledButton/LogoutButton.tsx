@@ -1,11 +1,13 @@
 'use client'
 import { useLogout } from '@/hooks/useLogout'
+import LoadingSvg from '../LoadingSvg'
 
-function LogoutButton() {
+function LogoutButton({ children, className }: { children: React.ReactNode, className: string }) {
   const { mutate: logout, isPending } = useLogout()
   return (
-    <button onClick={() => logout()} disabled={isPending}>
-      {isPending ? "Logging out..." : "Logout"}
+    <button className={className} onClick={() => logout()} disabled={isPending}>
+      {children}
+      {isPending ? <LoadingSvg/> : ""}
     </button>
   )
 }

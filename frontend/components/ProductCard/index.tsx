@@ -1,16 +1,48 @@
-import Image from 'next/image'
-import React from 'react'
 import { StarsComponent } from './StarsComponent'
-import { EyeIcon, HeartIcon } from '@heroicons/react/24/outline';
-import type { Product } from '@/types/api';
+import { EyeIcon, TrashIcon } from '@heroicons/react/24/outline';
+import HearIconButton from './HeartIconButton';
+import DeleteIconButton from './DeleteIconButton';
+
+type ProductCardData = {
+    _id: string;
+    name: string;
+    price: number;
+    priceAfterDiscount?: number;
+    coverImage?: string;
+    brand?: { name: string } | string | null;
+    avgRatings: number;
+    ratingsQuantity?: number;
+    colors?: string[];
+};
 
 interface ProductCardProps {
-    product: Product;
+    product: ProductCardData;
     className?: string;
+    variant?: "default" | "wishlist";
 }
 
-function ProductCard({ product, className }: ProductCardProps) {
-    const discount = product.priceAfterDiscount
+function ProductCard({ product, className, variant = "default" }: ProductCardProps) {
+
+    const config = {
+        default: {
+            showRating: true,
+            showEye: true,
+            showWishlist: true,
+            showDelete: false,
+            showAddToCart: false,
+        },
+        wishlist: {
+            showRating: false,
+            showEye: false,
+            showWishlist: false,
+            showDelete: true,
+            showAddToCart: true,
+        },
+    };
+
+    const current = config[variant];
+
+    const discount = product?.priceAfterDiscount
         ? Math.round((1 - product.priceAfterDiscount / product.price) * 100)
         : null;
 
@@ -21,12 +53,22 @@ function ProductCard({ product, className }: ProductCardProps) {
     return (
         <div className={`${className}`}>
             <div className='h-63 relative group'>
-                <img
-                    src={product.coverImage}
-                    alt={product.name}
-                    className='w-full h-full object-cover'
-                />
-                <button className='absolute bottom-0 right-0 w-full bg-black text-white px-4 py-2 rounded-none cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity'>
+                {product.coverImage && (
+                    <img
+                        src={product.coverImage}
+                        alt={product.name}
+                        className='w-full h-full object-cover'
+                    />
+                )}
+
+                {/* Add To Cart */}
+                <button
+                    className={`
+                        absolute bottom-0 right-0 w-full bg-black text-white px-4 py-2 
+                        rounded-none cursor-pointer transition-opacity
+                        ${current.showAddToCart ? "opacity-100" : "opacity-0 group-hover:opacity-100"}
+                    `}
+                >
                     Add To Cart
                 </button>
 
@@ -36,33 +78,47 @@ function ProductCard({ product, className }: ProductCardProps) {
                     </span>
                 )}
 
-                <button className='bg-white/80 hover:bg-white w-9 h-9 rounded-full absolute top-2.5 right-2.5 cursor-pointer flex items-center justify-center transition-all'>
-                    <HeartIcon className="h-6 w-6 text-center translate-y-[1px]" />
-                </button>
-                <button className='bg-white/80 hover:bg-white w-9 h-9 rounded-full absolute top-13.5 right-2.5 cursor-pointer flex items-center justify-center'>
-                    <EyeIcon className="h-6 w-6 text-center translate-y-[1px]" />
-                </button>
+                {/* Wishlist / Delete */}
+                {current.showWishlist && (
+                    <HearIconButton productId={product._id} />
+                )}
+
+                {current.showDelete && (
+                    <DeleteIconButton productId={product._id} />
+                )}
+
+                {/* Eye */}
+                {current.showEye && (
+                    <button className='bg-white/80 hover:bg-white w-9 h-9 rounded-full absolute top-13.5 right-2.5 cursor-pointer flex items-center justify-center'>
+                        <EyeIcon className="h-6 w-6 text-center translate-y-[1px]" />
+                    </button>
+                )}
             </div>
 
             <div className='pt-3'>
                 <h3 className='text-[1rem] font-[500]'>{product.name}</h3>
+
                 <p className='text-[1rem] font-[500] space-x-3 py-2'>
                     <span className='text-[#DB4444]'>
                         ${product.priceAfterDiscount ?? product.price}
                     </span>
+
                     {product.priceAfterDiscount && (
                         <span className='line-through text-black opacity-50'>
                             ${product.price}
                         </span>
                     )}
                 </p>
-                <StarsComponent
-                    rating={product.avgRatings}
-                    size={16}
-                    reviews={product.ratingsQuantity}
-                />
 
-                {product.colors.length > 0 && (
+                {current.showRating && (
+                    <StarsComponent
+                        rating={product.avgRatings}
+                        size={16}
+                        reviews={product.ratingsQuantity ?? 0}
+                    />
+                )}
+
+                {product.colors?.length ? (
                     <div className='flex gap-2 items-center py-2 px-1'>
                         {product.colors.map((color, i) => (
                             <input
@@ -74,7 +130,7 @@ function ProductCard({ product, className }: ProductCardProps) {
                             />
                         ))}
                     </div>
-                )}
+                ) : null}
             </div>
         </div>
     )

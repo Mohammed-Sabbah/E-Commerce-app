@@ -1,13 +1,11 @@
-import Link from "next/link"
 import Container from "../Container"
-import SearchInput from "../SearchInput"
-import { ShoppingCartIcon, HeartIcon } from '@heroicons/react/24/outline';
-import { logout } from "@/services/authService";
-import LogoutButton from "../StyledButton/LogoutButton";
-import UserMenu from "../UserMenu";
+import { cookies } from "next/headers";
+import NavBar from "./NavBar";
 
 
-function Header() {
+async function Header() {
+    const token = (await cookies()).get("token")?.value;
+
     return (
         <header className="border-b-[1.5px] border-gray-300">
             <div className="header-banner bg-black">
@@ -16,29 +14,7 @@ function Header() {
                     <button className="absolute right-4 top-4">English</button>
                 </Container>
             </div>
-            <nav className="bg-white text-black pt-8">
-                <Container className="flex items-center justify-between p-3">
-                    <div className="logo text-2xl font-bold">Exclusive</div>
-                    <ul className="flex space-x-8">
-                        <li><Link href="/">Home</Link></li>
-                        <li><Link href="/">Contact</Link></li>
-                        <li><Link href="/">About</Link></li>
-                        <li><Link href="/">Sign Up</Link></li>
-                    </ul>
-                    <div className="flex space-x-5">
-                        <SearchInput />
-                        <button className="relative">
-                            <HeartIcon className="h-6 w-6" />
-                        </button>
-                        <button className="relative">
-                            <ShoppingCartIcon className="h-6 w-6" />
-                        </button>
-                        <UserMenu />
-                        {/* <LogoutButton /> */}
-
-                    </div>
-                </Container>
-            </nav>
+            <NavBar token={token}/>
         </header>
     )
 }
