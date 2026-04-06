@@ -1,15 +1,15 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { HeartIcon } from "@heroicons/react/24/outline";
-import { useWishlist } from "@/hooks/useWishlist";
+import { ShoppingCartIcon } from "@heroicons/react/24/outline";
+import { useCart } from "@/hooks/useCart";
 import { useRouter } from "next/navigation";
 
-function HeaderHeartButton() {
-    const { wishlist } = useWishlist();
+function HeaderCartButton() {
+    const { cart } = useCart();
     const router = useRouter();
 
-    const count = wishlist.length;
+    const count = cart?.cartItems?.length || 0;
     const displayCount = count > 99 ? "99+" : count;
 
     const [animate, setAnimate] = useState(false);
@@ -30,13 +30,14 @@ function HeaderHeartButton() {
             clearTimeout(timeout);
         };
     }, [count]);
+
     return (
         <button
-            onClick={() => router.push("/wishlist")}
+            onClick={() => router.push("/cart")}
             className="relative flex items-center justify-center cursor-pointer"
         >
             {/* الأيقونة */}
-            <HeartIcon className="h-6 w-6 transition-transform duration-200 hover:scale-120" />
+            <ShoppingCartIcon className="h-6 w-6 transition-transform duration-200 hover:scale-120" />
 
             {/* البادج */}
             {count > 0 && (
@@ -58,4 +59,4 @@ function HeaderHeartButton() {
     );
 }
 
-export default HeaderHeartButton;
+export default HeaderCartButton;

@@ -6,8 +6,13 @@ const CustomError = require("../utils/CustomError");
 
 
 const getLoggedUserCart = asyncErrorHandler(async function (req, res) {
-    let cart = await Cart.findOne({ user: req.user.id });
+    let cart = await Cart.findOne({ user: req.user.id })
+        .populate({
+            path: "cartItems.product",
+            select: "name price priceAfterDiscount coverImage slug",
+        });
 
+        
     if (!cart) {
         cart = await Cart.create({
             user: req.user.id
@@ -23,10 +28,11 @@ const getLoggedUserCart = asyncErrorHandler(async function (req, res) {
 });
 
 const addToCart = asyncErrorHandler(async function (req, res) {
-    const { product: productId, quantity, color } = req.body;
-
+    const { productId, quantity, color } = req.body;
     const product = await Product.findById(productId);
     let cart = await Cart.findOne({ user: req.user });
+
+
 
     // 1- user don't have cart
     if (!cart) {

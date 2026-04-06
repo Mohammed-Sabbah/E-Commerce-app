@@ -22,69 +22,69 @@ const fetchJson = async (url) => {
 };
 
 // ─── models ──────────────────────────────────────────────────
-const Category   = require("../models/Category");
+const Category = require("../models/Category");
 const SubCategory = require("../models/SubCategory");
-const Brand      = require("../models/Brand");
-const Product    = require("../models/Product");
-const User       = require("../models/User");
-const Cart       = require("../models/Cart");
-const Order      = require("../models/Order");
-const Review     = require("../models/Review");
-const Coupon     = require("../models/Coupon");
+const Brand = require("../models/Brand");
+const Product = require("../models/Product");
+const User = require("../models/User");
+const Cart = require("../models/Cart");
+const Order = require("../models/Order");
+const Review = require("../models/Review");
+const Coupon = require("../models/Coupon");
 
 // ─── data ────────────────────────────────────────────────────
 const CATEGORY_MAP = {
-    "beauty":               ["Beauty Skincare", "Beauty Makeup"],
-    "fragrances":           ["Fragrances Perfumes", "Fragrances Body Sprays"],
-    "furniture":            ["Furniture Living Room", "Furniture Bedroom"],
-    "groceries":            ["Groceries Fruits Vegetables", "Groceries Dairy"],
-    "home-decoration":      ["Home Wall Art", "Home Lighting"],
-    "kitchen-accessories":  ["Kitchen Cookware", "Kitchen Storage"],
-    "laptops":              ["Gaming Laptops", "Business Laptops"],
-    "mens-shirts":          ["Mens Casual Shirts", "Mens Formal Shirts"],
-    "mens-shoes":           ["Mens Sneakers", "Mens Boots"],
-    "mens-watches":         ["Mens Luxury Watches", "Mens Sport Watches"],
-    "mobile-accessories":   ["Mobile Cases", "Mobile Chargers"],
-    "motorcycle":           ["Motorcycle Parts", "Motorcycle Gear"],
-    "skin-care":            ["Skincare Face", "Skincare Body"],
-    "smartphones":          ["Android Phones", "iPhones"],
-    "sports-accessories":   ["Sports Gym", "Sports Outdoor"],
-    "sunglasses":           ["Men Sunglasses", "Women Sunglasses"],
-    "tablets":              ["Android Tablets", "iPads"],
-    "tops-for-women":       ["Women T-Shirts", "Women Blouses"],
-    "vehicle":              ["Vehicle Cars", "Vehicle SUVs"],
-    "womens-bags":          ["Womens Handbags", "Womens Backpacks"],
-    "womens-dresses":       ["Casual Dresses", "Evening Dresses"],
-    "womens-jewellery":     ["Jewellery Necklaces", "Jewellery Rings"],
-    "womens-shoes":         ["Womens Heels", "Womens Flats"],
-    "womens-watches":       ["Womens Luxury Watches", "Womens Sport Watches"],
+    "beauty": ["Beauty Skincare", "Beauty Makeup"],
+    "fragrances": ["Fragrances Perfumes", "Fragrances Body Sprays"],
+    "furniture": ["Furniture Living Room", "Furniture Bedroom"],
+    "groceries": ["Groceries Fruits Vegetables", "Groceries Dairy"],
+    "home-decoration": ["Home Wall Art", "Home Lighting"],
+    "kitchen-accessories": ["Kitchen Cookware", "Kitchen Storage"],
+    "laptops": ["Gaming Laptops", "Business Laptops"],
+    "mens-shirts": ["Mens Casual Shirts", "Mens Formal Shirts"],
+    "mens-shoes": ["Mens Sneakers", "Mens Boots"],
+    "mens-watches": ["Mens Luxury Watches", "Mens Sport Watches"],
+    "mobile-accessories": ["Mobile Cases", "Mobile Chargers"],
+    "motorcycle": ["Motorcycle Parts", "Motorcycle Gear"],
+    "skin-care": ["Skincare Face", "Skincare Body"],
+    "smartphones": ["Android Phones", "iPhones"],
+    "sports-accessories": ["Sports Gym", "Sports Outdoor"],
+    "sunglasses": ["Men Sunglasses", "Women Sunglasses"],
+    "tablets": ["Android Tablets", "iPads"],
+    "tops-for-women": ["Women T-Shirts", "Women Blouses"],
+    "vehicle": ["Vehicle Cars", "Vehicle SUVs"],
+    "womens-bags": ["Womens Handbags", "Womens Backpacks"],
+    "womens-dresses": ["Casual Dresses", "Evening Dresses"],
+    "womens-jewellery": ["Jewellery Necklaces", "Jewellery Rings"],
+    "womens-shoes": ["Womens Heels", "Womens Flats"],
+    "womens-watches": ["Womens Luxury Watches", "Womens Sport Watches"],
 };
 
 const CATEGORY_PHOTOS = {
-    "beauty":               "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400",
-    "fragrances":           "https://images.unsplash.com/photo-1541643600914-78b084683702?w=400",
-    "furniture":            "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400",
-    "groceries":            "https://images.unsplash.com/photo-1542838132-92c53300491e?w=400",
-    "home-decoration":      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400",
-    "kitchen-accessories":  "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400",
-    "laptops":              "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400",
-    "mens-shirts":          "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=400",
-    "mens-shoes":           "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400",
-    "mens-watches":         "https://images.unsplash.com/photo-1523170335258-f4f3f4f2fd59?w=400",
-    "mobile-accessories":   "https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=400",
-    "motorcycle":           "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400",
-    "skin-care":            "https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=400",
-    "smartphones":          "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400",
-    "sports-accessories":   "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=400",
-    "sunglasses":           "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400",
-    "tablets":              "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=400",
-    "tops-for-women":       "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400",
-    "vehicle":              "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=400",
-    "womens-bags":          "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400",
-    "womens-dresses":       "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400",
-    "womens-jewellery":     "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400",
-    "womens-shoes":         "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=400",
-    "womens-watches":       "https://images.unsplash.com/photo-1508057198894-247b23fe5ade?w=400",
+    "beauty": "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400",
+    "fragrances": "https://images.unsplash.com/photo-1541643600914-78b084683702?w=400",
+    "furniture": "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400",
+    "groceries": "https://images.unsplash.com/photo-1542838132-92c53300491e?w=400",
+    "home-decoration": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400",
+    "kitchen-accessories": "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400",
+    "laptops": "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400",
+    "mens-shirts": "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=400",
+    "mens-shoes": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400",
+    "mens-watches": "https://images.unsplash.com/photo-1523170335258-f4f3f4f2fd59?w=400",
+    "mobile-accessories": "https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=400",
+    "motorcycle": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400",
+    "skin-care": "https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=400",
+    "smartphones": "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400",
+    "sports-accessories": "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=400",
+    "sunglasses": "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400",
+    "tablets": "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=400",
+    "tops-for-women": "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400",
+    "vehicle": "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=400",
+    "womens-bags": "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400",
+    "womens-dresses": "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400",
+    "womens-jewellery": "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400",
+    "womens-shoes": "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=400",
+    "womens-watches": "https://images.unsplash.com/photo-1508057198894-247b23fe5ade?w=400",
 };
 
 // ─── delete ──────────────────────────────────────────────────
@@ -162,9 +162,27 @@ const seedAll = async () => {
     const brandByName = {};
     brandDocs.forEach((b) => (brandByName[b.name] = b._id));
 
+
+    
     // 4. Products
     console.log("📦 Seeding products...");
     const { products } = await fetchJson("https://dummyjson.com/products?limit=194");
+
+    // ألوان أساسية
+    const baseColors = ["black", "white", "red", "blue", "green", "yellow", "gray"];
+
+    // function نظيفة بدون تخريب الـ array الأصلي
+    const getRandomColors = () => {
+        const shuffled = [...baseColors].sort(() => 0.5 - Math.random());
+        const selected = shuffled.slice(0, Math.floor(Math.random() * 3) + 2);
+
+        // تأكد الأسود موجود
+        if (!selected.includes("black")) {
+            selected.push("black");
+        }
+
+        return selected;
+    };
 
     const fallbackCatId = categoryDocs[0]._id;
     const fallbackSubIds = subsByCatId[fallbackCatId.toString()] || [];
@@ -173,12 +191,16 @@ const seedAll = async () => {
         const catSlug = slug(p.category);
         const matchedCatId = categoryBySlug[catSlug];
         const catId = matchedCatId || fallbackCatId;
-        const subCatIds = matchedCatId ? subsByCatId[catId.toString()] || [] : fallbackSubIds;
+        const subCatIds = matchedCatId
+            ? subsByCatId[catId.toString()] || []
+            : fallbackSubIds;
+
         const brandId = brandByName[p.brand] || null;
 
-        const description = p.description.length >= 20
-            ? p.description
-            : `${p.description} — ${p.title} is a high quality product.`;
+        const description =
+            p.description.length >= 20
+                ? p.description
+                : `${p.description} — ${p.title} is a high quality product.`;
 
         return {
             name: p.title,
@@ -197,12 +219,13 @@ const seedAll = async () => {
             brand: brandId,
             avgRatings: p.rating,
             ratingsQuantity: Math.floor(Math.random() * 200) + 10,
+
+            colors: getRandomColors(), // 👈 الإضافة المهمة
         };
     });
 
     await Product.insertMany(productData);
     console.log(`   ✅ ${productData.length} products`);
-
     // 5. Users
     console.log("📦 Seeding users...");
     await User.create({

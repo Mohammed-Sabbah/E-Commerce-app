@@ -2,8 +2,9 @@ import { StarsComponent } from './StarsComponent'
 import { EyeIcon, TrashIcon } from '@heroicons/react/24/outline';
 import HearIconButton from './HeartIconButton';
 import DeleteIconButton from './DeleteIconButton';
+import AddToCartButton from './AddToCartButton';
 
-type ProductCardData = {
+export type ProductCardData = {
     _id: string;
     name: string;
     price: number;
@@ -62,15 +63,7 @@ function ProductCard({ product, className, variant = "default" }: ProductCardPro
                 )}
 
                 {/* Add To Cart */}
-                <button
-                    className={`
-                        absolute bottom-0 right-0 w-full bg-black text-white px-4 py-2 
-                        rounded-none cursor-pointer transition-opacity
-                        ${current.showAddToCart ? "opacity-100" : "opacity-0 group-hover:opacity-100"}
-                    `}
-                >
-                    Add To Cart
-                </button>
+                <AddToCartButton product={product} showAddToCart= {current.showAddToCart}/>
 
                 {discount && (
                     <span className='discount-label px-3 py-1 rounded-sm absolute left-2.5 top-2.5 bg-[#DB4444] text-[0.6rem] text-white font-normal'>

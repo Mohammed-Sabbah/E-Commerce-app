@@ -5,7 +5,7 @@ const validationMiddleware = require("../../middlewares/validationMiddleware");
 const CustomError = require("../CustomError");
 
 const addToCartValidator = [
-    validator.check("product")
+    validator.check("productId")
         .notEmpty().withMessage("Product id is required")
         .isMongoId().withMessage("invalid product id format")
         .custom(async (value) => {
@@ -21,8 +21,8 @@ const addToCartValidator = [
         .isString()
         .withMessage("color must be string")
         .custom(async (value, { req }) => {
-            if (req.body.product) {
-                const product = await Product.findById(req.body.product);
+            if (req.body.productId) {
+                const product = await Product.findById(req.body.productId);
                 if (!product)
                     throw new CustomError("No product found", 404);
                 if (!product.colors.includes(value))

@@ -4,6 +4,7 @@ import SearchInput from '../SearchInput'
 import { ShoppingCartIcon, HeartIcon } from '@heroicons/react/24/outline';
 import UserMenu from "../UserMenu";
 import HeaderHeartButton from './HeaderHeartButton';
+import HeaderCartButton from './HeaderCartButton';
 
 
 function NavBar({token}:{token:string | undefined}) {
@@ -20,9 +21,7 @@ function NavBar({token}:{token:string | undefined}) {
                 <div className="flex gap-5">
                     <SearchInput />
                     <HeaderHeartButton/>
-                    <button className="relative  text-center">
-                        <ShoppingCartIcon className="h-6 w-6" />
-                    </button>
+                    <HeaderCartButton/>
                     {token && <UserMenu />}
 
                 </div>
