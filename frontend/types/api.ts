@@ -50,7 +50,7 @@ export interface Product {
     colors: string[];
     coverImage: string;
     images: string[];
-    category: { name: string } | string;
+    category: { name: string };
     subCategory: { name: string }[] | string[];
     brand: { name: string } | string | null;
     avgRatings: number;

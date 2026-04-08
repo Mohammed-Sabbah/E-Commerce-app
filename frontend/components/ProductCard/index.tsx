@@ -3,6 +3,8 @@ import { EyeIcon, TrashIcon } from '@heroicons/react/24/outline';
 import HearIconButton from './HeartIconButton';
 import DeleteIconButton from './DeleteIconButton';
 import AddToCartButton from './AddToCartButton';
+import Link from 'next/link';
+import Image from 'next/image';
 
 export type ProductCardData = {
     _id: string;
@@ -55,15 +57,17 @@ function ProductCard({ product, className, variant = "default" }: ProductCardPro
         <div className={`${className}`}>
             <div className='h-63 relative group'>
                 {product.coverImage && (
-                    <img
+                    <Image
                         src={product.coverImage}
                         alt={product.name}
-                        className='w-full h-full object-cover'
+                        fill
+                        className='object-cover'
+                        sizes="(max-width: 768px) 100vw, 25vw"
                     />
                 )}
 
                 {/* Add To Cart */}
-                <AddToCartButton product={product} showAddToCart= {current.showAddToCart}/>
+                <AddToCartButton product={product} showAddToCart={current.showAddToCart} />
 
                 {discount && (
                     <span className='discount-label px-3 py-1 rounded-sm absolute left-2.5 top-2.5 bg-[#DB4444] text-[0.6rem] text-white font-normal'>
@@ -82,9 +86,9 @@ function ProductCard({ product, className, variant = "default" }: ProductCardPro
 
                 {/* Eye */}
                 {current.showEye && (
-                    <button className='bg-white/80 hover:bg-white w-9 h-9 rounded-full absolute top-13.5 right-2.5 cursor-pointer flex items-center justify-center'>
+                    <Link href={`/products/${product._id}`} className='bg-white/80 hover:bg-white w-9 h-9 rounded-full absolute top-13.5 right-2.5 cursor-pointer flex items-center justify-center'>
                         <EyeIcon className="h-6 w-6 text-center translate-y-[1px]" />
-                    </button>
+                    </Link>
                 )}
             </div>
 

@@ -21,7 +21,7 @@ export async function getProducts(params: ProductParams = {}): Promise<ProductsR
 }
 
 
-export async function getProductById(id: string): Promise<{ data: Product }> {
+export async function getProductById(id: string): Promise<{ data: {doc: Product} }> {
     const res = await fetch(`${API}/api/v1/products/${id}`, {
         next: { revalidate: 60 },
     });
