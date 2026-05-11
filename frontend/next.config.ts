@@ -2,6 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
+    minimumCacheTTL: 3600,
+    dangerouslyAllowSVG: false,
+    unoptimized: process.env.NODE_ENV === "development",
     remotePatterns: [
       {
         protocol: "http",
@@ -14,11 +17,13 @@ const nextConfig: NextConfig = {
         hostname: "images.unsplash.com",
         pathname: "/**",
       },
-      { hostname: "images.unsplash.com" },
       { hostname: "cdn.dummyjson.com" },
       { hostname: "via.placeholder.com" },
       { hostname: "i.pravatar.cc" },
     ],
+  },
+  experimental: {
+    optimizePackageImports: ["lucide-react", "@radix-ui/react-icons"],
   },
 };
 

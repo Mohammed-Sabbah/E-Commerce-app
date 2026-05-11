@@ -1,25 +1,30 @@
-import { Product } from '@/types/api'
-import React from 'react'
-import ProductGallery from './ProductGallery'
-import ProductOptions from './ProductOptions'
-import ProductActions from './ProductActions'
-import { StarsComponent } from '../ProductCard/StarsComponent'
-import { ArrowPathIcon, TruckIcon } from '@heroicons/react/24/outline'
+'use client';
 
-function ProductDetailesComponent({ product }: { product: Product }) {
+import { useState } from 'react';
+import { Product } from '@/types/api';
+import ProductGallery from './ProductGallery';
+import ProductOptions from './ProductOptions';
+import ProductActions from './ProductActions';
+import { StarsComponent } from '../ProductCard/StarsComponent';
+import { ArrowPathIcon, TruckIcon } from '@heroicons/react/24/outline';
 
-    const inStock = product.quantity > 0
+export default function ProductDetailesComponent({ product }: { product: Product }) {
+    const inStock = product.quantity > 0;
+
+    // ── الـ state رفعناه هون عشان ProductOptions و ProductActions يشاركوه ──
+    const [selectedColor, setSelectedColor] = useState<string | null>(product.colors?.[0] ?? null);
+    const [selectedSize, setSelectedSize] = useState<string | null>(null);
 
     const breadcrumbs = [
         { label: 'Account', href: '/account' },
         { label: product.category.name, href: `/category/${product.category.name}` },
         { label: product.name },
-    ]
+    ];
 
     return (
         <main className="max-w-6xl mx-auto px-4 py-6">
             {/* Breadcrumb */}
-            <nav className="flex items-center gap-2 text-sm text-gray-500 mb-8">
+            <nav className="flex flex-wrap items-center gap-2 text-sm text-gray-500 mb-8">
                 {breadcrumbs.map((crumb, i) => (
                     <span key={i} className="flex items-center gap-2">
                         {crumb.href ? (
@@ -41,10 +46,10 @@ function ProductDetailesComponent({ product }: { product: Product }) {
 
                 {/* Right: Info + Options + Actions */}
                 <div className="flex flex-col gap-6">
-                    <div className=''>
+                    <div>
                         <h1 className="text-2xl font-inter font-semibold text-gray-900">{product.name}</h1>
                         <div className="flex items-center gap-3 mt-2">
-                            <StarsComponent rating={product.avgRatings}/>
+                            <StarsComponent rating={product.avgRatings} />
                             <span className="text-sm text-gray-500">({product.ratingsQuantity} Reviews)</span>
                             <span className="w-px h-4 bg-gray-300" />
                             <span className={`text-sm font-medium ${inStock ? 'text-green-500' : 'text-red-500'}`}>
@@ -57,24 +62,39 @@ function ProductDetailesComponent({ product }: { product: Product }) {
 
                     <hr className="border-gray-200" />
 
-                    <ProductOptions colors={product.colors} sizes={[]} />
-                    <ProductActions productId={product._id} inStock={inStock} />
+                    {/* Options — يستقبل الـ state ويرفعه للأب */}
+                    <ProductOptions
+                        colors={product.colors}
+                        sizes={[]}
+                        selectedColor={selectedColor}
+                        selectedSize={selectedSize}
+                        onColorChange={setSelectedColor}
+                        onSizeChange={setSelectedSize}
+                    />
+
+                    {/* Actions — يستقبل المنتج كامل + selectedColor */}
+                    <ProductActions
+                        product={{
+                            _id: product._id,
+                            name: product.name,
+                            price: product.price,
+                            image: product.images?.[0] ?? '',
+                        }}
+                        inStock={inStock}
+                        selectedColor={selectedColor}
+                    />
 
                     {/* Delivery info */}
                     <div className="border border-gray-200 rounded-lg divide-y divide-gray-100">
-                        <div className="flex items-start gap-4 p-4">
-                            <span className="text-2xl">
-                                <TruckIcon className='h-7 w-7' strokeWidth={1} />
-                            </span>
+                        <div className="flex items-center gap-4 p-4">
+                            <TruckIcon className="h-9 w-9 flex-shrink-0" strokeWidth={1} />
                             <div>
                                 <p className="text-sm font-medium text-gray-900">Free Delivery</p>
                                 <p className="text-xs text-gray-500 mt-0.5">Enter your postal code for Delivery Availability</p>
                             </div>
                         </div>
-                        <div className="flex items-start gap-4 p-4">
-                            <span className="text-2xl">
-                                <ArrowPathIcon  className="w-6 h-6"  strokeWidth={1}/>
-                            </span>
+                        <div className="flex items-center gap-4 p-4">
+                            <ArrowPathIcon className="h-9 w-9 flex-shrink-0" strokeWidth={1} />
                             <div>
                                 <p className="text-sm font-medium text-gray-900">Return Delivery</p>
                                 <p className="text-xs text-gray-500 mt-0.5">Free 30 Days Delivery Returns. Details</p>
@@ -84,7 +104,5 @@ function ProductDetailesComponent({ product }: { product: Product }) {
                 </div>
             </div>
         </main>
-    )
+    );
 }
-
-export default ProductDetailesComponent

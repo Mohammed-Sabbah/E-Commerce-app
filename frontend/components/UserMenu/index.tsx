@@ -31,7 +31,7 @@ function UserMenu() {
             {/* زر اليوزر */}
             <button
                 onClick={() => setOpen(!open)}
-                className={`rounded-full transition p-1 ${open ? "bg-[#DB4444] text-white" : " text-black"
+                className={`rounded-full transition p-1 cursor-pointer ${open ? "bg-[#DB4444] text-white" : " text-black"
                     }`}
             >
                 <UserIcon className="h-6 w-6 transition-transform duration-200 hover:scale-120" />

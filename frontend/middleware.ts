@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 // المسارات المحمية (التي تتطلب تسجيل دخول)
-const protectedRoutes = [ '/wishlist', '/profile', '/orders', '/dashboard'];
+const protectedRoutes = ['/wishlist', '/cart', '/checkout', '/profile', '/orders', '/dashboard'];
 // مسارات الضيوف (التي لا يمكن دخولها إذا كنت مسجل دخول)
 const authRoutes = ['/login', '/register'];
 
@@ -34,14 +34,33 @@ export function middleware(request: NextRequest) {
 
 // الـ Matcher مهم جداً لاستثناء ملفات النظام والصور
 export const config = {
+
     matcher: [
-        /*
-         * مطابقة كل المسارات ما عدا:
-         * 1. api (مسارات الـ API)
-         * 2. _next/static (الملفات الاستاتيكية)
-         * 3. _next/image (صور Next.js المحسنة)
-         * 4. favicon.ico (أيقونة الموقع)
-         */
-        '/((?!api|_next/static|_next/image|favicon.ico).*)',
+        '/wishlist',
+        '/wishlist/:path*',
+        '/cart',
+        '/cart/:path*',
+        '/checkout',
+        '/checkout/:path*',
+        '/profile',
+        '/profile/:path*',
+        '/orders',
+        '/orders/:path*',
+        '/dashboard',
+        '/dashboard/:path*',
+        '/login',
+        '/register',
     ],
+
+
+    // matcher: [
+    //     /*
+    //      * مطابقة كل المسارات ما عدا:
+    //      * 1. api (مسارات الـ API)
+    //      * 2. _next/static (الملفات الاستاتيكية)
+    //      * 3. _next/image (صور Next.js المحسنة)
+    //      * 4. favicon.ico (أيقونة الموقع)
+    //      */
+    //     '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    // ],
 };

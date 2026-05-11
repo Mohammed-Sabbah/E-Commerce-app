@@ -7,11 +7,11 @@ function HeaderCarouselSection() {
     return (
         <section>
             <Container className="flex">
-                <div className="flex-1/5">
+                <div className="hidden lg:block flex-1/5">
                     <CollapsibleTree ClassName="p-5 border-r-[1.5px] border-gray-300 max-h-98 overflow-y-auto" />
                 </div>
-                <div className="flex-4/5 p-10 pr-0">
-                    <CarouselPlugin ClassName="rounded-none" />
+                <div className="flex-1 lg:flex-4/5 min-w-0 pl-11 pt-10">
+                    <CarouselPlugin ClassName="rounded-none " />
                 </div>
             </Container>
         </section>

@@ -12,28 +12,29 @@ import { useCart } from "@/hooks/useCart";
 import ProductRow from "./ProductRow";
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import ProductMobileCard from "./ProductMobileCard";
+import type { CartItem } from "@/types/cart";
 
 export default function CartPage() {
+    const router = useRouter();
     const { cart, isLoading, updateCartItem } = useCart();
     const [updates, setUpdates] = useState<{ [key: string]: number }>({});
 
     const handleChange = (id: string, qty: number) => {
-        setUpdates((prev) => ({
-            ...prev,
-            [id]: qty,
-        }));
+        setUpdates((prev) => ({ ...prev, [id]: qty }));
     };
 
     const handleUpdateCart = () => {
         Object.entries(updates).forEach(([id, quantity]) => {
-            updateCartItem({
-                productId: id,
-                quantity,
-            });
+            updateCartItem({ productId: id, quantity });
         });
-
         setUpdates({});
+    };
+
+    // ✅ بدون sessionStorage — الـ checkout بيقرأ الـ cart مباشرة
+    const handleProceedToCheckout = () => {
+        router.push('/checkout');
     };
 
     if (isLoading) return <p className="text-center mt-10">Loading ...</p>;
@@ -42,11 +43,9 @@ export default function CartPage() {
         return <p className="text-center mt-10">Cart is empty</p>;
 
     const subtotal = cart.cartItems.reduce(
-        (acc: number, cartItem: any) => {
+        (acc: number, cartItem: CartItem) => {
             const price = cartItem.product.priceAfterDiscount ?? cartItem.price;
-            
-            return acc + price * cartItem.quantity
-
+            return acc + price * cartItem.quantity;
         },
         0
     );
@@ -71,7 +70,7 @@ export default function CartPage() {
                         </TableHeader>
 
                         <TableBody>
-                            {cart.cartItems.map((item: any) => (
+                            {cart.cartItems.map((item: CartItem) => (
                                 <ProductRow
                                     key={item._id}
                                     cartItem={item}
@@ -85,7 +84,7 @@ export default function CartPage() {
 
                 {/* Mobile */}
                 <div className="md:hidden space-y-4">
-                    {cart.cartItems.map((item: any) => (
+                    {cart.cartItems.map((item: CartItem) => (
                         <ProductMobileCard
                             key={item._id}
                             item={item}
@@ -125,9 +124,7 @@ export default function CartPage() {
                     </div>
 
                     <div className="border rounded-xl p-6 w-full max-w-md md:ml-auto m-auto">
-                        <h2 className="font-semibold mb-4">
-                            Cart Total
-                        </h2>
+                        <h2 className="font-semibold mb-4">Cart Total</h2>
 
                         <div className="flex justify-between mb-2">
                             <span>Subtotal:</span>
@@ -144,7 +141,10 @@ export default function CartPage() {
                             <span>${subtotal.toFixed(2)}</span>
                         </div>
 
-                        <button className="mt-5 w-full bg-[#DB4444] text-white py-3 rounded-md cursor-pointer">
+                        <button
+                            onClick={handleProceedToCheckout}
+                            className="mt-5 w-full bg-[#DB4444] text-white py-3 rounded-md cursor-pointer hover:bg-red-600 transition"
+                        >
                             Proceed to checkout
                         </button>
                     </div>

@@ -3,9 +3,16 @@
 import LoadingSvg from "@/components/LoadingSvg";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { useCart } from "@/hooks/useCart";
+import type { CartItem } from "@/types/cart";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
-function ProductRow({ cartItem, onChange, updates }: any) {
+interface ProductRowProps {
+    cartItem: CartItem;
+    onChange: (id: string, qty: number) => void;
+    updates: Record<string, number>;
+}
+
+function ProductRow({ cartItem, onChange, updates }: ProductRowProps) {
 
     const { removeFromCart, isRemoving } = useCart();
 
@@ -32,12 +39,13 @@ function ProductRow({ cartItem, onChange, updates }: any) {
                 <div className="relative group">
                     <img
                         src={cartItem.product.coverImage}
+                        alt={cartItem.product.name}
                         className="w-12 h-12 object-cover rounded-md"
                     />
 
                     {/* زر الحذف */}
                     <button
-                        onClick={() => removeFromCart(cartItem._id)} // اربطه بالـ API تبعك
+                        onClick={() => removeFromCart(cartItem._id)}
                         className="absolute cursor-pointer top-0 left-0 bg-red-500 text-white p-1 rounded-full 
                         opacity-0 group-hover:opacity-100 
                         transition duration-200"

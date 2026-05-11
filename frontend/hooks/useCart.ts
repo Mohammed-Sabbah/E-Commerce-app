@@ -8,16 +8,17 @@ import {
     updateCartItem
 } from "@/services/cartService";
 import { QUERY_KEYS } from "@/constants/queryKeys";
+import type { CartItem, CartResponse } from "@/types/cart";
 
 export const useCart = () => {
     const queryClient = useQueryClient();
 
-    const { data, isLoading } = useQuery({
+    const { data, isLoading } = useQuery<CartResponse>({
         queryKey: QUERY_KEYS.CART,
         queryFn: getCart,
     });
 
-    const cart = data?.data?.cart || [];
+    const cart = data?.data?.cart;
 
 
     // ➕ Add
@@ -45,7 +46,7 @@ export const useCart = () => {
         },
     });
     const isInCart = (productId: string) => {
-        return cart.some((item: any) => item._id === productId);
+        return cart?.cartItems?.some((item: CartItem) => item._id === productId) ?? false;
     };
 
     return {

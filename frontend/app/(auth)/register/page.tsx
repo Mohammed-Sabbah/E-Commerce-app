@@ -28,7 +28,7 @@ export default function Register() {
 
     const onSubmit = (data: RegisterSchema) => {
         const { confirmPassword, ...rest } = data;
-        registerUser({ ...rest, confirmPassword: confirmPassword });
+        registerUser({ ...rest, passwordConfirm: confirmPassword });
     };
 
     return (

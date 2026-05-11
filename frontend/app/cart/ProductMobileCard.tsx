@@ -2,10 +2,16 @@
 
 import LoadingSvg from "@/components/LoadingSvg";
 import { useCart } from "@/hooks/useCart";
+import type { CartItem } from "@/types/cart";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { useState } from "react";
 
-export default function ProductMobileCard({ item, onChange, updates }: any) {
+interface ProductMobileCardProps {
+    item: CartItem;
+    onChange: (id: string, qty: number) => void;
+    updates: Record<string, number>;
+}
+
+export default function ProductMobileCard({ item, onChange, updates }: ProductMobileCardProps) {
 
     const { removeFromCart, isRemoving } = useCart();
 
@@ -27,6 +33,7 @@ export default function ProductMobileCard({ item, onChange, updates }: any) {
             <div className="relative group w-fit">
                 <img
                     src={item.product.coverImage}
+                    alt={item.product.name}
                     className="w-14 h-14 object-cover rounded-md"
                 />
 

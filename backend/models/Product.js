@@ -95,15 +95,15 @@ productSchema.pre(/^find/, function (next) {
 let setImageUrl = function (doc) {
     if (doc.coverImage) {
         if (!doc.coverImage.startsWith("http")) {
-            let url = `${process.env.BASE_URL}/products/${doc.coverImage}`;
-            doc.coverImage = url;
+            const cleanImage = doc.coverImage.replace(/^\/+/, ""); // ← إزالة / الزيادة
+            doc.coverImage = `${process.env.BASE_URL}/products/${cleanImage}`;
         }
     }
     if (doc.images) {
         doc.images = doc.images.map(image => {
             if (!image.startsWith("http")) {
-                let url = `${process.env.BASE_URL}/products/${image}`;
-                return url;
+                const cleanImage = image.replace(/^\/+/, ""); // ← إزالة / الزيادة
+                return `${process.env.BASE_URL}/products/${cleanImage}`;
             }
             return image;
         });
