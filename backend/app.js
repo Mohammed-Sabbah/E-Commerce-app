@@ -10,7 +10,6 @@ const sanitizer = require("express-mongo-sanitize");
 const xss = require("xss-clean");
 const cookieParser = require('cookie-parser');
 
-
 // import strategy
 const strategies = require('./config/passport');
 
@@ -35,8 +34,8 @@ app.post("/api/v1/webhook", express.raw({ type: "application/json" }), webhook);
 
 // rate limiter
 const authLimiter = expressLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 10, // limit each IP to 100 requests per windowMs
+    windowMs: 15 * 60 * 1000,
+    max: 10,
     message: "Too many requests, please try again later."
 });
 
@@ -47,7 +46,16 @@ app.use(
         credentials: true,
     })
 );
-app.use(helmet());
+
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            imgSrc: ["'self'", "data:", "http://localhost:8000"],
+        }
+    },
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+}));
+
 app.use(morgan("dev"));
 app.use(express.urlencoded({ extended: true, limit: "1kb" }));
 app.use(express.json({ limit: "1kb" }));

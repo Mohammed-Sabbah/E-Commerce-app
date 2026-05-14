@@ -1,16 +1,10 @@
-import React, { Suspense } from 'react'
+import React from 'react'
 import Container from '../../Container'
 import SectionTitle from '../SectionTitel'
 import Timer from '../../Timer'
-import { CardsCarousel } from '../../CarouselPlugin/CardsCarousel'
-import StyledButton from "@/components/StyledButton";
-import { getProducts } from "@/services/server/pruductService";
-import FlashSalesCarousel from './FlashSalesCarousel'
-import SectionSkeleton from '../ProductsSkeleton'
+import StyledButton from '@/components/StyledButton'
 
-
-
-function FlashSalesSection() {
+function FlashSalesSection({ children }: { children: React.ReactNode }) {
     return (
         <section className="mb-16 md:mb-20">
             <Container className="relative">
@@ -18,14 +12,13 @@ function FlashSalesSection() {
                     <Timer />
                 </SectionTitle>
 
-                <div className="pt-5">
-                    <Suspense fallback={<SectionSkeleton />}>
-                        <FlashSalesCarousel />
-                    </Suspense>
+                <div className="pt-5 relative">
+                    {children}
                 </div>
 
                 <div className="flex justify-center pt-16">
-                    <StyledButton title="View All Products" />
+                    <StyledButton title="View All Products" href="/products?discount=true" />
+
                 </div>
             </Container>
         </section>

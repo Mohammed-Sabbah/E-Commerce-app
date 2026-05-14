@@ -10,9 +10,9 @@ module.exports = class QueryManipulater {
             reqQueryStr = reqQueryStr.replace(/\b(gte|gt|lte|lt|ne)\b/g, match => `$${match}`);
 
         let filter = JSON.parse(reqQueryStr);
-        ["sort", "select", "keyword", "page", "limit", "skip"].forEach(val => {
-            if (filter[val])
-                delete filter[val];
+
+        ["sort", "select", "keyword", "page", "limit", "skip", "discount"].forEach(val => {
+            if (filter[val]) delete filter[val];
         });
 
         this.query = this.model.find(filter);
@@ -32,9 +32,9 @@ module.exports = class QueryManipulater {
     sort() {
         let sort;
         if (this.req.query.sort)
-            sort = this.req.query.sort.split(",").join(" ");
+            sort = `${this.req.query.sort.split(",").join(" ")} _id`;
         else
-            sort = "-createdAt";
+            sort = "-createdAt _id";
         this.query = this.query.sort(sort);
         return this;
     }
@@ -61,6 +61,15 @@ module.exports = class QueryManipulater {
         let skip = (page - 1) * limit;
 
         this.query = this.query.skip(skip).limit(limit);
+        return this;
+    }
+
+    discountFilter() {
+        if (this.req.query.discount === "true") {
+            this.query = this.query.find({
+                $expr: { $lt: ["$priceAfterDiscount", "$price"] }
+            });
+        }
         return this;
     }
 }

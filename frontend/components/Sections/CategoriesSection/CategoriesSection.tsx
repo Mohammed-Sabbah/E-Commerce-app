@@ -1,13 +1,8 @@
-import React, { Suspense } from 'react'
+import React from 'react'
 import Container from '../../Container'
 import SectionTitle from '../SectionTitel'
-import { CardsCarousel } from '../../CarouselPlugin/CardsCarousel'
-import type { Category } from '@/types/api'
-import CategoriesCarousel from './CategoriesCarousel'
-import CategoriesSkeleton from '../CategoriesSkeleton'
 
-
-function CategoriesSection() {
+function CategoriesSection({ children }: { children: React.ReactNode }) {
     return (
         <section className="pb-15">
             <Container>
@@ -18,11 +13,8 @@ function CategoriesSection() {
                 </div>
 
                 <div className="pt-5">
-                    <Suspense fallback={<CategoriesSkeleton/>}>
-                        <CategoriesCarousel/>
-                    </Suspense>
+                    {children}
                 </div>
-
             </Container>
         </section>
     )

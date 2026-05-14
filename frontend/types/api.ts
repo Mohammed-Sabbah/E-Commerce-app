@@ -74,6 +74,7 @@ export interface WishlistProduct {
 export interface ProductsResponse {
     status: string;
     count: number;
+    totalCount: number;  
     data: {
         docs: Product[];
     };

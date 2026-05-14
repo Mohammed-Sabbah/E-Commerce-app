@@ -36,7 +36,7 @@ export function CardsCarousel(props: CardsCarouselProps) {
         }
 
         return (
-            <Carousel opts={{ align: "start" }} className="w-full">
+            <Carousel opts={{ align: "start" }} className="w-full overflow-visible">
                 <CarouselContent>
                     {pairs.map((pair, index) => (
                         <CarouselItem key={index} className="basis-1/2 sm:basis-1/3 lg:basis-1/4">
@@ -55,7 +55,7 @@ export function CardsCarousel(props: CardsCarouselProps) {
     }
 
     return (
-        <Carousel opts={{ align: "start" }} className="w-full">
+        <Carousel opts={{ align: "start" }} className="w-full overflow-visible">
             <CarouselContent className="w-full">
                 {type === "products"
                     ? (data as Product[]).map((product) => (

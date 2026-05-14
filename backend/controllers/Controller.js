@@ -8,16 +8,23 @@ let getAll = function (model) {
 
         let qm = new QueryManipulater(req, model)
             .filter()
+            .discountFilter()
             .limit()
             .sort()
             .search()
-            .paginate();
 
-        let docs = await qm.query.find(req.filterObj);;
+        // نحسب الإجمالي قبل الـ pagination
+        let totalCount = await qm.query.clone().countDocuments();
+
+        qm.paginate();
+
+        // let docs = await qm.query.find(req.filterObj);
+        let docs = await qm.query;
 
         res.status(200).json({
             status: "success",
             count: docs.length,
+            totalCount,
             data: {
                 docs
             }
