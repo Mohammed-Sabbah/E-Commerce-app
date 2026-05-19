@@ -11,7 +11,6 @@ import { ArrowPathIcon, TruckIcon } from '@heroicons/react/24/outline';
 export default function ProductDetailesComponent({ product }: { product: Product }) {
     const inStock = product.quantity > 0;
 
-    // ── الـ state رفعناه هون عشان ProductOptions و ProductActions يشاركوه ──
     const [selectedColor, setSelectedColor] = useState<string | null>(product.colors?.[0] ?? null);
     const [selectedSize, setSelectedSize] = useState<string | null>(null);
 
@@ -56,13 +55,24 @@ export default function ProductDetailesComponent({ product }: { product: Product
                                 {inStock ? 'In Stock' : 'Out of Stock'}
                             </span>
                         </div>
-                        <p className="text-3xl font-inter font-[400] mt-3">${product.price.toFixed(2)}</p>
+
+                        {/* السعر مع الخصم */}
+                        <div className="flex items-center gap-3 mt-3">
+                            <p className="text-3xl font-inter font-[400] text-black">
+                                ${(product.priceAfterDiscount ?? product.price).toFixed(2)}
+                            </p>
+                            {product.priceAfterDiscount && product.priceAfterDiscount < product.price && (
+                                <p className="text-xl font-inter font-[400] line-through text-gray-400">
+                                    ${product.price.toFixed(2)}
+                                </p>
+                            )}
+                        </div>
+
                         <p className="text-black font-[400] text-sm mt-3 leading-relaxed">{product.description}</p>
                     </div>
 
                     <hr className="border-gray-200" />
 
-                    {/* Options — يستقبل الـ state ويرفعه للأب */}
                     <ProductOptions
                         colors={product.colors}
                         sizes={[]}
@@ -72,12 +82,11 @@ export default function ProductDetailesComponent({ product }: { product: Product
                         onSizeChange={setSelectedSize}
                     />
 
-                    {/* Actions — يستقبل المنتج كامل + selectedColor */}
                     <ProductActions
                         product={{
                             _id: product._id,
                             name: product.name,
-                            price: product.price,
+                            price: product.priceAfterDiscount ?? product.price,
                             image: product.images?.[0] ?? '',
                         }}
                         inStock={inStock}

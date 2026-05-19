@@ -85,6 +85,7 @@ export interface ProductParams {
     limit?: number;
     sort?: string;           // مثال: "-sold" | "-createdAt"
     select?: string;         // مثال: "name,price,image"
+    discount?: string
     keyword?: string;        // بحث في name و description
     category?: string;
     "priceAfterDiscount[gt]"?: number;   // فلتر المخفضات

@@ -20,6 +20,7 @@ const nextConfig: NextConfig = {
       { hostname: "cdn.dummyjson.com" },
       { hostname: "via.placeholder.com" },
       { hostname: "i.pravatar.cc" },
+      { hostname: "fdn2.gsmarena.com" },
     ],
   },
   experimental: {

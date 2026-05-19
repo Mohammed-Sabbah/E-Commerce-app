@@ -45,7 +45,7 @@ function ProductCard({ product, className, variant = "default" }: ProductCardPro
 
     const current = config[variant];
 
-    const discount = product?.priceAfterDiscount
+    const discount = product?.priceAfterDiscount && product.priceAfterDiscount < product.price
         ? Math.round((1 - product.priceAfterDiscount / product.price) * 100)
         : null;
 
@@ -61,7 +61,7 @@ function ProductCard({ product, className, variant = "default" }: ProductCardPro
                         src={product.coverImage}
                         alt={product.name}
                         fill
-                        className='object-cover'
+                        className='object-contain'
                         sizes="(max-width: 768px) 100vw, 25vw"
                     />
                 )}
@@ -100,7 +100,7 @@ function ProductCard({ product, className, variant = "default" }: ProductCardPro
                         ${product.priceAfterDiscount ?? product.price}
                     </span>
 
-                    {product.priceAfterDiscount && (
+                    {product.priceAfterDiscount && product.priceAfterDiscount < product.price && (
                         <span className='line-through text-black opacity-50'>
                             ${product.price}
                         </span>
