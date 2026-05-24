@@ -25,15 +25,15 @@ export default function PaymentMethodSelector({ value, onChange }: Props) {
             {/* Bank */}
             <button
                 type="button"
-                onClick={() => onChange('bank')}
+                onClick={() => onChange('card')}
                 className={`flex items-center justify-between p-3 rounded border w-full transition-colors ${
-                    value === 'bank'
+                    value === 'card'
                         ? 'border-gray-400 bg-gray-50'
                         : 'border-gray-200 hover:border-gray-300'
                 }`}
             >
                 <div className="flex items-center gap-2">
-                    <RadioDot checked={value === 'bank'} />
+                    <RadioDot checked={value === 'card'} />
                     <span className="text-sm text-gray-700">Bank</span>
                 </div>
                 <div className="flex items-center gap-1">
@@ -46,7 +46,7 @@ export default function PaymentMethodSelector({ value, onChange }: Props) {
                 </div>
             </button>
 
-            {value === 'bank' && (
+            {value === 'card' && (
                 <p className="text-xs text-gray-400 pl-2">
                     Online payment coming soon. Please use Cash on Delivery.
                 </p>

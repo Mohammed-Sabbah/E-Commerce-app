@@ -24,6 +24,11 @@ let app = express();
 
 app.use(cookieParser());
 
+
+// Health check
+app.get('/healthz', (req, res) => res.send('OK'));
+
+
 // use strategies
 passport.use(strategies.googleStrategy);
 passport.use(strategies.facebookStrategy);

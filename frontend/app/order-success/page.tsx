@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -32,7 +32,8 @@ interface Order {
     createdAt: string;
 }
 
-export default function OrderSuccessPage() {
+
+function OrderSuccessContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const orderId = searchParams.get('id');
@@ -246,5 +247,20 @@ export default function OrderSuccessPage() {
                 </Link>
             </div>
         </Container></main>
+    );
+}
+
+export default function OrderSuccessPage() {
+    return (
+        <Suspense fallback={
+            <main>
+                <Container className="py-20 flex flex-col items-center gap-4">
+                    <div className="w-8 h-8 border-4 border-[#DB4444] border-t-transparent rounded-full animate-spin" />
+                    <p className="text-gray-500 text-sm">Loading your order...</p>
+                </Container>
+            </main>
+        }>
+            <OrderSuccessContent />
+        </Suspense>
     );
 }

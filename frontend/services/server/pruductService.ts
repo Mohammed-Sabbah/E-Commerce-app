@@ -16,7 +16,7 @@ export async function getProducts(params: ProductParams = {}): Promise<ProductsR
         if (!res.ok) throw new Error("Failed to fetch products");
         return res.json();
     } catch {
-        return { status: "success", count: 0, data: { docs: [] } };
+        return { status: "success", count: 0, totalCount: 0, data: { docs: [] } };
     }
 }
 
