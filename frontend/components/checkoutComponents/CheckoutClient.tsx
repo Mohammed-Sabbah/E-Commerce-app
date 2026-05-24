@@ -1,91 +1,118 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useMemo, useState } from 'react';
 import { useCart } from '@/hooks/useCart';
-import { BillingData, OrderItem, PaymentMethod } from '@/types/checkout';
-import BillingForm from './BillingForm';
+import { usePlaceOrder } from '@/hooks/usePlaceOrder';
+import { PaymentMethod, BillingData } from '@/types/checkout';
+import type { Address } from '@/services/server/userService';
+import type { CartItem } from '@/types/cart';
 import OrderSummary from './OrderSummary';
 import PaymentMethodSelector from './PaymentMethod';
 import CouponInput from './CouponInput';
-import type { CartItem } from '@/types/cart';
+import BillingForm from './BillingForm';
 
 interface Props {
+    addresses: Address[];
     initialBilling: BillingData;
-    buyNowItem: OrderItem | null; // null = جاي من السلة
 }
 
-export default function CheckoutClient({ initialBilling, buyNowItem }: Props) {
-    const router = useRouter();
-
-    const [billing, setBilling] = useState<BillingData>(initialBilling);
+export default function CheckoutClient({ addresses, initialBilling }: Props) {
+    const [selectedAddressId, setSelectedAddressId] = useState<string>(
+        addresses[0]?._id ?? ''
+    );
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cash');
     const [discount, setDiscount] = useState(0);
-    const [loading, setLoading] = useState(false);
-    const [items, setItems] = useState<OrderItem[]>([]);
 
     const { cart } = useCart();
+    const { submit, loading, error } = usePlaceOrder();
 
-    useEffect(() => {
-        if (buyNowItem) {
-            // ✅ جاي من Buy Now → منتج واحد فقط
-            setItems([buyNowItem]);
-        } else {
-            // ✅ جاي من السلة → كل المنتجات
-            if (!Array.isArray(cart?.cartItems)) return;
-            const cartItems: OrderItem[] = cart.cartItems.map((item: CartItem) => ({
-                _id: item._id,
-                name: item.product?.name ?? '',
-                price: item.product?.priceAfterDiscount ?? item.price ?? 0,
-                quantity: item.quantity,
-                image: item.product?.coverImage ?? item.product?.images?.[0] ?? '',
-                color: item.color,
-            }));
-            setItems(cartItems);
-        }
-    }, [buyNowItem, cart]);
+    const items = useMemo(() => {
+        if (!Array.isArray(cart?.cartItems)) return [];
+        return cart.cartItems.map((item: CartItem) => ({
+            _id: item._id,
+            name: item.product?.name ?? '',
+            price: item.product?.priceAfterDiscount ?? item.price ?? 0,
+            quantity: item.quantity,
+            image: item.product?.coverImage ?? item.product?.images?.[0] ?? '',
+            color: item.color,
+        }));
+    }, [cart]);
 
     const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
     const handlePlaceOrder = async () => {
-        if (!billing.firstName || !billing.street || !billing.city || !billing.phone || !billing.email) {
-            alert('Please fill in all required fields.');
-            return;
-        }
-        if (paymentMethod === 'bank') return;
-
-        setLoading(true);
-        try {
-            // TODO: استبدل بـ API call الحقيقي
-            // await placeOrder({ billing, items, paymentMethod, discount });
-            await new Promise((r) => setTimeout(r, 1000));
-            router.push('/order-success');
-        } catch {
-            alert('Something went wrong. Please try again.');
-        } finally {
-            setLoading(false);
-        }
+        if (paymentMethod === 'card') return;
+        await submit({ addressId: selectedAddressId, paymentMethod });
     };
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 xl:gap-16">
 
-            {/* LEFT — Billing */}
+            {/* LEFT */}
             <div>
                 <h1 className="text-2xl font-semibold text-gray-900 mb-8">Billing Details</h1>
-                <BillingForm value={billing} onChange={setBilling} />
+
+                {addresses.length > 0 ? (
+                    <div className="mb-6">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Shipping Address
+                        </label>
+                        <div className="flex flex-col gap-3">
+                            {addresses.map((addr) => (
+                                <label
+                                    key={addr._id}
+                                    className={`flex items-start gap-3 border rounded-lg p-4 cursor-pointer transition-colors
+                                        ${selectedAddressId === addr._id
+                                            ? 'border-red-500 bg-red-50'
+                                            : 'border-gray-200 hover:border-gray-300'
+                                        }`}
+                                >
+                                    <input
+                                        type="radio"
+                                        name="address"
+                                        value={addr._id}
+                                        checked={selectedAddressId === addr._id}
+                                        onChange={() => setSelectedAddressId(addr._id)}
+                                        className="mt-1 accent-red-500"
+                                    />
+                                    <div className="text-sm">
+                                        <p className="font-medium text-gray-900">{addr.alias}</p>
+                                        <p className="text-gray-600">{addr.details}, {addr.city}</p>
+                                        <p className="text-gray-500">{addr.phone}</p>
+                                    </div>
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+                ) : (
+                    <p className="text-sm text-red-500 mb-6">
+                        No saved addresses. Please add one in your{' '}
+                        <a href="/account/address" className="underline">account settings</a>.
+                    </p>
+                )}
+
+                <BillingForm value={initialBilling} />
             </div>
 
-            {/* RIGHT — Summary + Payment */}
+            {/* RIGHT */}
             <div className="flex flex-col gap-6">
                 <OrderSummary items={items} discount={discount} />
                 <PaymentMethodSelector value={paymentMethod} onChange={setPaymentMethod} />
                 <CouponInput onApply={setDiscount} subtotal={subtotal} />
 
+                {error && (
+                    <p className="text-sm text-red-500">{error}</p>
+                )}
+
                 <button
                     type="button"
                     onClick={handlePlaceOrder}
-                    disabled={paymentMethod === 'bank' || loading || items.length === 0}
+                    disabled={
+                        paymentMethod === 'card' ||
+                        loading ||
+                        items.length === 0 ||
+                        !selectedAddressId
+                    }
                     className="h-12 bg-red-500 hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed
                                text-white font-medium rounded transition-colors flex items-center justify-center gap-2"
                 >
@@ -94,6 +121,8 @@ export default function CheckoutClient({ initialBilling, buyNowItem }: Props) {
                             <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                             Placing Order...
                         </>
+                    ) : paymentMethod === 'card' ? (
+                        'Card Payment — Coming Soon'
                     ) : (
                         'Place Order'
                     )}

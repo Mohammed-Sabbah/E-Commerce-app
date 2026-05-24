@@ -3,7 +3,7 @@
 import { BillingData } from '@/types/checkout';
 
 const inputCls =
-    'w-full h-11 px-4 bg-gray-100 rounded text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-all';
+    'w-full h-11 px-4 bg-gray-100 rounded text-sm text-gray-800 placeholder-gray-400 focus:outline-none cursor-default';
 
 function Field({
     label,
@@ -27,94 +27,38 @@ function Field({
 
 interface Props {
     value: BillingData;
-    onChange: (data: BillingData) => void;
 }
 
-export default function BillingForm({ value, onChange }: Props) {
-    const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value: val, type, checked } = e.target;
-        onChange({ ...value, [name]: type === 'checkbox' ? checked : val });
-    };
-
+export default function BillingForm({ value }: Props) {
     return (
         <div className="flex flex-col gap-5">
             <Field label="First Name" required>
-                <input
-                    name="firstName"
-                    value={value.firstName}
-                    onChange={handleInput}
-                    className={inputCls}
-                />
+                <input readOnly name="firstName" value={value.firstName} className={inputCls} />
             </Field>
 
             <Field label="Company Name">
-                <input
-                    name="companyName"
-                    value={value.companyName}
-                    onChange={handleInput}
-                    className={inputCls}
-                />
+                <input readOnly name="companyName" value={value.companyName} className={inputCls} />
             </Field>
 
             <Field label="Street Address" required>
-                <input
-                    name="street"
-                    value={value.street}
-                    onChange={handleInput}
-                    className={inputCls}
-                />
+                <input readOnly name="street" value={value.street} className={inputCls} />
             </Field>
 
             <Field label="Apartment, floor, etc. (optional)">
-                <input
-                    name="apartment"
-                    value={value.apartment}
-                    onChange={handleInput}
-                    className={inputCls}
-                />
+                <input readOnly name="apartment" value={value.apartment} className={inputCls} />
             </Field>
 
             <Field label="Town / City" required>
-                <input
-                    name="city"
-                    value={value.city}
-                    onChange={handleInput}
-                    className={inputCls}
-                />
+                <input readOnly name="city" value={value.city} className={inputCls} />
             </Field>
 
             <Field label="Phone Number" required>
-                <input
-                    name="phone"
-                    type="tel"
-                    value={value.phone}
-                    onChange={handleInput}
-                    className={inputCls}
-                />
+                <input readOnly name="phone" type="tel" value={value.phone} className={inputCls} />
             </Field>
 
             <Field label="Email Address" required>
-                <input
-                    name="email"
-                    type="email"
-                    value={value.email}
-                    onChange={handleInput}
-                    className={inputCls}
-                />
+                <input readOnly name="email" type="email" value={value.email} className={inputCls} />
             </Field>
-
-            <label className="flex items-center gap-3 cursor-pointer mt-1">
-                <input
-                    type="checkbox"
-                    name="saveInfo"
-                    checked={value.saveInfo}
-                    onChange={handleInput}
-                    className="w-4 h-4 accent-red-500"
-                />
-                <span className="text-sm text-gray-700">
-                    Save this information for faster check-out next time
-                </span>
-            </label>
         </div>
     );
 }

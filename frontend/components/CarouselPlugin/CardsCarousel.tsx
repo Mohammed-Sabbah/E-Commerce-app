@@ -5,6 +5,7 @@ import {
     CarouselItem,
     CarouselNext,
     CarouselPrevious,
+    type CarouselApi,
 } from "@/components/ui/carousel"
 import ProductCard from "@/components/ProductCard"
 import CatigoryCard from "@/components/CatigoryCard"
@@ -12,6 +13,9 @@ import type { Product, Category } from "@/types/api"
 
 interface BaseProps {
     type: "products" | "categories" | "products-grid"
+    setApi?: (api: CarouselApi) => void
+    hideControls?: boolean
+    controlsOffset?: number
 }
 
 interface ProductsProps extends BaseProps {
@@ -27,7 +31,10 @@ interface CategoriesProps extends BaseProps {
 type CardsCarouselProps = ProductsProps | CategoriesProps
 
 export function CardsCarousel(props: CardsCarouselProps) {
-    const { type, data } = props
+    const { type, data, setApi, hideControls = false, controlsOffset = 12 } = props
+
+    const btnPrev = `"absolute -top-8 md:-top-14 right-10 left-auto translate-y-0`
+    const btnNext = `absolute -top-8 md:-top-14 right-0 left-auto translate-y-0`
 
     if (type === "products-grid") {
         const pairs: Product[][] = []
@@ -36,7 +43,7 @@ export function CardsCarousel(props: CardsCarouselProps) {
         }
 
         return (
-            <Carousel opts={{ align: "start" }} className="w-full overflow-visible">
+            <Carousel opts={{ align: "start" }} setApi={setApi} className="w-full overflow-visible">
                 <CarouselContent>
                     {pairs.map((pair, index) => (
                         <CarouselItem key={index} className="basis-1/2 sm:basis-1/3 lg:basis-1/4">
@@ -48,14 +55,14 @@ export function CardsCarousel(props: CardsCarouselProps) {
                         </CarouselItem>
                     ))}
                 </CarouselContent>
-                <CarouselPrevious className="absolute -top-12 right-10 left-auto translate-y-0" />
-                <CarouselNext className="absolute -top-12 right-0 left-auto translate-y-0" />
+                {!hideControls && <CarouselPrevious className={btnPrev} />}
+                {!hideControls && <CarouselNext className={btnNext} />}
             </Carousel>
         )
     }
 
     return (
-        <Carousel opts={{ align: "start" }} className="w-full overflow-visible">
+        <Carousel opts={{ align: "start" }} setApi={setApi} className="w-full overflow-visible">
             <CarouselContent className="w-full">
                 {type === "products"
                     ? (data as Product[]).map((product) => (
@@ -76,8 +83,8 @@ export function CardsCarousel(props: CardsCarouselProps) {
                     ))
                 }
             </CarouselContent>
-            <CarouselPrevious className="absolute -top-12 right-10 left-auto translate-y-0" />
-            <CarouselNext className="absolute -top-12 right-0 left-auto translate-y-0" />
+            {!hideControls && <CarouselPrevious className={btnPrev} />}
+            {!hideControls && <CarouselNext className={btnNext} />}
         </Carousel>
     )
 }

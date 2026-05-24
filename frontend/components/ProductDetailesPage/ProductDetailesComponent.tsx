@@ -7,6 +7,7 @@ import ProductOptions from './ProductOptions';
 import ProductActions from './ProductActions';
 import { StarsComponent } from '../ProductCard/StarsComponent';
 import { ArrowPathIcon, TruckIcon } from '@heroicons/react/24/outline';
+import ProductReviews from './ProductReviews';
 
 export default function ProductDetailesComponent({ product }: { product: Product }) {
     const inStock = product.quantity > 0;
@@ -112,6 +113,7 @@ export default function ProductDetailesComponent({ product }: { product: Product
                     </div>
                 </div>
             </div>
+            <ProductReviews productId={product._id} />
         </main>
     );
 }

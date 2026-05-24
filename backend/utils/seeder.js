@@ -242,10 +242,10 @@ const seedAll = async () => {
     const testUsers = Array.from({ length: 5 }, (_, i) => ({
         name: `Test User ${i + 1}`,
         slug: `test-user-${i + 1}`,
-        email: `user${i + 1}@ecommerce.com`,
+        email: `user${i + 1}`,
         password: bcrypt.hashSync("12345678", 10),
         phone: `056${String(i).padStart(7, "0")}`,
-        role: "user",
+        role: "user",@ecommerce.com
         profileImage: `https://i.pravatar.cc/150?img=${i + 10}`,
         isActive: true,
     }));

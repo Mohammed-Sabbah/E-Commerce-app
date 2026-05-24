@@ -1,8 +1,18 @@
+// frontend/middleware.ts
+
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 // المسارات المحمية (التي تتطلب تسجيل دخول)
-const protectedRoutes = ['/wishlist', '/cart', '/checkout', '/profile', '/orders', '/dashboard'];
+const protectedRoutes = [
+    '/wishlist',
+    '/cart',
+    '/checkout',
+    '/account',
+    // ملاحظة: /orders و /dashboard أُزيلا لأن الصفحات الفعلية على /account/orders
+    // إذا أضفت Admin Dashboard مستقبلاً أعد إضافة /dashboard هنا
+];
+
 // مسارات الضيوف (التي لا يمكن دخولها إذا كنت مسجل دخول)
 const authRoutes = ['/login', '/register'];
 
@@ -10,21 +20,16 @@ export function middleware(request: NextRequest) {
     const token = request.cookies.get('token')?.value;
     const { pathname } = request.nextUrl;
 
-    // 1. إذا كان المستخدم غير مسجل دخول ويحاول دخول صفحة محمية
-    // أضفنا شرط إضافي للتأكد أنه ليس في صفحة login بالفعل لتجنب الـ Loop
     const isProtectedRoute = protectedRoutes.some((route) =>
         pathname === route || pathname.startsWith(`${route}/`)
     );
 
+    // 1. غير مسجل دخول يحاول يفتح صفحة محمية → redirect للـ login
     if (!token && isProtectedRoute) {
-        // استثناء: إذا كان المسار هو login أو register لا تفعل شيء
-        if (authRoutes.includes(pathname)) {
-            return NextResponse.next();
-        }
         return NextResponse.redirect(new URL('/login', request.url));
     }
 
-    // 2. إذا كان المستخدم مسجل دخول ويحاول دخول صفحات الـ Auth (login/register)
+    // 2. مسجل دخول يحاول يفتح login/register → redirect للـ home
     if (token && authRoutes.includes(pathname)) {
         return NextResponse.redirect(new URL('/', request.url));
     }
@@ -32,9 +37,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
 }
 
-// الـ Matcher مهم جداً لاستثناء ملفات النظام والصور
 export const config = {
-
     matcher: [
         '/wishlist',
         '/wishlist/:path*',
@@ -42,25 +45,9 @@ export const config = {
         '/cart/:path*',
         '/checkout',
         '/checkout/:path*',
-        '/profile',
-        '/profile/:path*',
-        '/orders',
-        '/orders/:path*',
-        '/dashboard',
-        '/dashboard/:path*',
+        '/account',
+        '/account/:path*',
         '/login',
         '/register',
     ],
-
-
-    // matcher: [
-    //     /*
-    //      * مطابقة كل المسارات ما عدا:
-    //      * 1. api (مسارات الـ API)
-    //      * 2. _next/static (الملفات الاستاتيكية)
-    //      * 3. _next/image (صور Next.js المحسنة)
-    //      * 4. favicon.ico (أيقونة الموقع)
-    //      */
-    //     '/((?!api|_next/static|_next/image|favicon.ico).*)',
-    // ],
 };

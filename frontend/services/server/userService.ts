@@ -1,4 +1,5 @@
 import { apiClient } from '@/lib/apiClient';
+import { cookies } from 'next/headers';
 
 export interface UserProfile {
     _id: string;
@@ -10,14 +11,24 @@ export interface UserProfile {
 }
 
 export interface Address {
-    street?: string;
-    apartment?: string;
-    city?: string;
+    _id: string;  
+    alias: string;
+    details: string;
+    phone: string;
+    city: string;
+    postalCode: string;
 }
 
 export const getMyProfile = async (): Promise<UserProfile | null> => {
     try {
-        const res = await apiClient.get('/api/v1/users/myProfile');
+        const cookieStore = await cookies();
+        const cookieHeader = cookieStore.toString();
+
+        const res = await apiClient.get('/api/v1/users/myProfile', {
+            headers: {
+                Cookie: cookieHeader,
+            },
+        });
         return res.data?.data?.doc ?? null;
     } catch {
         return null;

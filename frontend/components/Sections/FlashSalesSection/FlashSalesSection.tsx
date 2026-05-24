@@ -12,13 +12,12 @@ function FlashSalesSection({ children }: { children: React.ReactNode }) {
                     <Timer />
                 </SectionTitle>
 
-                <div className="pt-5 relative">
+                <div className="pt-8 relative">
                     {children}
                 </div>
 
                 <div className="flex justify-center pt-16">
                     <StyledButton title="View All Products" href="/products?discount=true" />
-
                 </div>
             </Container>
         </section>

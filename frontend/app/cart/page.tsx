@@ -1,25 +1,21 @@
 "use client";
 
 import Container from "@/components/Container";
-import {
-    Table,
-    TableBody,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
 import { useCart } from "@/hooks/useCart";
-import ProductRow from "./ProductRow";
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import ProductMobileCard from "./ProductMobileCard";
 import type { CartItem } from "@/types/cart";
+import CartEmptyState from "@/components/Cart/CartEmptyState";
+import CartDesktopTable from "@/components/Cart/CartDesktopTable";
+import CartMobileList from "@/components/Cart/CartMobileList";
+import CartActions from "@/components/Cart/CartActions";
+import CartSummary from "@/components/Cart/CartSummary";
+
 
 export default function CartPage() {
     const router = useRouter();
     const { cart, isLoading, updateCartItem } = useCart();
-    const [updates, setUpdates] = useState<{ [key: string]: number }>({});
+    const [updates, setUpdates] = useState<Record<string, number>>({});
 
     const handleChange = (id: string, qty: number) => {
         setUpdates((prev) => ({ ...prev, [id]: qty }));
@@ -32,123 +28,52 @@ export default function CartPage() {
         setUpdates({});
     };
 
-    // ✅ بدون sessionStorage — الـ checkout بيقرأ الـ cart مباشرة
     const handleProceedToCheckout = () => {
-        router.push('/checkout');
+        router.push("/checkout");
     };
 
     if (isLoading) return <p className="text-center mt-10">Loading ...</p>;
 
-    if (!cart?.cartItems?.length)
-        return <p className="text-center mt-10">Cart is empty</p>;
+    if (!cart?.cartItems?.length) {
+        return (
+            <section className="min-h-[60vh]">
+                <Container>
+                    <CartEmptyState />
+                </Container>
+            </section>
+        );
+    }
 
-    const subtotal = cart.cartItems.reduce(
-        (acc: number, cartItem: CartItem) => {
-            const price = cartItem.product.priceAfterDiscount ?? cartItem.price;
-            return acc + price * cartItem.quantity;
-        },
-        0
-    );
+    const subtotal = cart.cartItems.reduce((acc: number, item: CartItem) => {
+        const price = item.product.priceAfterDiscount ?? item.price;
+        return acc + price * item.quantity;
+    }, 0);
 
     return (
-        <section className="py-10">
+        <section className="py-10 min-h-[60vh]">
             <Container>
-                <h1 className="text-2xl font-semibold mb-8">
+                <h1 className="text-xl sm:text-2xl font-semibold mb-8">
                     Cart ({cart.cartItems.length})
                 </h1>
 
-                {/* Desktop */}
-                <div className="hidden md:block border rounded-xl overflow-hidden">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Product</TableHead>
-                                <TableHead>Price</TableHead>
-                                <TableHead>Quantity</TableHead>
-                                <TableHead>Subtotal</TableHead>
-                            </TableRow>
-                        </TableHeader>
+                <CartDesktopTable
+                    cartItems={cart.cartItems}
+                    onChange={handleChange}
+                    updates={updates}
+                />
 
-                        <TableBody>
-                            {cart.cartItems.map((item: CartItem) => (
-                                <ProductRow
-                                    key={item._id}
-                                    cartItem={item}
-                                    onChange={handleChange}
-                                    updates={updates}
-                                />
-                            ))}
-                        </TableBody>
-                    </Table>
-                </div>
+                <CartMobileList
+                    cartItems={cart.cartItems}
+                    onChange={handleChange}
+                    updates={updates}
+                />
 
-                {/* Mobile */}
-                <div className="md:hidden space-y-4">
-                    {cart.cartItems.map((item: CartItem) => (
-                        <ProductMobileCard
-                            key={item._id}
-                            item={item}
-                            onChange={handleChange}
-                            updates={updates}
-                        />
-                    ))}
-                </div>
+                <CartActions onUpdate={handleUpdateCart} />
 
-                {/* Actions */}
-                <div className="flex flex-col sm:flex-row justify-between gap-4 mt-6">
-                    <Link
-                        href="/"
-                        className="border border-black rounded-md px-6 py-3 text-center hover:bg-black hover:text-white transition"
-                    >
-                        Return To Shop
-                    </Link>
-
-                    <button
-                        onClick={handleUpdateCart}
-                        className="border border-black rounded-md px-6 py-3 hover:bg-black hover:text-white transition cursor-pointer"
-                    >
-                        Update Cart
-                    </button>
-                </div>
-
-                {/* Bottom */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
-                    <div className="flex gap-3">
-                        <input
-                            placeholder="Coupon Code"
-                            className="border px-4 py-2 w-full rounded-md h-14"
-                        />
-                        <button className="bg-[#DB4444] text-white px-14 rounded-md h-14 cursor-pointer">
-                            Apply
-                        </button>
-                    </div>
-
-                    <div className="border rounded-xl p-6 w-full max-w-md md:ml-auto m-auto">
-                        <h2 className="font-semibold mb-4">Cart Total</h2>
-
-                        <div className="flex justify-between mb-2">
-                            <span>Subtotal:</span>
-                            <span>${subtotal.toFixed(2)}</span>
-                        </div>
-
-                        <div className="flex justify-between mb-2">
-                            <span>Shipping:</span>
-                            <span>Free</span>
-                        </div>
-
-                        <div className="flex justify-between border-t pt-3 font-bold">
-                            <span>Total:</span>
-                            <span>${subtotal.toFixed(2)}</span>
-                        </div>
-
-                        <button
-                            onClick={handleProceedToCheckout}
-                            className="mt-5 w-full bg-[#DB4444] text-white py-3 rounded-md cursor-pointer hover:bg-red-600 transition"
-                        >
-                            Proceed to checkout
-                        </button>
-                    </div>
-                </div>
+                <CartSummary
+                    subtotal={subtotal}
+                    onCheckout={handleProceedToCheckout}
+                />
             </Container>
         </section>
     );

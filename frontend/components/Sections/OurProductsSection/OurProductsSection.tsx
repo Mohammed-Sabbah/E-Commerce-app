@@ -11,7 +11,7 @@ function OurProductsSection({ children }: { children: React.ReactNode }) {
                     <SectionTitle Category="Our Products" title="Explore Our Products" />
                 </div>
 
-                <div className="pt-5">
+                <div className="pt-8">
                     {children}
                 </div>
 

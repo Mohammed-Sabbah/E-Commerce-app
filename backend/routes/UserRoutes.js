@@ -5,6 +5,8 @@ const {
     allowedTo
 } = require("../middlewares/authMiddleware");
 
+const Review = require("../models/Review");
+
 const {
     removePasswordFromReqBody,
     myProfileMiddleware,
@@ -33,6 +35,7 @@ const {
     changePassword,
     deleteMe
 } = require("../controllers/UserController");
+const { asyncErrorHandler } = require("../middlewares/ErrorMiddleware");
 
 let router = express.Router();
 
@@ -94,6 +97,32 @@ router.route("/:id/activate")
         activateMiddleware,
         updateUser
     );
+
+
+// ─── My Reviews ──────────────────────────────────────────────────────────────
+// GET /api/v1/users/myReviews
+// يرجع كل reviews اليوزر المسجل مع populate للمنتج
+router.route("/myReviews")
+    .get(
+        protect,
+        asyncErrorHandler(async function (req, res) {
+            const reviews = await Review.find({ user: req.user.id })
+                .populate({
+                    path: "product",
+                    select: "_id name coverImage"
+                })
+                .sort("-createdAt")
+                .lean();
+
+            res.status(200).json({
+                status: "success",
+                count: reviews.length,
+                data: { docs: reviews }
+            });
+        })
+    );
+
+
 
 router.route("/:id")
     .get(getUserValidator, getUser)

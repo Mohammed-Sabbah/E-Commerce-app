@@ -12,7 +12,7 @@ function CategoriesSection({ children }: { children: React.ReactNode }) {
                     <SectionTitle Category="Categories" title="Browse By Category" />
                 </div>
 
-                <div className="pt-5">
+                <div className="pt-8">
                     {children}
                 </div>
             </Container>

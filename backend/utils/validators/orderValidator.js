@@ -104,9 +104,25 @@ const updateOrdersDeliveredStatusValidator = [
 ]
 
 
+const cancelOrderValidator = [
+    validator.check("id")
+        .notEmpty().withMessage("Order id is required.")
+        .isMongoId().withMessage("Invalid order id"),
+    validationMiddleware
+];
+
+const returnOrderValidator = [
+    validator.check("id")
+        .notEmpty().withMessage("Order id is required.")
+        .isMongoId().withMessage("Invalid order id"),
+    validationMiddleware
+];
+
 module.exports = {
     createOrderValidator,
     getOrderValidator,
     updateOrdersPaidStatusValidator,
-    updateOrdersDeliveredStatusValidator
-}
+    updateOrdersDeliveredStatusValidator,
+    cancelOrderValidator,
+    returnOrderValidator
+};

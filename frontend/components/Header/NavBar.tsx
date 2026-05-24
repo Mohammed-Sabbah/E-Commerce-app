@@ -7,9 +7,9 @@ import UserMenu from "../UserMenu";
 import HeaderHeartButton from './HeaderHeartButton';
 import HeaderCartButton from './HeaderCartButton';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
-import { useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { CollapsibleTree } from '../CollapsibleTree'; // ← أضف هاد
+import type { ReactNode } from 'react';
 
 const navLinks = [
     { label: "Home", href: "/" },
@@ -18,19 +18,59 @@ const navLinks = [
     { label: "Sign Up", href: "/register" },
 ];
 
-function NavBar({ token }: { token: string | undefined }) {
+function NavLink({ href, label, pathname, onClick }: {
+    href: string;
+    label: string;
+    pathname: string;
+    onClick?: () => void;
+}) {
+    const isActive = pathname === href;
+    return (
+        <Link
+            href={href}
+            onClick={onClick}
+            className={`block text-sm py-2 px-2 rounded-md transition
+                hover:bg-gray-50 hover:text-red-500
+                ${isActive ? "font-semibold bg-gray-50" : ""}`}
+        >
+            {label}
+        </Link>
+    );
+}
+
+function NavBar({ token, categoriesSlot }: {
+    token: string | undefined;
+    categoriesSlot: ReactNode;
+}) {
     const [menuOpen, setMenuOpen] = useState(false);
+    const [openedAtPath, setOpenedAtPath] = useState("");
     const pathname = usePathname();
+
+    const isMenuOpen = menuOpen && pathname === openedAtPath;
+
+    const toggleMenu = useCallback(() => {
+        setMenuOpen(prev => {
+            if (!prev) setOpenedAtPath(pathname);
+            return !prev;
+        });
+    }, [pathname]);
+
+    const closeMenu = useCallback(() => {
+        setMenuOpen(false);
+    }, []);
+
+    useEffect(() => {
+        document.body.style.overflow = isMenuOpen ? "hidden" : "";
+        return () => { document.body.style.overflow = ""; };
+    }, [isMenuOpen]);
 
     return (
         <nav className="bg-white text-black">
             <Container className="flex items-center justify-between py-4 px-3">
-                {/* Logo */}
-                <Link href="/" className="text-2xl font-bold shrink-0">
+                <Link href="/" onClick={closeMenu} className="text-2xl font-bold shrink-0">
                     Exclusive
                 </Link>
 
-                {/* Desktop Links */}
                 <ul className="hidden lg:flex items-center space-x-8">
                     {navLinks.map((link) => (
                         <li key={link.href}>
@@ -45,7 +85,6 @@ function NavBar({ token }: { token: string | undefined }) {
                     ))}
                 </ul>
 
-                {/* Right Side */}
                 <div className="flex items-center gap-4">
                     <div className="hidden sm:block">
                         <SearchInput />
@@ -54,13 +93,14 @@ function NavBar({ token }: { token: string | undefined }) {
                     <HeaderCartButton />
                     {token && <UserMenu />}
 
-                    {/* Mobile Menu Button */}
                     <button
-                        className="lg:hidden flex items-center justify-center"
-                        onClick={() => setMenuOpen(!menuOpen)}
-                        aria-label="Toggle menu"
+                        className="lg:hidden flex items-center justify-center p-1"
+                        onClick={toggleMenu}
+                        aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+                        aria-expanded={isMenuOpen}
+                        aria-controls="mobile-menu"
                     >
-                        {menuOpen
+                        {isMenuOpen
                             ? <XMarkIcon className="w-6 h-6" />
                             : <Bars3Icon className="w-6 h-6" />
                         }
@@ -68,38 +108,41 @@ function NavBar({ token }: { token: string | undefined }) {
                 </div>
             </Container>
 
-            {/* Mobile Menu */}
-            {menuOpen && (
-                <div className="lg:hidden border-t border-gray-100 bg-white px-4 py-4 flex flex-col gap-4 max-h-[80vh] overflow-y-auto">
-                    {/* Search on mobile */}
+            <div
+                id="mobile-menu"
+                role="dialog"
+                aria-label="Navigation menu"
+                className={`lg:hidden border-t border-gray-100 bg-white
+                    overflow-hidden transition-all duration-300 ease-in-out
+                    ${isMenuOpen ? "max-h-[80vh] opacity-100" : "max-h-0 opacity-0 pointer-events-none"}`}
+            >
+                <div className="px-4 py-4 flex flex-col gap-4 overflow-y-auto max-h-[80vh]">
                     <div className="sm:hidden">
                         <SearchInput />
                     </div>
 
-                    {/* Nav Links */}
-                    <ul className="flex flex-col gap-3">
+                    <ul className="flex flex-col gap-1">
                         {navLinks.map((link) => (
                             <li key={link.href}>
-                                <Link
+                                <NavLink
                                     href={link.href}
-                                    onClick={() => setMenuOpen(false)}
-                                    className={`block text-sm py-1 transition hover:text-red-500
-                                        ${pathname === link.href ? "font-semibold" : ""}`}
-                                >
-                                    {link.label}
-                                </Link>
+                                    label={link.label}
+                                    pathname={pathname}
+                                    onClick={closeMenu}
+                                />
                             </li>
                         ))}
                     </ul>
 
-                    {/* Divider */}
                     <div className="border-t border-gray-200" />
 
-                    {/* Categories */}
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Categories</p>
-                    <CollapsibleTree />
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        Categories
+                    </p>
+
+                    {categoriesSlot}
                 </div>
-            )}
+            </div>
         </nav>
     );
 }

@@ -1,3 +1,6 @@
+import type { Address } from '@/services/server/userService';
+export type { Address };
+
 export interface OrderItem {
     _id: string;
     name: string;
@@ -18,4 +21,4 @@ export interface BillingData {
     saveInfo: boolean;
 }
 
-export type PaymentMethod = 'cash' | 'bank';
+export type PaymentMethod = 'cash' | 'card';

@@ -36,7 +36,7 @@ function ProductCard({ product, className, variant = "default" }: ProductCardPro
         },
         wishlist: {
             showRating: false,
-            showEye: false,
+            showEye: true,
             showWishlist: false,
             showDelete: true,
             showAddToCart: true,
@@ -114,8 +114,8 @@ function ProductCard({ product, className, variant = "default" }: ProductCardPro
                         reviews={product.ratingsQuantity ?? 0}
                     />
                 )}
-
-                {product.colors?.length ? (
+                {/* Colors */}
+                {/* {product.colors?.length ? (
                     <div className='flex gap-2 items-center py-2 px-1'>
                         {product.colors.map((color, i) => (
                             <input
@@ -127,7 +127,7 @@ function ProductCard({ product, className, variant = "default" }: ProductCardPro
                             />
                         ))}
                     </div>
-                ) : null}
+                ) : null} */}
             </div>
         </div>
     )

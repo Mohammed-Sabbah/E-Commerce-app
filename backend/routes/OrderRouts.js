@@ -9,13 +9,17 @@ const {
     createOrderValidator,
     getOrderValidator,
     updateOrdersPaidStatusValidator,
-    updateOrdersDeliveredStatusValidator
+    updateOrdersDeliveredStatusValidator,
+    cancelOrderValidator,
+    returnOrderValidator
 } = require("../utils/validators/orderValidator");
 const {
     getOrders,
     createOrder,
     getOrder,
-    updateOrder
+    updateOrder,
+    cancelOrder,
+    returnOrder
 } = require("../controllers/OrderController");
 
 let router = express.Router();
@@ -47,6 +51,20 @@ router.route("/:id/deliver")
         updateOrdersDeliveredStatusMiddleware,
         updateOrdersDeliveredStatusValidator,
         updateOrder
+    );
+
+router.route("/:id/cancel")
+    .patch(
+        allowedTo("user"),
+        cancelOrderValidator,
+        cancelOrder
+    );
+
+router.route("/:id/return")
+    .patch(
+        allowedTo("user"),
+        returnOrderValidator,
+        returnOrder
     );
 
 router.route("/:id")

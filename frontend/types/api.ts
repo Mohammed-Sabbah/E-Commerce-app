@@ -74,7 +74,7 @@ export interface WishlistProduct {
 export interface ProductsResponse {
     status: string;
     count: number;
-    totalCount: number;  
+    totalCount: number;
     data: {
         docs: Product[];
     };
@@ -95,3 +95,24 @@ export interface ProductParams {
     [key: string]: string | number | undefined; // لأي فلتر إضافي
 }
 
+export interface SubCategoriesResponse {
+    status: string;
+    count: number;
+    data: {
+        docs: SubCategory[];
+    };
+}
+
+// ─── Review ──────────────────────────────────────────────────
+export interface Review {
+    _id: string;
+    user: {
+        _id: string;
+        name: string;
+        profileImage?: string;
+    };
+    product: string;
+    comment: string;
+    rating: number;
+    createdAt: string;
+}
