@@ -1,24 +1,26 @@
-import { apiClient } from "@/lib/apiClient";
-import { cookies } from "next/headers"; // ← نجيب الـ cookies من الـ server
+import { cookies } from "next/headers";
 import { Order } from "@/types/Order";
 
-// helper عشان ما نكرر الكود
-async function getServerCookies() {
-    const cookieStore = await cookies();
-    return { Cookie: cookieStore.toString() };
-}
+const API = process.env.API_URL; // ← مباشرة للـ backend مش الـ proxy
 
 export async function getMyOrders(): Promise<Order[]> {
     try {
-        const res = await apiClient.get("/api/v1/orders", {
-            headers: await getServerCookies(), // ← نبعت الـ cookies يدوياً
+        const cookieStore = await cookies();
+        const token = cookieStore.get("token")?.value;
+        if (!token) return [];
+
+        const res = await fetch(`${API}/api/v1/orders`, {
+            headers: { Cookie: `token=${token}` },
+            cache: "no-store",
         });
-        return res.data?.data?.docs ?? [];
+
+        if (!res.ok) return [];
+        const data = await res.json();
+        return data?.data?.docs ?? [];
     } catch {
         return [];
     }
 }
-
 // // cancelOrder و returnOrder بيشتغلوا من الـ client (browser)
 // // فما بحتاجوا تعديل — withCredentials بيكفي
 // export async function cancelOrder(id: string): Promise<void> {
