@@ -17,7 +17,7 @@ interface RegisterRequest {
     name: string;
     email: string;
     password: string;
-    passwordConfirm: string;
+    confirmPassword: string;
 }
 
 interface ApiError {
