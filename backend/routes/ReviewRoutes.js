@@ -8,6 +8,7 @@ const {
 const {
     addUserIdToReqBody,
     addProductIdToReqBody,
+    addProductIdToFilterObj,
 } = require("../middlewares/reviewMiddleware");
 
 const {
@@ -28,7 +29,7 @@ const {
 let router = express.Router({ mergeParams: true });
 
 router.route("/")
-    .get(getAllReviews)
+    .get(addProductIdToFilterObj, getAllReviews)
     .post(
         protect,
         allowedTo("user"),
