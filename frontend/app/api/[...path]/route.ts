@@ -5,7 +5,7 @@ const API = process.env.API_URL;
 export async function GET(req: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
     const { path } = await params;
     const search = req.nextUrl.search;
-    const res = await fetch(`${API}/api/v1/${path.join('/')}${search}`, {
+    const res = await fetch(`${API}/${path.join('/')}${search}`, {
         headers: { Cookie: req.headers.get('cookie') || '' },
     });
     const data = await res.json();
@@ -15,7 +15,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ path
 export async function POST(req: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
     const { path } = await params;
     const body = await req.json();
-    const res = await fetch(`${API}/api/v1/${path.join('/')}`, {
+    const res = await fetch(`${API}/${path.join('/')}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Cookie: req.headers.get('cookie') || '' },
         body: JSON.stringify(body),
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pat
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
     const { path } = await params;
     const body = await req.json();
-    const res = await fetch(`${API}/api/v1/${path.join('/')}`, {
+    const res = await fetch(`${API}/${path.join('/')}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', Cookie: req.headers.get('cookie') || '' },
         body: JSON.stringify(body),
@@ -41,7 +41,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ pa
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
     const { path } = await params;
-    const res = await fetch(`${API}/api/v1/${path.join('/')}`, {
+    const res = await fetch(`${API}/${path.join('/')}`, {
         method: 'DELETE',
         headers: { Cookie: req.headers.get('cookie') || '' },
     });
