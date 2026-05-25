@@ -22,7 +22,7 @@ export const register = async (data: {
     name: string;
     email: string;
     password: string;
-    passwordConfirm: string;
+    confirmPassword: string;
 }) => {
     const res = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/signup`,
