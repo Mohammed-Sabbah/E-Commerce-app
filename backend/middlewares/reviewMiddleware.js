@@ -9,8 +9,14 @@ let addProductIdToReqBody = function (req, res, next) {
     next();
 }
 
+let addProductIdToFilterObj = function (req, res, next) {
+    if (req.params.productId)
+        req.filterObj = { product: req.params.productId };
+    next();
+}
+
 module.exports = {
     addUserIdToReqBody,
     addProductIdToReqBody,
-
+    addProductIdToFilterObj
 }
