@@ -62,8 +62,8 @@ app.use(helmet({
 }));
 
 app.use(morgan("dev"));
-app.use(express.urlencoded({ extended: true, limit: "1kb" }));
-app.use(express.json({ limit: "1kb" }));
+app.use(express.urlencoded({ extended: true, limit: "10kb" }));
+app.use(express.json({ limit: "10kb" }));
 
 app.use(function (req, res, next) {
     if (toobusy()) throw new CustomError("Server Too Busy", 503);
