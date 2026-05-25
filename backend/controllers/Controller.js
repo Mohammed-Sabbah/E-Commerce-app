@@ -3,6 +3,7 @@ const { asyncErrorHandler } = require("../middlewares/ErrorMiddleware");
 const QueryManipulater = require("../utils/QueryManipulater");
 const CustomError = require("../utils/CustomError");
 
+
 let getAll = function (model) {
     return asyncErrorHandler(async function (req, res) {
 
@@ -13,12 +14,15 @@ let getAll = function (model) {
             .sort()
             .search()
 
-        // نحسب الإجمالي قبل الـ pagination
+        // ← أضف هاد هون
+        if (req.filterObj) {
+            qm.query = qm.query.find(req.filterObj);
+        }
+
         let totalCount = await qm.query.clone().countDocuments();
 
         qm.paginate();
 
-        // let docs = await qm.query.find(req.filterObj);
         let docs = await qm.query;
 
         res.status(200).json({
