@@ -5,8 +5,8 @@ import { ShoppingCartIcon } from "@heroicons/react/24/outline";
 import { useCart } from "@/hooks/useCart";
 import { useRouter } from "next/navigation";
 
-function HeaderCartButton() {
-    const { cart } = useCart();
+function HeaderCartButton({ token }: { token?: string }) {
+    const { cart } = useCart(!!token);
     const router = useRouter();
 
     const count = cart?.cartItems?.length || 0;
@@ -16,15 +16,8 @@ function HeaderCartButton() {
 
     useEffect(() => {
         if (count === 0) return;
-
-        const frame = requestAnimationFrame(() => {
-            setAnimate(true);
-        });
-
-        const timeout = setTimeout(() => {
-            setAnimate(false);
-        }, 300);
-
+        const frame = requestAnimationFrame(() => setAnimate(true));
+        const timeout = setTimeout(() => setAnimate(false), 300);
         return () => {
             cancelAnimationFrame(frame);
             clearTimeout(timeout);
@@ -36,10 +29,8 @@ function HeaderCartButton() {
             onClick={() => router.push("/cart")}
             className="relative flex items-center justify-center cursor-pointer"
         >
-            {/* الأيقونة */}
             <ShoppingCartIcon className="h-6 w-6 transition-transform duration-200 hover:scale-120" />
 
-            {/* البادج */}
             {count > 0 && (
                 <span
                     className={`

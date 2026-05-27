@@ -1,11 +1,14 @@
 "use client"
 
+import Cookies from 'js-cookie';
 import { useCart } from "@/hooks/useCart"
 import LoadingSvg from "../LoadingSvg"
 import { ProductCardData } from "."
 
 function AddToCartButton({ product, showAddToCart }: { product: ProductCardData, showAddToCart: boolean }) {
-    const { addToCart, isAdding } = useCart()
+    const hasToken = !!Cookies.get('token');
+    const { addToCart, isAdding } = useCart(hasToken)
+
     return (
         <button onClick={() => { addToCart({ productId: product._id, color: "black", quantity: 1 }) }}
             className={`
@@ -15,7 +18,6 @@ function AddToCartButton({ product, showAddToCart }: { product: ProductCardData,
                     `}
         >
             {isAdding ? <LoadingSvg /> : "Add To Cart"}
-
         </button>
     )
 }

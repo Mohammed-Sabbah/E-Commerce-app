@@ -5,8 +5,8 @@ import { HeartIcon } from "@heroicons/react/24/outline";
 import { useWishlist } from "@/hooks/useWishlist";
 import { useRouter } from "next/navigation";
 
-function HeaderHeartButton() {
-    const { wishlist } = useWishlist();
+function HeaderHeartButton({ token }: { token?: string }) {
+    const { wishlist } = useWishlist(!!token);
     const router = useRouter();
 
     const count = wishlist.length;
@@ -16,29 +16,21 @@ function HeaderHeartButton() {
 
     useEffect(() => {
         if (count === 0) return;
-
-        const frame = requestAnimationFrame(() => {
-            setAnimate(true);
-        });
-
-        const timeout = setTimeout(() => {
-            setAnimate(false);
-        }, 300);
-
+        const frame = requestAnimationFrame(() => setAnimate(true));
+        const timeout = setTimeout(() => setAnimate(false), 300);
         return () => {
             cancelAnimationFrame(frame);
             clearTimeout(timeout);
         };
     }, [count]);
+
     return (
         <button
             onClick={() => router.push("/wishlist")}
             className="relative flex items-center justify-center cursor-pointer"
         >
-            {/* الأيقونة */}
             <HeartIcon className="h-6 w-6 transition-transform duration-200 hover:scale-120" />
 
-            {/* البادج */}
             {count > 0 && (
                 <span
                     className={`

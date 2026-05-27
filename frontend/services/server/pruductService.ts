@@ -8,9 +8,6 @@ export async function getProducts(params: ProductParams = {}): Promise<ProductsR
         if (value !== undefined) query.append(key, String(value));
     });
 
-    console.log("API URL:", API); // أضف هاد
-    console.log("Fetching:", `${API}/api/v1/products?${query.toString()}`); // وهاد
-
     try {
         const res = await fetch(`${API}/api/v1/products?${query.toString()}`, {
             next: { revalidate: 60 },
