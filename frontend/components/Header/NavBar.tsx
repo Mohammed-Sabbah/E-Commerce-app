@@ -89,8 +89,9 @@ function NavBar({ token, categoriesSlot }: {
                     <div className="hidden sm:block">
                         <SearchInput />
                     </div>
-                    <HeaderHeartButton />
-                    <HeaderCartButton />
+                    {/* token يتمرر عشان الـ hooks ما يبعتوا API calls بدون authentication */}
+                    <HeaderHeartButton token={token} />
+                    <HeaderCartButton token={token} />
                     {token && <UserMenu />}
 
                     <button

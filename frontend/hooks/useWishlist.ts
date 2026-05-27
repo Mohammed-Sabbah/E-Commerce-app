@@ -18,15 +18,17 @@ interface WishlistResponse {
     };
 }
 
-export const useWishlist = () => {
+export const useWishlist = (enabled: boolean = true) => {
     const queryClient = useQueryClient();
 
-    // 🆕 نتتبع أي productId عم يتحمّل
     const pendingIds = useRef<Set<string>>(new Set());
 
     const { data, isLoading } = useQuery<WishlistResponse>({
         queryKey: QUERY_KEYS.WISHLIST,
         queryFn: getWishlist,
+        // ← لا يبعت أي request إذا المستخدم مش logged in
+        // بيوقف 401 error على كل page load لـ guests
+        enabled,
     });
 
     const wishlist: WishlistItem[] = data?.data?.wishlist ?? [];
@@ -35,7 +37,7 @@ export const useWishlist = () => {
         mutationFn: addToWishlist,
 
         onMutate: async (productId: string) => {
-            pendingIds.current.add(productId); // 🆕
+            pendingIds.current.add(productId);
             await queryClient.cancelQueries({ queryKey: QUERY_KEYS.WISHLIST });
             const previous = queryClient.getQueryData<WishlistResponse>(QUERY_KEYS.WISHLIST);
 
@@ -60,7 +62,7 @@ export const useWishlist = () => {
         },
 
         onSettled: (_data, _err, productId) => {
-            pendingIds.current.delete(productId); // 🆕
+            pendingIds.current.delete(productId);
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WISHLIST });
         },
     });
@@ -69,7 +71,7 @@ export const useWishlist = () => {
         mutationFn: removeFromWishlist,
 
         onMutate: async (productId: string) => {
-            pendingIds.current.add(productId); // 🆕
+            pendingIds.current.add(productId);
             await queryClient.cancelQueries({ queryKey: QUERY_KEYS.WISHLIST });
             const previous = queryClient.getQueryData<WishlistResponse>(QUERY_KEYS.WISHLIST);
 
@@ -94,7 +96,7 @@ export const useWishlist = () => {
         },
 
         onSettled: (_data, _err, productId) => {
-            pendingIds.current.delete(productId); // 🆕
+            pendingIds.current.delete(productId);
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.WISHLIST });
         },
     });
@@ -102,7 +104,6 @@ export const useWishlist = () => {
     const isInWishlist = (productId: string) =>
         wishlist.some((item: WishlistItem) => item._id === productId);
 
-    // 🆕 بدل isAdding/isRemoving العامين
     const isPending = (productId: string) =>
         pendingIds.current.has(productId);
 
@@ -112,6 +113,6 @@ export const useWishlist = () => {
         addToWishlist: addMutation.mutate,
         removeFromWishlist: removeMutation.mutate,
         isInWishlist,
-        isPending, // 🆕
+        isPending,
     };
 };

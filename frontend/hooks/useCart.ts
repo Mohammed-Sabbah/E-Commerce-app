@@ -10,21 +10,22 @@ import {
 import { QUERY_KEYS } from "@/constants/queryKeys";
 import type { CartItem, CartResponse } from "@/types/cart";
 
-export const useCart = () => {
+export const useCart = (enabled: boolean = true) => {
     const queryClient = useQueryClient();
 
     const { data, isLoading } = useQuery<CartResponse>({
         queryKey: QUERY_KEYS.CART,
         queryFn: getCart,
+        // ← لا يبعت أي request إذا المستخدم مش logged in
+        // بيوقف 401 error على كل page load لـ guests
+        enabled,
     });
 
     const cart = data?.data?.cart;
 
-
     // ➕ Add
     const addMutation = useMutation({
         mutationFn: addToCart,
-
         onSettled: () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CART });
         },
@@ -45,6 +46,7 @@ export const useCart = () => {
             queryClient.invalidateQueries({ queryKey: QUERY_KEYS.CART });
         },
     });
+
     const isInCart = (productId: string) => {
         return cart?.cartItems?.some((item: CartItem) => item._id === productId) ?? false;
     };

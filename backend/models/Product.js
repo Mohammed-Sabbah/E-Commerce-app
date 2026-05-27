@@ -76,6 +76,24 @@ let productSchema = new mongoose.Schema(
     }
 );
 
+// ─── Indexes ─────────────────────────────────────────────────
+// category: أكثر فلتر مستخدم في الـ products page
+productSchema.index({ category: 1 });
+
+// price, priceAfterDiscount: للفلترة بالسعر وعروض الـ flash sales
+productSchema.index({ price: 1 });
+productSchema.index({ priceAfterDiscount: 1 });
+
+// sold: للـ sort في Best Selling (sort: "-sold")
+productSchema.index({ sold: -1 });
+
+// createdAt: الـ sort الافتراضي في كل الـ queries (sort: "-createdAt")
+productSchema.index({ createdAt: -1 });
+
+// compound index: category + createdAt — للـ filtered + sorted queries
+productSchema.index({ category: 1, createdAt: -1 });
+// ─────────────────────────────────────────────────────────────
+
 productSchema.pre(/^find/, function (next) {
     this.populate({
         path: "category",
@@ -95,14 +113,14 @@ productSchema.pre(/^find/, function (next) {
 let setImageUrl = function (doc) {
     if (doc.coverImage) {
         if (!doc.coverImage.startsWith("http")) {
-            const cleanImage = doc.coverImage.replace(/^\/+/, ""); // ← إزالة / الزيادة
+            const cleanImage = doc.coverImage.replace(/^\/+/, "");
             doc.coverImage = `${process.env.BASE_URL}/products/${cleanImage}`;
         }
     }
     if (doc.images) {
         doc.images = doc.images.map(image => {
             if (!image.startsWith("http")) {
-                const cleanImage = image.replace(/^\/+/, ""); // ← إزالة / الزيادة
+                const cleanImage = image.replace(/^\/+/, "");
                 return `${process.env.BASE_URL}/products/${cleanImage}`;
             }
             return image;

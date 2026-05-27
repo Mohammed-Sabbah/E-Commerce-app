@@ -1297,25 +1297,6 @@ module.exports = {
 }
 </file>
 
-<file path="backend/middlewares/reviewMiddleware.js">
-let addUserIdToReqBody = function (req, res, next) {
-    req.body.user = req.user.id;
-    next();
-}
-
-let addProductIdToReqBody = function (req, res, next) {
-    if (req.params.productId)
-        req.body.product = req.params.productId;
-    next();
-}
-
-module.exports = {
-    addUserIdToReqBody,
-    addProductIdToReqBody,
-
-}
-</file>
-
 <file path="backend/middlewares/subCategoryMiddleware.js">
 let addCategoryIdToReqBody = function (req, res, next) {
     if (req.params.categoryId)
@@ -2137,71 +2118,6 @@ router.route("/:id")
         allowedTo("admin"),
         deleteProductValidator,
         deleteProduct
-    );
-
-module.exports = router;
-</file>
-
-<file path="backend/routes/ReviewRoutes.js">
-const express = require("express");
-
-const {
-    protect,
-    allowedTo
-} = require("../middlewares/authMiddleware");
-
-const {
-    addUserIdToReqBody,
-    addProductIdToReqBody,
-} = require("../middlewares/reviewMiddleware");
-
-const {
-    createReviewValidator,
-    getReviewValidator,
-    updateReviewValidator,
-    deleteReviewValidator
-} = require("../utils/validators/reviewValidator");
-
-const {
-    getAllReviews,
-    getReview,
-    createReview,
-    updateReview,
-    deleteReview
-} = require("../controllers/ReviewController");
-
-let router = express.Router({ mergeParams: true });
-
-router.route("/")
-    .get(getAllReviews)
-    .post(
-        protect,
-        allowedTo("user"),
-        addUserIdToReqBody,
-        addProductIdToReqBody,
-        createReviewValidator,
-        createReview
-    );
-
-router.route("/:id")
-    .get(
-        getReviewValidator,
-        getReview
-    )
-    .patch(
-        protect,
-        allowedTo("user"),
-        addUserIdToReqBody,
-        addProductIdToReqBody,
-        updateReviewValidator,
-        updateReview
-    )
-    .delete(
-        protect,
-        addUserIdToReqBody,
-        addProductIdToReqBody,
-        deleteReviewValidator,
-        deleteReview
     );
 
 module.exports = router;
@@ -7964,31 +7880,6 @@ export default function ReviewsClient({ reviews: initial }: { reviews: UserRevie
 }
 </file>
 
-<file path="frontend/components/AuthInput/AuthInput.tsx">
-import React from "react";
-
-type AuthInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
-  error?: string;
-};
-
-export default function AuthInput({ error, className, ...props }: AuthInputProps) {
-  return (
-    <div className="w-full">
-      <input
-        {...props}
-        className={[
-          "h-10 w-full border-b border-[#c7c7c7] bg-transparent text-sm text-[#111] outline-none transition focus:border-[#111]",
-          className,
-        ]
-          .filter(Boolean)
-          .join(" ")}
-      />
-      {error ? <p className="mt-1 text-xs text-red-500">{error}</p> : null}
-    </div>
-  );
-}
-</file>
-
 <file path="frontend/components/Cart/CartActions.tsx">
 import Link from "next/link";
 
@@ -11337,42 +11228,6 @@ export type RegisterSchema = z.infer<typeof registerSchema>;
 export type LoginSchema = z.infer<typeof loginSchema>;
 </file>
 
-<file path="frontend/services/authService.ts">
-import axios from "axios";
-
-export const login = async (data: { email: string; password: string }) => {
-    const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/login`,
-        data,
-        { withCredentials: true } // ✅ عشان السيرفر يقرأ الكوكي
-    );
-    return res.data;
-};
-
-export const logout = async () => {
-    const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/logout`,
-        {},
-        { withCredentials: true } // ✅ عشان السيرفر يحذف الكوكي
-    );
-    return res.data;
-};
-
-export const register = async (data: {
-    name: string;
-    email: string;
-    password: string;
-    passwordConfirm: string;
-}) => {
-    const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/signup`,
-        data,
-        { withCredentials: true }
-    );
-    return res.data;
-};
-</file>
-
 <file path="frontend/services/cartService.ts">
 import { apiClient } from "@/lib/apiClient";
 
@@ -11447,39 +11302,6 @@ export async function fetchProducts(params: Record<string, string | number>): Pr
     if (!res.ok) throw new Error('Failed to fetch products')
     return res.json()
 }
-</file>
-
-<file path="frontend/services/server/orderService.ts">
-import { apiClient } from "@/lib/apiClient";
-import { cookies } from "next/headers"; // ← نجيب الـ cookies من الـ server
-import { Order } from "@/types/Order";
-
-// helper عشان ما نكرر الكود
-async function getServerCookies() {
-    const cookieStore = await cookies();
-    return { Cookie: cookieStore.toString() };
-}
-
-export async function getMyOrders(): Promise<Order[]> {
-    try {
-        const res = await apiClient.get("/api/v1/orders", {
-            headers: await getServerCookies(), // ← نبعت الـ cookies يدوياً
-        });
-        return res.data?.data?.docs ?? [];
-    } catch {
-        return [];
-    }
-}
-
-// // cancelOrder و returnOrder بيشتغلوا من الـ client (browser)
-// // فما بحتاجوا تعديل — withCredentials بيكفي
-// export async function cancelOrder(id: string): Promise<void> {
-//     await apiClient.patch(`/api/v1/orders/${id}/cancel`);
-// }
-
-// export async function returnOrder(id: string): Promise<void> {
-//     await apiClient.patch(`/api/v1/orders/${id}/return`);
-// }
 </file>
 
 <file path="frontend/services/wishlistService.ts">
@@ -13061,125 +12883,6 @@ module.exports = {
 }
 </file>
 
-<file path="backend/controllers/Controller.js">
-const { default: slugify } = require("slugify");
-const { asyncErrorHandler } = require("../middlewares/ErrorMiddleware");
-const QueryManipulater = require("../utils/QueryManipulater");
-const CustomError = require("../utils/CustomError");
-
-let getAll = function (model) {
-    return asyncErrorHandler(async function (req, res) {
-
-        let qm = new QueryManipulater(req, model)
-            .filter()
-            .discountFilter()
-            .limit()
-            .sort()
-            .search()
-
-        // نحسب الإجمالي قبل الـ pagination
-        let totalCount = await qm.query.clone().countDocuments();
-
-        qm.paginate();
-
-        // let docs = await qm.query.find(req.filterObj);
-        let docs = await qm.query;
-
-        res.status(200).json({
-            status: "success",
-            count: docs.length,
-            totalCount,
-            data: {
-                docs
-            }
-        });
-    });
-}
-
-let createOne = function (model) {
-    return asyncErrorHandler(async function (req, res) {
-        if (req.body.name)
-            req.body.slug = slugify(req.body.name);
-
-        let newDoc = await model.create(req.body);
-
-        res.status(201).json({
-            status: "success",
-            data: {
-                newDoc
-            }
-        });
-    });
-}
-
-let getOne = function (model, modelName = "", populateOption = "") {
-    return asyncErrorHandler(async function (req, res) {
-        let query = model.findById(req.params.id);
-
-        if (populateOption)
-            query.populate(populateOption);
-
-        let doc = await query;
-
-        if (!doc)
-            throw new CustomError(`There is no ${modelName} with id : ${req.params.id}`, 404);
-        res.status(200).json({
-            status: "success",
-            data: {
-                doc
-            }
-        });
-    });
-}
-
-let updateOne = function (model, modelName) {
-    return asyncErrorHandler(async function (req, res) {
-        if (req.body.name)
-            req.body.slug = slugify(req.body.name);
-
-        let updatedDoc = await model.findByIdAndUpdate(req.params.id, req.body,
-            {
-                runValidators: true,
-                new: true
-            }
-        );
-
-        if (!updatedDoc)
-            throw new CustomError(`There is no ${modelName} with id : ${req.params.id}`, 404);
-
-        updatedDoc.save();
-
-        res.status(200).json({
-            status: "success",
-            data: {
-                updatedDoc
-            }
-        });
-    });
-}
-
-let deleteOne = function (model, modelName = "") {
-    return asyncErrorHandler(async function (req, res) {
-        let deletedDoc = await model.findOneAndDelete(req.params.id);
-
-        if (!deletedDoc)
-            throw new CustomError(`There is no ${modelName} with id: ${req.params.id}`, 404);
-
-        res.status(204).send();
-
-    });
-};
-
-
-module.exports = {
-    getAll,
-    createOne,
-    getOne,
-    updateOne,
-    deleteOne
-}
-</file>
-
 <file path="backend/controllers/OrderController.js">
 const Order = require("../models/Order");
 const Product = require("../models/Product");
@@ -13302,6 +13005,31 @@ module.exports = {
     cancelOrder,
     returnOrder
 };
+</file>
+
+<file path="backend/middlewares/reviewMiddleware.js">
+let addUserIdToReqBody = function (req, res, next) {
+    req.body.user = req.user.id;
+    next();
+}
+
+let addProductIdToReqBody = function (req, res, next) {
+    if (req.params.productId)
+        req.body.product = req.params.productId;
+    next();
+}
+
+let addProductIdToFilterObj = function (req, res, next) {
+    if (req.params.productId)
+        req.filterObj = { product: req.params.productId };
+    next();
+}
+
+module.exports = {
+    addUserIdToReqBody,
+    addProductIdToReqBody,
+    addProductIdToFilterObj
+}
 </file>
 
 <file path="backend/models/Category.js">
@@ -13971,6 +13699,72 @@ router.route("/:id")
     .get(
         getOrderValidator,
         getOrder
+    );
+
+module.exports = router;
+</file>
+
+<file path="backend/routes/ReviewRoutes.js">
+const express = require("express");
+
+const {
+    protect,
+    allowedTo
+} = require("../middlewares/authMiddleware");
+
+const {
+    addUserIdToReqBody,
+    addProductIdToReqBody,
+    addProductIdToFilterObj,
+} = require("../middlewares/reviewMiddleware");
+
+const {
+    createReviewValidator,
+    getReviewValidator,
+    updateReviewValidator,
+    deleteReviewValidator
+} = require("../utils/validators/reviewValidator");
+
+const {
+    getAllReviews,
+    getReview,
+    createReview,
+    updateReview,
+    deleteReview
+} = require("../controllers/ReviewController");
+
+let router = express.Router({ mergeParams: true });
+
+router.route("/")
+    .get(addProductIdToFilterObj, getAllReviews)
+    .post(
+        protect,
+        allowedTo("user"),
+        addUserIdToReqBody,
+        addProductIdToReqBody,
+        createReviewValidator,
+        createReview
+    );
+
+router.route("/:id")
+    .get(
+        getReviewValidator,
+        getReview
+    )
+    .patch(
+        protect,
+        allowedTo("user"),
+        addUserIdToReqBody,
+        addProductIdToReqBody,
+        updateReviewValidator,
+        updateReview
+    )
+    .delete(
+        protect,
+        addUserIdToReqBody,
+        addProductIdToReqBody,
+        deleteReviewValidator,
+        deleteReview
     );
 
 module.exports = router;
@@ -14898,6 +14692,37 @@ export default function WishlistPage() {
         </div>
     );
 }
+</file>
+
+<file path="frontend/components/AuthInput/AuthInput.tsx">
+import React, { forwardRef } from "react";
+
+type AuthInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
+  error?: string;
+};
+
+const AuthInput = forwardRef<HTMLInputElement, AuthInputProps>(
+  ({ error, className, ...props }, ref) => {
+    return (
+      <div className="w-full">
+        <input
+          ref={ref}
+          {...props}
+          className={[
+            "h-10 w-full border-b border-[#c7c7c7] bg-transparent text-sm text-[#111] outline-none transition focus:border-[#111]",
+            className,
+          ]
+            .filter(Boolean)
+            .join(" ")}
+        />
+        {error ? <p className="mt-1 text-xs text-red-500">{error}</p> : null}
+      </div>
+    );
+  }
+);
+
+AuthInput.displayName = "AuthInput";
+export default AuthInput;
 </file>
 
 <file path="frontend/components/CarouselPlugin/index.tsx">
@@ -16190,54 +16015,6 @@ export const useCart = () => {
 };
 </file>
 
-<file path="frontend/hooks/useRegister.ts">
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { register } from "@/services/authService";
-import { useRouter } from "next/navigation";
-
-interface User {
-    id: string;
-    name: string;
-    email: string;
-}
-
-interface RegisterResponse {
-    token: string;
-    user: User;
-}
-
-interface RegisterRequest {
-    name: string;
-    email: string;
-    password: string;
-    passwordConfirm: string;
-}
-
-interface ApiError {
-    response?: { data?: { message: string } };
-    message?: string;
-}
-
-export const useRegister = () => {
-    const queryClient = useQueryClient();
-    const router = useRouter();
-
-    return useMutation<RegisterResponse, ApiError, RegisterRequest>({
-        mutationFn: register,
-
-        onSuccess: (data) => {
-            queryClient.setQueryData(["user"], data.user);
-            router.push("/");
-            router.refresh();
-        },
-
-        onError: (error) => {
-            console.log("Register error", error.response?.data?.message || error.message);
-        },
-    });
-};
-</file>
-
 <file path="frontend/lib/apiClient.ts">
 import axios from "axios";
 
@@ -16263,6 +16040,77 @@ export const queryClient = new QueryClient({
         },
     },
 });
+</file>
+
+<file path="frontend/services/authService.ts">
+import axios from "axios";
+
+export const login = async (data: { email: string; password: string }) => {
+    const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/login`,
+        data,
+        { withCredentials: true } // ✅ عشان السيرفر يقرأ الكوكي
+    );
+    return res.data;
+};
+
+export const logout = async () => {
+    const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/logout`,
+        {},
+        { withCredentials: true } // ✅ عشان السيرفر يحذف الكوكي
+    );
+    return res.data;
+};
+
+export const register = async (data: {
+    name: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+}) => {
+    const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/signup`,
+        data,
+        { withCredentials: true }
+    );
+    return res.data;
+};
+</file>
+
+<file path="frontend/services/server/orderService.ts">
+import { cookies } from "next/headers";
+import { Order } from "@/types/Order";
+
+const API = process.env.API_URL; // ← مباشرة للـ backend مش الـ proxy
+
+export async function getMyOrders(): Promise<Order[]> {
+    try {
+        const cookieStore = await cookies();
+        const token = cookieStore.get("token")?.value;
+        if (!token) return [];
+
+        const res = await fetch(`${API}/api/v1/orders`, {
+            headers: { Cookie: `token=${token}` },
+            cache: "no-store",
+        });
+
+        if (!res.ok) return [];
+        const data = await res.json();
+        return data?.data?.docs ?? [];
+    } catch {
+        return [];
+    }
+}
+// // cancelOrder و returnOrder بيشتغلوا من الـ client (browser)
+// // فما بحتاجوا تعديل — withCredentials بيكفي
+// export async function cancelOrder(id: string): Promise<void> {
+//     await apiClient.patch(`/api/v1/orders/${id}/cancel`);
+// }
+
+// export async function returnOrder(id: string): Promise<void> {
+//     await apiClient.patch(`/api/v1/orders/${id}/return`);
+// }
 </file>
 
 <file path="frontend/services/server/userService.ts">
@@ -16369,6 +16217,129 @@ export interface BillingData {
 export type PaymentMethod = 'cash' | 'card';
 </file>
 
+<file path="backend/controllers/Controller.js">
+const { default: slugify } = require("slugify");
+const { asyncErrorHandler } = require("../middlewares/ErrorMiddleware");
+const QueryManipulater = require("../utils/QueryManipulater");
+const CustomError = require("../utils/CustomError");
+
+
+let getAll = function (model) {
+    return asyncErrorHandler(async function (req, res) {
+
+        let qm = new QueryManipulater(req, model)
+            .filter()
+            .discountFilter()
+            .limit()
+            .sort()
+            .search()
+
+        // ← أضف هاد هون
+        if (req.filterObj) {
+            qm.query = qm.query.find(req.filterObj);
+        }
+
+        let totalCount = await qm.query.clone().countDocuments();
+
+        qm.paginate();
+
+        let docs = await qm.query;
+
+        res.status(200).json({
+            status: "success",
+            count: docs.length,
+            totalCount,
+            data: {
+                docs
+            }
+        });
+    });
+}
+
+let createOne = function (model) {
+    return asyncErrorHandler(async function (req, res) {
+        if (req.body.name)
+            req.body.slug = slugify(req.body.name);
+
+        let newDoc = await model.create(req.body);
+
+        res.status(201).json({
+            status: "success",
+            data: {
+                newDoc
+            }
+        });
+    });
+}
+
+let getOne = function (model, modelName = "", populateOption = "") {
+    return asyncErrorHandler(async function (req, res) {
+        let query = model.findById(req.params.id);
+
+        if (populateOption)
+            query.populate(populateOption);
+
+        let doc = await query;
+
+        if (!doc)
+            throw new CustomError(`There is no ${modelName} with id : ${req.params.id}`, 404);
+        res.status(200).json({
+            status: "success",
+            data: {
+                doc
+            }
+        });
+    });
+}
+
+let updateOne = function (model, modelName) {
+    return asyncErrorHandler(async function (req, res) {
+        if (req.body.name)
+            req.body.slug = slugify(req.body.name);
+
+        let updatedDoc = await model.findByIdAndUpdate(req.params.id, req.body,
+            {
+                runValidators: true,
+                new: true
+            }
+        );
+
+        if (!updatedDoc)
+            throw new CustomError(`There is no ${modelName} with id : ${req.params.id}`, 404);
+
+        updatedDoc.save();
+
+        res.status(200).json({
+            status: "success",
+            data: {
+                updatedDoc
+            }
+        });
+    });
+}
+
+let deleteOne = function (model, modelName = "") {
+    return asyncErrorHandler(async function (req, res) {
+        let deletedDoc = await model.findOneAndDelete(req.params.id);
+
+        if (!deletedDoc)
+            throw new CustomError(`There is no ${modelName} with id: ${req.params.id}`, 404);
+
+        res.status(204).send();
+
+    });
+};
+
+
+module.exports = {
+    getAll,
+    createOne,
+    getOne,
+    updateOne,
+    deleteOne
+}
+</file>
+
 <file path="backend/package.json">
 {
   "name": "ecommerce-api",
@@ -16423,123 +16394,6 @@ export type PaymentMethod = 'cash' | 'card';
     "nodemon": "^3.1.10",
     "prettier": "^3.5.3"
   }
-}
-</file>
-
-<file path="frontend/app/(auth)/register/page.tsx">
-"use client";
-
-import React from "react";
-import Link from "next/link";
-import StyledButton from "@/components/StyledButton";
-import AuthInput from "@/components/AuthInput/AuthInput";
-import { useRegister } from "@/hooks/useRegister";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { registerSchema, type RegisterSchema } from "@/schemas/authSchemas";
-
-export default function Register() {
-    const { mutate: registerUser, isPending, error } = useRegister();
-
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-    } = useForm<RegisterSchema>({
-        resolver: zodResolver(registerSchema),
-        defaultValues: {
-            name: "",
-            email: "",
-            password: "",
-            confirmPassword: "",
-        },
-    });
-
-    const onSubmit = (data: RegisterSchema) => {
-        const { confirmPassword, ...rest } = data;
-        registerUser({ ...rest, passwordConfirm: confirmPassword });
-    };
-
-    return (
-        <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="w-full max-w-md px-4"
-        >
-            {/* Title */}
-            <h1 className="text-2xl md:text-4xl font-medium text-black">
-                Create an account
-            </h1>
-
-            <p className="mt-2 text-sm md:text-base text-black">
-                Enter your details below
-            </p>
-
-            {/* Inputs */}
-            <div className="mt-6 flex flex-col gap-5">
-                <AuthInput
-                    type="text"
-                    placeholder="Name"
-                    autoComplete="name"
-                    {...register("name")}
-                    error={errors.name?.message}
-                />
-
-                <AuthInput
-                    type="text"
-                    placeholder="Email or Phone Number"
-                    autoComplete="username"
-                    {...register("email")}
-                    error={errors.email?.message}
-                />
-
-                <AuthInput
-                    type="password"
-                    placeholder="Password"
-                    autoComplete="new-password"
-                    {...register("password")}
-                    error={errors.password?.message}
-                />
-
-                <AuthInput
-                    type="password"
-                    placeholder="Confirm Password"
-                    autoComplete="new-password"
-                    {...register("confirmPassword")}
-                    error={errors.confirmPassword?.message}
-                />
-
-                {error && (
-                    <p className="text-red-500 text-sm">
-                        {error.response?.data?.message || "Register failed"}
-                    </p>
-                )}
-            </div>
-
-            {/* Actions */}
-            <div className="mt-6 flex flex-col gap-3">
-                <StyledButton
-                    title="Create Account"
-                    isLoading={isPending}
-                    loadingText="Creating ..."
-                    type="submit"
-                    ClassName="w-full"
-                />
-
-                <StyledButton
-                    title="Sign up with Google"
-                    type="button"
-                    ClassName="w-full border border-black bg-transparent text-black"
-                />
-
-                <p className="text-center text-sm">
-                    Already have an account?
-                    <Link href="/login" className="ml-2 font-semibold underline">
-                        Login
-                    </Link>
-                </p>
-            </div>
-        </form>
-    );
 }
 </file>
 
@@ -17028,6 +16882,54 @@ export function Columns() {
 }
 </file>
 
+<file path="frontend/hooks/useRegister.ts">
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { register } from "@/services/authService";
+import { useRouter } from "next/navigation";
+
+interface User {
+    id: string;
+    name: string;
+    email: string;
+}
+
+interface RegisterResponse {
+    token: string;
+    user: User;
+}
+
+interface RegisterRequest {
+    name: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+}
+
+interface ApiError {
+    response?: { data?: { message: string } };
+    message?: string;
+}
+
+export const useRegister = () => {
+    const queryClient = useQueryClient();
+    const router = useRouter();
+
+    return useMutation<RegisterResponse, ApiError, RegisterRequest>({
+        mutationFn: register,
+
+        onSuccess: (data) => {
+            queryClient.setQueryData(["user"], data.user);
+            router.push("/");
+            router.refresh();
+        },
+
+        onError: (error) => {
+            console.log("Register error", error.response?.data?.message || error.message);
+        },
+    });
+};
+</file>
+
 <file path="frontend/hooks/useWishlist.ts">
 "use client";
 
@@ -17435,6 +17337,123 @@ const run = async () => {
 };
 
 run();
+</file>
+
+<file path="frontend/app/(auth)/register/page.tsx">
+"use client";
+
+import React from "react";
+import Link from "next/link";
+import StyledButton from "@/components/StyledButton";
+import AuthInput from "@/components/AuthInput/AuthInput";
+import { useRegister } from "@/hooks/useRegister";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { registerSchema, type RegisterSchema } from "@/schemas/authSchemas";
+
+export default function Register() {
+    const { mutate: registerUser, isPending, error } = useRegister();
+
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm<RegisterSchema>({
+        resolver: zodResolver(registerSchema),
+        defaultValues: {
+            name: "",
+            email: "",
+            password: "",
+            confirmPassword: "",
+        },
+    });
+
+    const onSubmit = (data: RegisterSchema) => {
+        const { confirmPassword, ...rest } = data;
+        registerUser({ ...rest, confirmPassword: confirmPassword });
+    };
+
+    return (
+        <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="w-full max-w-md px-4"
+        >
+            {/* Title */}
+            <h1 className="text-2xl md:text-4xl font-medium text-black">
+                Create an account
+            </h1>
+
+            <p className="mt-2 text-sm md:text-base text-black">
+                Enter your details below
+            </p>
+
+            {/* Inputs */}
+            <div className="mt-6 flex flex-col gap-5">
+                <AuthInput
+                    type="text"
+                    placeholder="Name"
+                    autoComplete="name"
+                    {...register("name")}
+                    error={errors.name?.message}
+                />
+
+                <AuthInput
+                    type="text"
+                    placeholder="Email or Phone Number"
+                    autoComplete="username"
+                    {...register("email")}
+                    error={errors.email?.message}
+                />
+
+                <AuthInput
+                    type="password"
+                    placeholder="Password"
+                    autoComplete="new-password"
+                    {...register("password")}
+                    error={errors.password?.message}
+                />
+
+                <AuthInput
+                    type="password"
+                    placeholder="Confirm Password"
+                    autoComplete="new-password"
+                    {...register("confirmPassword")}
+                    error={errors.confirmPassword?.message}
+                />
+
+                {error && (
+                    <p className="text-red-500 text-sm">
+                        {error.response?.data?.message || "Register failed"}
+                    </p>
+                )}
+            </div>
+
+            {/* Actions */}
+            <div className="mt-6 flex flex-col gap-3">
+                <StyledButton
+                    title="Create Account"
+                    isLoading={isPending}
+                    loadingText="Creating ..."
+                    type="submit"
+                    ClassName="w-full"
+                />
+
+                <StyledButton
+                    title="Sign up with Google"
+                    type="button"
+                    ClassName="w-full border border-black bg-transparent text-black"
+                />
+
+                <p className="text-center text-sm">
+                    Already have an account?
+                    <Link href="/login" className="ml-2 font-semibold underline">
+                        Login
+                    </Link>
+                </p>
+            </div>
+        </form>
+    );
+}
 </file>
 
 <file path="frontend/app/globals.css">

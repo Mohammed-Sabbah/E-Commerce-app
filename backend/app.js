@@ -9,6 +9,7 @@ const helmet = require("helmet");
 const sanitizer = require("express-mongo-sanitize");
 const xss = require("xss-clean");
 const cookieParser = require('cookie-parser');
+const compression = require("compression"); // ← مضاف
 
 // import strategy
 const strategies = require('./config/passport');
@@ -24,6 +25,14 @@ let app = express();
 
 app.use(cookieParser());
 
+// ─── Compression ────────────────────────────────────────────
+// يضغط كل الـ responses (JSON, HTML, etc.) — يوفّر 40-60% من حجم الـ responses
+// استثناء: الـ webhook route يحتاج raw body، لذلك يتعرّف عليه قبل الـ compression
+app.use(compression({
+    level: 6,          // توازن بين السرعة وحجم الضغط (1-9)
+    threshold: 1024,   // ما يضغطش responses أصغر من 1KB
+}));
+// ────────────────────────────────────────────────────────────
 
 // Health check
 app.get('/healthz', (req, res) => res.send('OK'));
@@ -33,7 +42,7 @@ app.get('/healthz', (req, res) => res.send('OK'));
 passport.use(strategies.googleStrategy);
 passport.use(strategies.facebookStrategy);
 
-//webhook route
+//webhook route — raw body لازم يجي قبل express.json
 const { webhook } = require("./controllers/PaymentController");
 app.post("/api/v1/webhook", express.raw({ type: "application/json" }), webhook);
 
