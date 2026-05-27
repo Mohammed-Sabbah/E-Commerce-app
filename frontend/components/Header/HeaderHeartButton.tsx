@@ -27,6 +27,7 @@ function HeaderHeartButton({ token }: { token?: string }) {
     return (
         <button
             onClick={() => router.push("/wishlist")}
+            aria-label="Wishlist"
             className="relative flex items-center justify-center cursor-pointer"
         >
             <HeartIcon className="h-6 w-6 transition-transform duration-200 hover:scale-120" />
