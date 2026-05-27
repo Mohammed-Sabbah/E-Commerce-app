@@ -86,8 +86,8 @@ function ProductCard({ product, className, variant = "default" }: ProductCardPro
 
                 {/* Eye */}
                 {current.showEye && (
-                    <Link href={`/products/${product._id}`} className='bg-white/80 hover:bg-white w-9 h-9 rounded-full absolute top-13.5 right-2.5 cursor-pointer flex items-center justify-center'>
-                        <EyeIcon className="h-6 w-6 text-center translate-y-[1px]" />
+                    <Link href={`/products/${product._id}`} aria-label={`View ${product.name}`} className='bg-white/80 hover:bg-white w-9 h-9 rounded-full absolute top-13.5 right-2.5 cursor-pointer flex items-center justify-center'>
+                        <EyeIcon aria-hidden="true" className="h-6 w-6 text-center translate-y-[1px]" />
                     </Link>
                 )}
             </div>

@@ -27,6 +27,7 @@ function HeaderCartButton({ token }: { token?: string }) {
     return (
         <button
             onClick={() => router.push("/cart")}
+            aria-label="Shopping cart"
             className="relative flex items-center justify-center cursor-pointer"
         >
             <ShoppingCartIcon className="h-6 w-6 transition-transform duration-200 hover:scale-120" />
