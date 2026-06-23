@@ -1,6 +1,7 @@
 const Order = require("../models/Order");
 const Product = require("../models/Product");
 const Cart = require("../models/Cart");
+const Coupon = require("../models/Coupon");
 const { asyncErrorHandler } = require("../middlewares/ErrorMiddleware");
 const {
     getAll,
@@ -27,9 +28,14 @@ const createOrder = asyncErrorHandler(async function (req, res, next) {
         cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2)
     );
 
-    // 4- apply coupon ratio if exists
+    // 4- apply coupon if provided
     let finalOrderPrice = orderPrice;
-    if (cart.totalPriceAfterDiscount) {
+    if (req.body.couponCode) {
+        const coupon = await Coupon.findOne({ name: req.body.couponCode, expire: { $gte: Date.now() } });
+        if (!coupon)
+            return next(new CustomError("Invalid or expired coupon", 400));
+        finalOrderPrice = parseFloat((orderPrice - (orderPrice * (coupon.discount / 100))).toFixed(2));
+    } else if (cart.totalPriceAfterDiscount) {
         const discountRatio = cart.totalPriceAfterDiscount / cart.totalPrice;
         finalOrderPrice = parseFloat((orderPrice * discountRatio).toFixed(2));
     }

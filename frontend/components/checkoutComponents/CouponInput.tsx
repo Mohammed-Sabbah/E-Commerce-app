@@ -1,41 +1,71 @@
 'use client';
 
-import { useState } from 'react';
-import { applyCoupon } from '@/services/cartService';
+import { useState, useEffect, useRef } from 'react';
+import { apiClient } from '@/lib/apiClient';
 
 interface Props {
-    onApply: (discount: number) => void;
+    onApply: (discount: number, code: string) => void;
     subtotal: number;
+    initialCode?: string;
 }
 
-export default function CouponInput({ onApply, subtotal }: Props) {
-    const [code, setCode] = useState('');
+export default function CouponInput({ onApply, subtotal, initialCode }: Props) {
+    const [code, setCode] = useState(initialCode ?? '');
     const [error, setError] = useState('');
-    const [applied, setApplied] = useState(false);
+    const [appliedCode, setAppliedCode] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
+    const initialApplied = useRef(false);
+
+    useEffect(() => {
+        if (!initialCode || initialApplied.current) return;
+        initialApplied.current = true;
+        (async () => {
+            setLoading(true);
+            try {
+                const res = await apiClient.post("/api/v1/coupons/validate", { code: initialCode });
+                const data = res.data?.data;
+                if (data?.valid && data?.discount) {
+                    const amount = parseFloat(((subtotal * data.discount) / 100).toFixed(2));
+                    onApply(amount, initialCode);
+                    setAppliedCode(initialCode);
+                }
+            } catch {
+                // silent — user can retry
+            } finally {
+                setLoading(false);
+            }
+        })();
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleApply = async () => {
         setError('');
         setLoading(true);
         try {
-            const res = await applyCoupon(code.trim());
-            const cart = res.data?.cart;
-            if (cart?.totalPriceAfterDiscount != null) {
-                const discount = subtotal - cart.totalPriceAfterDiscount;
-                onApply(discount > 0 ? discount : 0);
-                setApplied(true);
+            const res = await apiClient.post("/api/v1/coupons/validate", { code: code.trim() });
+            const data = res.data?.data;
+            if (data?.valid && data?.discount) {
+                const discount = parseFloat(((subtotal * data.discount) / 100).toFixed(2));
+                onApply(discount, code.trim());
+                setAppliedCode(code.trim());
             } else {
-                onApply(0);
+                onApply(0, '');
                 setError('Coupon could not be applied');
             }
         } catch (err: any) {
-            const msg = err?.response?.data?.message || 'Failed to apply coupon';
-            onApply(0);
+            const msg = err?.response?.data?.message || 'Failed to validate coupon';
+            onApply(0, '');
             setError(msg);
-            setApplied(false);
+            setAppliedCode(null);
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleRemove = () => {
+        setCode('');
+        setAppliedCode(null);
+        setError('');
+        onApply(0, '');
     };
 
     return (
@@ -46,23 +76,35 @@ export default function CouponInput({ onApply, subtotal }: Props) {
                     onChange={(e) => {
                         setCode(e.target.value);
                         setError('');
-                        setApplied(false);
-                        onApply(0);
+                        if (e.target.value !== appliedCode) {
+                            setAppliedCode(null);
+                            onApply(0, '');
+                        }
                     }}
                     placeholder="Coupon Code"
                     className="flex-1 h-11 px-4 border border-gray-300 rounded text-sm focus:outline-none focus:border-gray-500 transition-colors"
                 />
-                <button
-                    type="button"
-                    onClick={handleApply}
-                    disabled={loading || !code.trim()}
-                    className="h-11 px-6 bg-red-500 hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded transition-colors whitespace-nowrap"
-                >
-                    {loading ? 'Applying...' : 'Apply Coupon'}
-                </button>
+                {appliedCode ? (
+                    <button
+                        type="button"
+                        onClick={handleRemove}
+                        className="h-11 px-6 bg-gray-500 hover:bg-gray-600 text-white text-sm font-medium rounded transition-colors whitespace-nowrap"
+                    >
+                        Remove
+                    </button>
+                ) : (
+                    <button
+                        type="button"
+                        onClick={handleApply}
+                        disabled={loading || !code.trim()}
+                        className="h-11 px-6 bg-red-500 hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded transition-colors whitespace-nowrap"
+                    >
+                        {loading ? 'Validating...' : 'Apply Coupon'}
+                    </button>
+                )}
             </div>
             {error && <p className="text-xs text-red-500 pl-1">{error}</p>}
-            {applied && <p className="text-xs text-green-600 pl-1">Coupon applied successfully!</p>}
+            {appliedCode && <p className="text-xs text-green-600 pl-1">Coupon &quot;{appliedCode}&quot; applied — discount shown at checkout</p>}
         </div>
     );
 }

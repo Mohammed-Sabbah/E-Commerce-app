@@ -14,7 +14,6 @@ let getAll = function (model) {
             .sort()
             .search()
 
-        // ← أضف هاد هون
         if (req.filterObj) {
             qm.query = qm.query.find(req.filterObj);
         }
@@ -100,7 +99,8 @@ let updateOne = function (model, modelName) {
 
 let deleteOne = function (model, modelName = "") {
     return asyncErrorHandler(async function (req, res) {
-        let deletedDoc = await model.findOneAndDelete(req.params.id);
+        // ✅ إصلاح: findOneAndDelete(string) دايماً ترجع null — لازم findByIdAndDelete
+        let deletedDoc = await model.findByIdAndDelete(req.params.id);
 
         if (!deletedDoc)
             throw new CustomError(`There is no ${modelName} with id: ${req.params.id}`, 404);

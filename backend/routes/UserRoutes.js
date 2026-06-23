@@ -72,7 +72,8 @@ router.route("/deleteMe")
     );
 
 router.route("/")
-    .get(getAllUsers)
+    // ✅ إصلاح: أضفنا protect + allowedTo("admin") — كان مكشوفاً للجميع
+    .get(protect, allowedTo("admin"), getAllUsers)
     .post(
         protect,
         allowedTo("admin"),
@@ -100,8 +101,6 @@ router.route("/:id/activate")
 
 
 // ─── My Reviews ──────────────────────────────────────────────────────────────
-// GET /api/v1/users/myReviews
-// يرجع كل reviews اليوزر المسجل مع populate للمنتج
 router.route("/myReviews")
     .get(
         protect,

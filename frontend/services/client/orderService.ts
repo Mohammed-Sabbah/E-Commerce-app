@@ -4,6 +4,7 @@ import { apiClient } from '@/lib/apiClient';
 export interface PlaceOrderPayload {
     shippingAddress: string;
     paymentMethod: 'cash' | 'card';
+    couponCode?: string;
 }
 
 export async function placeOrder(payload: PlaceOrderPayload) {

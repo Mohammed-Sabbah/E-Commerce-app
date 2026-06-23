@@ -25,6 +25,11 @@ const createOrderValidator = [
         .isIn(["cash", "card"])
         .withMessage("invalid payment Method"),
 
+    validator.check("couponCode")
+        .optional()
+        .isString()
+        .withMessage("couponCode must be a string"),
+
     validator.check("shippingAddress")
         .notEmpty()
         .withMessage("shipping address is required.")

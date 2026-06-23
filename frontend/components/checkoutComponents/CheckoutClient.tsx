@@ -14,14 +14,16 @@ import BillingForm from './BillingForm';
 interface Props {
     addresses: Address[];
     initialBilling: BillingData;
+    initialCoupon?: string;
 }
 
-export default function CheckoutClient({ addresses, initialBilling }: Props) {
+export default function CheckoutClient({ addresses, initialBilling, initialCoupon }: Props) {
     const [selectedAddressId, setSelectedAddressId] = useState<string>(
         addresses[0]?._id ?? ''
     );
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cash');
     const [discount, setDiscount] = useState(0);
+    const [couponCode, setCouponCode] = useState('');
 
     const { cart } = useCart();
     const { submit, loading, error } = usePlaceOrder();
@@ -42,7 +44,7 @@ export default function CheckoutClient({ addresses, initialBilling }: Props) {
 
     const handlePlaceOrder = async () => {
         if (paymentMethod === 'card') return;
-        await submit({ addressId: selectedAddressId, paymentMethod });
+        await submit({ addressId: selectedAddressId, paymentMethod, couponCode });
     };
 
     return (
@@ -98,7 +100,7 @@ export default function CheckoutClient({ addresses, initialBilling }: Props) {
             <div className="flex flex-col gap-6">
                 <OrderSummary items={items} discount={discount} />
                 <PaymentMethodSelector value={paymentMethod} onChange={setPaymentMethod} />
-                <CouponInput onApply={setDiscount} subtotal={subtotal} />
+                <CouponInput onApply={(amount, code) => { setDiscount(amount); setCouponCode(code); }} subtotal={subtotal} initialCode={initialCoupon} />
 
                 {error && (
                     <p className="text-sm text-red-500">{error}</p>

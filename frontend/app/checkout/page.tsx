@@ -1,8 +1,13 @@
 import { getMyProfile } from '@/services/server/userService';
 import CheckoutClient from '@/components/checkoutComponents/CheckoutClient';
 
-export default async function CheckoutPage() {
+export default async function CheckoutPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ coupon?: string }>;
+}) {
     const user = await getMyProfile();
+    const { coupon } = await searchParams;
 
     const addresses = user?.addresses ?? [];
 
@@ -33,6 +38,7 @@ export default async function CheckoutPage() {
             <CheckoutClient
                 addresses={addresses}
                 initialBilling={initialBilling}
+                initialCoupon={coupon}
             />
         </main>
     );
