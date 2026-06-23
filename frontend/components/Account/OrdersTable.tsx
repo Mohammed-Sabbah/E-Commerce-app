@@ -5,6 +5,8 @@ import Image from "next/image";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { apiClient } from "@/lib/apiClient";
 import { Order, OrderFilter } from "@/types/Order";
+import { STATUS_STYLES, formatId } from "@/constants/orders";
+import { formatDate } from "@/lib/utils";
 
 const TABS: { label: string; value: OrderFilter }[] = [
     { label: "All", value: "all" },
@@ -13,28 +15,10 @@ const TABS: { label: string; value: OrderFilter }[] = [
     { label: "Returned", value: "returned" },
 ];
 
-const STATUS_STYLES: Record<string, string> = {
-    pending: "bg-yellow-100 text-yellow-700",
-    processing: "bg-blue-100 text-blue-700",
-    delivered: "bg-green-100 text-green-700",
-    cancelled: "bg-red-100 text-red-600",
-    returned: "bg-gray-100 text-gray-600",
-};
-
 function filterOrders(orders: Order[], filter: OrderFilter): Order[] {
     if (filter === "all") return orders;
     if (filter === "active") return orders.filter(o => ["pending", "processing", "delivered"].includes(o.status));
     return orders.filter(o => o.status === filter);
-}
-
-function formatDate(dateStr: string) {
-    return new Date(dateStr).toLocaleDateString("en-GB", {
-        day: "2-digit", month: "short", year: "numeric"
-    });
-}
-
-function formatId(id: string) {
-    return `#${id.slice(-6).toUpperCase()}`;
 }
 
 function ExpandedItems({ order }: { order: Order }) {

@@ -66,15 +66,7 @@ const orderSchema = new mongoose.Schema(
     }
 );
 
-orderSchema.pre(/^find/, function (next) {
-    this.populate({
-        path: "user",
-        select: "name email coverImage"
-    }).populate({
-        path: "cartItems.product",
-        select: "name coverImage"
-    });
-    next();
-});
+orderSchema.index({ user: 1 });
+orderSchema.index({ createdAt: -1 });
 
 module.exports = mongoose.model("Order", orderSchema);

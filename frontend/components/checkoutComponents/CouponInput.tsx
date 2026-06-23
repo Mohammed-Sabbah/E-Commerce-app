@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { applyCoupon } from '@/services/cartService';
 
 interface Props {
     onApply: (discount: number) => void;
@@ -8,19 +9,32 @@ interface Props {
 }
 
 export default function CouponInput({ onApply, subtotal }: Props) {
-    const [code, setCode]     = useState('');
-    const [error, setError]   = useState('');
+    const [code, setCode] = useState('');
+    const [error, setError] = useState('');
     const [applied, setApplied] = useState(false);
+    const [loading, setLoading] = useState(false);
 
-    const handleApply = () => {
+    const handleApply = async () => {
         setError('');
-        if (code.trim().toUpperCase() === 'SAVE10') {
-            onApply(Math.round(subtotal * 0.1));
-            setApplied(true);
-        } else {
+        setLoading(true);
+        try {
+            const res = await applyCoupon(code.trim());
+            const cart = res.data?.cart;
+            if (cart?.totalPriceAfterDiscount != null) {
+                const discount = subtotal - cart.totalPriceAfterDiscount;
+                onApply(discount > 0 ? discount : 0);
+                setApplied(true);
+            } else {
+                onApply(0);
+                setError('Coupon could not be applied');
+            }
+        } catch (err: any) {
+            const msg = err?.response?.data?.message || 'Failed to apply coupon';
             onApply(0);
+            setError(msg);
             setApplied(false);
-            setError('Invalid coupon code');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -41,13 +55,14 @@ export default function CouponInput({ onApply, subtotal }: Props) {
                 <button
                     type="button"
                     onClick={handleApply}
-                    className="h-11 px-6 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded transition-colors whitespace-nowrap"
+                    disabled={loading || !code.trim()}
+                    className="h-11 px-6 bg-red-500 hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded transition-colors whitespace-nowrap"
                 >
-                    Apply Coupon
+                    {loading ? 'Applying...' : 'Apply Coupon'}
                 </button>
             </div>
-            {error   && <p className="text-xs text-red-500 pl-1">{error}</p>}
-            {applied && <p className="text-xs text-green-600 pl-1">Coupon applied successfully! 🎉</p>}
+            {error && <p className="text-xs text-red-500 pl-1">{error}</p>}
+            {applied && <p className="text-xs text-green-600 pl-1">Coupon applied successfully!</p>}
         </div>
     );
 }

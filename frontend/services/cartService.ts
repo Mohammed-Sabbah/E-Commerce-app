@@ -25,3 +25,8 @@ export const updateCartItem = async ({ productId, quantity }: { productId: strin
     });
     return res.data;
 };
+
+export const applyCoupon = async (coupon: string) => {
+    const res = await apiClient.patch("/api/v1/cart", { coupon });
+    return res.data;
+};
