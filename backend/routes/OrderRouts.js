@@ -3,7 +3,8 @@ const { protect, allowedTo } = require("../middlewares/authMiddleware");
 const {
     getOrdersMiddleware,
     updateOrdersPaidStatusMiddleware,
-    updateOrdersDeliveredStatusMiddleware
+    updateOrdersDeliveredStatusMiddleware,
+    updateOrderStatusMiddleware
 } = require("../middlewares/orderMiddleware");
 const {
     createOrderValidator,
@@ -11,7 +12,8 @@ const {
     updateOrdersPaidStatusValidator,
     updateOrdersDeliveredStatusValidator,
     cancelOrderValidator,
-    returnOrderValidator
+    returnOrderValidator,
+    updateOrderStatusValidator
 } = require("../utils/validators/orderValidator");
 const {
     getOrders,
@@ -71,6 +73,14 @@ router.route("/:id")
     .get(
         getOrderValidator,
         getOrder
+    );
+
+router.route("/:id/status")
+    .patch(
+        allowedTo("admin"),
+        updateOrderStatusValidator,
+        updateOrderStatusMiddleware,
+        updateOrder
     );
 
 module.exports = router;

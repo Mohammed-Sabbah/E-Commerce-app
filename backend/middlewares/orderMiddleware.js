@@ -15,8 +15,24 @@ const updateOrdersDeliveredStatusMiddleware = (req, res, next) => {
     next();
 }
 
+const updateOrderStatusMiddleware = (req, res, next) => {
+    const { status } = req.body;
+    const payload = { status };
+    if (status === "delivered") {
+        payload.isDelivered = true;
+        payload.deliveredAt = Date.now();
+    }
+    if (status === "returned" || status === "cancelled") {
+        payload.isDelivered = false;
+        payload.deliveredAt = null;
+    }
+    req.body = payload;
+    next();
+}
+
 module.exports = {
     getOrdersMiddleware,
     updateOrdersPaidStatusMiddleware,
-    updateOrdersDeliveredStatusMiddleware
+    updateOrdersDeliveredStatusMiddleware,
+    updateOrderStatusMiddleware
 }

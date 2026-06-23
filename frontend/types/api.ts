@@ -38,6 +38,8 @@ export interface Brand {
 }
 
 // ─── Product ─────────────────────────────────────────────────
+export type PopulatedRef = { _id: string; name: string };
+
 export interface Product {
     _id: string;
     name: string;
@@ -50,9 +52,9 @@ export interface Product {
     colors: string[];
     coverImage: string;
     images: string[];
-    category: { name: string };
-    subCategory: { name: string }[] | string[];
-    brand: { name: string } | string | null;
+    category: PopulatedRef | string;
+    subCategory: (PopulatedRef | string)[];
+    brand: PopulatedRef | string | null;
     avgRatings: number;
     ratingsQuantity: number;
     createdAt: string;
@@ -64,11 +66,10 @@ export interface WishlistProduct {
     price: number;
     priceAfterDiscount?: number;
     coverImage: string;
-    category: { name: string } | string;
-    subCategory: { name: string }[] | string[];
-    brand: { name: string } | string | null;
+    category: PopulatedRef | string;
+    subCategory: (PopulatedRef | string)[];
+    brand: PopulatedRef | string | null;
     avgRatings: number;
-
 }
 
 export interface ProductsResponse {

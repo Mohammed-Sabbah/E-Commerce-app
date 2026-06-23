@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Product } from '@/types/api';
+import { Product, PopulatedRef } from '@/types/api';
 import ProductGallery from './ProductGallery';
 import ProductOptions from './ProductOptions';
 import ProductActions from './ProductActions';
@@ -15,9 +15,10 @@ export default function ProductDetailesComponent({ product }: { product: Product
     const [selectedColor, setSelectedColor] = useState<string | null>(product.colors?.[0] ?? null);
     const [selectedSize, setSelectedSize] = useState<string | null>(null);
 
+    const catName = typeof product.category === 'string' ? product.category : (product.category as PopulatedRef).name;
     const breadcrumbs = [
         { label: 'Account', href: '/account' },
-        { label: product.category.name, href: `/category/${product.category.name}` },
+        { label: catName, href: `/category/${catName}` },
         { label: product.name },
     ];
 

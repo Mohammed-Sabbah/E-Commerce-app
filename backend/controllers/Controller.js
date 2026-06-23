@@ -86,8 +86,6 @@ let updateOne = function (model, modelName) {
         if (!updatedDoc)
             throw new CustomError(`There is no ${modelName} with id : ${req.params.id}`, 404);
 
-        updatedDoc.save();
-
         res.status(200).json({
             status: "success",
             data: {

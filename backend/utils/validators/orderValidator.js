@@ -123,11 +123,28 @@ const returnOrderValidator = [
     validationMiddleware
 ];
 
+const updateOrderStatusValidator = [
+    validator.check("id")
+        .notEmpty().withMessage("Order id is required.")
+        .isMongoId().withMessage("Invalid order id")
+        .custom(async (value) => {
+            const order = await Order.findById(value);
+            if (!order) throw new CustomError("No order found", 404);
+            return true;
+        }),
+    validator.check("status")
+        .notEmpty().withMessage("Status is required.")
+        .isIn(["pending", "processing", "delivered", "cancelled", "returned"])
+        .withMessage("Invalid status value"),
+    validationMiddleware
+];
+
 module.exports = {
     createOrderValidator,
     getOrderValidator,
     updateOrdersPaidStatusValidator,
     updateOrdersDeliveredStatusValidator,
     cancelOrderValidator,
-    returnOrderValidator
+    returnOrderValidator,
+    updateOrderStatusValidator
 };
