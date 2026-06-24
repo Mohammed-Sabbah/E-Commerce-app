@@ -16,9 +16,6 @@ export default function ProductGallery({ images, productName }: Props) {
 
     if (validImages.length === 0) return null
 
-        console.log("coverImage:", images)  // ← هون
-
-
     return (
         <div className="flex gap-4">
             {/* Thumbnails */}

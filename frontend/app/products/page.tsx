@@ -34,12 +34,6 @@ export default async function ProductsPage({ searchParams }: PageProps) {
     const categories = categoriesData?.data?.docs ?? []
     const total = productsData?.totalCount ?? 0
 
-
-
-
-    console.log(productsData)
-
-
     return (
         <ProductsClient
             initialProducts={products}

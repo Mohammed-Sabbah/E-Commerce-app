@@ -25,3 +25,4 @@ export const updateCartItem = async ({ productId, quantity }: { productId: strin
     });
     return res.data;
 };
+

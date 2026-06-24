@@ -12,13 +12,27 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ path
     return NextResponse.json(data, { status: res.status });
 }
 
+// ✅ إصلاح: يدعم الآن multipart/form-data (رفع الصور) وJSON
 export async function POST(req: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
     const { path } = await params;
-    const body = await req.json();
+    const contentType = req.headers.get('content-type') || '';
+
+    let body: BodyInit;
+    const headers: HeadersInit = { Cookie: req.headers.get('cookie') || '' };
+
+    if (contentType.includes('multipart/form-data')) {
+        // pass-through as-is مع الحفاظ على الـ boundary
+        body = await req.blob();
+        headers['content-type'] = contentType;
+    } else {
+        body = await req.text();
+        headers['content-type'] = 'application/json';
+    }
+
     const res = await fetch(`${API}/api/v1/${path.join('/')}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Cookie: req.headers.get('cookie') || '' },
-        body: JSON.stringify(body),
+        headers,
+        body,
     });
     const data = await res.json();
     const response = NextResponse.json(data, { status: res.status });
@@ -27,13 +41,26 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pat
     return response;
 }
 
+// ✅ إصلاح: نفس الدعم على PATCH
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
     const { path } = await params;
-    const body = await req.json();
+    const contentType = req.headers.get('content-type') || '';
+
+    let body: BodyInit;
+    const headers: HeadersInit = { Cookie: req.headers.get('cookie') || '' };
+
+    if (contentType.includes('multipart/form-data')) {
+        body = await req.blob();
+        headers['content-type'] = contentType;
+    } else {
+        body = await req.text();
+        headers['content-type'] = 'application/json';
+    }
+
     const res = await fetch(`${API}/api/v1/${path.join('/')}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', Cookie: req.headers.get('cookie') || '' },
-        body: JSON.stringify(body),
+        headers,
+        body,
     });
     const data = await res.json();
     return NextResponse.json(data, { status: res.status });

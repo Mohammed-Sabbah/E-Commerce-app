@@ -28,8 +28,9 @@ export default function CartPage() {
         setUpdates({});
     };
 
-    const handleProceedToCheckout = () => {
-        router.push("/checkout");
+    const handleProceedToCheckout = (couponCode?: string) => {
+        const params = couponCode ? `?coupon=${encodeURIComponent(couponCode)}` : "";
+        router.push(`/checkout${params}`);
     };
 
     if (isLoading) return <p className="text-center mt-10">Loading ...</p>;

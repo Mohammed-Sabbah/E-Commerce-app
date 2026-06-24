@@ -11,10 +11,13 @@ const {
     createCoupon,
     getCoupon,
     updateCoupon,
-    deleteCoupon
+    deleteCoupon,
+    validateCoupon
 } = require("../controllers/CouponController");
 
 let router = express.Router();
+
+router.post("/validate", protect, allowedTo("user"), validateCoupon);
 
 router.use(protect, allowedTo("admin"));
 

@@ -22,15 +22,9 @@ let categorySchema = new mongoose.Schema(
 );
 
 let setImageUrl = function (doc) {
-        console.log("photo:", doc.photo); // شوف شو بيوصله
-
     if (doc.photo) {
-        if (doc.photo.includes("/categories/https://") || doc.photo.includes("/categories/http://")) {
-            doc.photo = doc.photo.split("/categories/")[1];
-        }
         if (!doc.photo.startsWith("http")) {
-            let url = `${process.env.BASE_URL}/categories/${doc.photo}`;
-            doc.photo = url;
+            doc.photo = `${process.env.BASE_URL}/${doc.photo}`;
         }
     }
 };

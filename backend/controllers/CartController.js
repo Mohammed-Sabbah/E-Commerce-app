@@ -155,7 +155,10 @@ const updateItemQuantity = asyncErrorHandler(async function (req, res) {
 });
 
 const applyCouponOnCart = asyncErrorHandler(async function (req, res) {
-    const coupon = await Coupon.findOne({ name: req.body.coupon });
+    const coupon = await Coupon.findOne({ name: req.body.coupon, expire: { $gte: Date.now() } });
+    if (!coupon)
+        throw new CustomError("Invalid or expired coupon", 400);
+
     let cart = await Cart.findOne({ user: req.user });
 
     if (cart.appliedCoupons.includes(coupon.id))
@@ -163,7 +166,7 @@ const applyCouponOnCart = asyncErrorHandler(async function (req, res) {
 
     cart.totalPriceAfterDiscount = parseFloat((cart.totalPrice - (cart.totalPrice * (coupon.discount / 100))).toFixed(2));
     cart.appliedCoupons.push(coupon.id);
-    cart.save();
+    await cart.save();
 
     res.status(200).json({
         status: "success",

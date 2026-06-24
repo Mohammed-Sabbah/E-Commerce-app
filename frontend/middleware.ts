@@ -3,17 +3,14 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-// المسارات المحمية (التي تتطلب تسجيل دخول)
 const protectedRoutes = [
     '/wishlist',
     '/cart',
     '/checkout',
     '/account',
-    // ملاحظة: /orders و /dashboard أُزيلا لأن الصفحات الفعلية على /account/orders
-    // إذا أضفت Admin Dashboard مستقبلاً أعد إضافة /dashboard هنا
+    '/admin',   // ← إضافة
 ];
 
-// مسارات الضيوف (التي لا يمكن دخولها إذا كنت مسجل دخول)
 const authRoutes = ['/login', '/register'];
 
 export function middleware(request: NextRequest) {
@@ -47,6 +44,8 @@ export const config = {
         '/checkout/:path*',
         '/account',
         '/account/:path*',
+        '/admin',          // ← إضافة
+        '/admin/:path*',   // ← إضافة
         '/login',
         '/register',
     ],

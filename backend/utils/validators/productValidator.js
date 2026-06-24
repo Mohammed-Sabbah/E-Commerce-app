@@ -1,4 +1,5 @@
 const validator = require("express-validator");
+const mongoose = require("mongoose");
 const validationMiddleware = require("../../middlewares/validationMiddleware");
 let Category = require("../../models/Category");
 let SubCategory = require("../../models/SubCategory");
@@ -38,7 +39,7 @@ let createProductValidator = [
         .optional()
         .isNumeric().withMessage("product priceAfterDiscount must be number.")
         .custom((value, { req }) => {
-            if (value > req.body.price)
+            if (req.body.price && +value > +req.body.price)
                 throw new Error("priceAfterDiscount must be less than price");
             return true;
         })
@@ -46,7 +47,11 @@ let createProductValidator = [
 
     validator.check("colors")
         .optional()
-        .isArray(),
+        .customSanitizer(value => {
+            if (typeof value === "string") return value.split(",").map(s => s.trim()).filter(Boolean);
+            return value;
+        })
+        .isArray().withMessage("colors must be an array"),
 
     validator.check("coverImage")
         .notEmpty().withMessage("product cover image is required."),
@@ -70,7 +75,7 @@ let createProductValidator = [
         .optional()
         .isArray()
         .custom(async (subCategoryIds) => {
-            let result = subCategoryIds.every(id => validator.check(id).isMongoId());
+            let result = subCategoryIds.every(id => mongoose.Types.ObjectId.isValid(id));
             if (!result)
                 throw new Error(`One or more invalid subCategory id format.`);
             return true;
@@ -137,16 +142,19 @@ let updateProductValidator = [
         .optional()
         .isNumeric().withMessage("product priceAfterDiscount must be number.")
         .custom((value, { req }) => {
-            if (req.body.price)
-                if (value > req.body.price)
-                    throw new Error("priceAfterDiscount must be less than price");
+            if (req.body.price && +value > +req.body.price)
+                throw new Error("priceAfterDiscount must be less than price");
             return true;
         })
         .toFloat(),
 
     validator.check("colors")
         .optional()
-        .isArray(),
+        .customSanitizer(value => {
+            if (typeof value === "string") return value.split(",").map(s => s.trim()).filter(Boolean);
+            return value;
+        })
+        .isArray().withMessage("colors must be an array"),
 
     validator.check("coverImage")
         .optional(),
@@ -169,8 +177,8 @@ let updateProductValidator = [
         .optional()
         .isArray()
         .custom(async (subCategoryIds) => {
-            let result = subCategoryIds.every(id => validator.check(id).isMongoId());
-            if (result)
+            let result = subCategoryIds.every(id => mongoose.Types.ObjectId.isValid(id));
+            if (!result)
                 throw new Error(`One or more invalid subCategory id format.`);
             return true;
         })

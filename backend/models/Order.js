@@ -66,14 +66,11 @@ const orderSchema = new mongoose.Schema(
     }
 );
 
+orderSchema.index({ user: 1 });
+orderSchema.index({ createdAt: -1 });
+
 orderSchema.pre(/^find/, function (next) {
-    this.populate({
-        path: "user",
-        select: "name email coverImage"
-    }).populate({
-        path: "cartItems.product",
-        select: "name coverImage"
-    });
+    this.populate({ path: "user", select: "name email" });
     next();
 });
 

@@ -57,7 +57,7 @@ let globalErrorHandler = function (error, req, res, next) {
     if (process.env.NODE_ENV === "production") {
         if (error.code === 11000) error = duplicateKeyError(error);
         if (error.name === "ValidationError") error = ValidationError(error);
-        if (error.name === "CastError") CastError(error);
+        if (error.name === "CastError") error = CastError(error);
         if (error.name === "JsonWebTokenError") JsonWebTokenError(error);
 
         prodErrors(res, error);
