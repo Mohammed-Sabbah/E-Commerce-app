@@ -4,6 +4,9 @@ const Product = require("../models/Product");
 const { asyncErrorHandler } = require("../middlewares/ErrorMiddleware");
 
 const getAdminStats = asyncErrorHandler(async (req, res) => {
+    const twelveMonthsAgo = new Date();
+    twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+
     const results = await Promise.allSettled([
         Order.countDocuments(),
         Order.aggregate([
@@ -18,10 +21,15 @@ const getAdminStats = asyncErrorHandler(async (req, res) => {
         Order.find()
             .sort("-createdAt")
             .limit(5)
-            .populate({ path: "user", select: "name email" }),
+            .populate({ path: "user", select: "_id name email" }),
         // Monthly revenue (last 12 months)
         Order.aggregate([
-            { $match: { status: { $nin: ["cancelled", "returned"] } } },
+            {
+                $match: {
+                    createdAt: { $gte: twelveMonthsAgo },
+                    status: { $nin: ["cancelled", "returned"] }
+                }
+            },
             {
                 $group: {
                     _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
@@ -29,10 +37,14 @@ const getAdminStats = asyncErrorHandler(async (req, res) => {
                 }
             },
             { $sort: { _id: 1 } },
-            { $limit: 12 }
         ]),
         // Monthly orders (last 12 months)
         Order.aggregate([
+            {
+                $match: {
+                    createdAt: { $gte: twelveMonthsAgo }
+                }
+            },
             {
                 $group: {
                     _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
@@ -40,7 +52,6 @@ const getAdminStats = asyncErrorHandler(async (req, res) => {
                 }
             },
             { $sort: { _id: 1 } },
-            { $limit: 12 }
         ]),
         // Top 10 products by quantity sold
         Order.aggregate([

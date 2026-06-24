@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { apiClient } from "@/lib/apiClient";
 import { parseError } from "@/lib/adminUtils";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -42,6 +42,28 @@ function refName(v: PopulatedRef | string | null | undefined): string {
 
 const PAGE_SIZE = 15;
 
+function FileInput({ current, file, onChange, onRemove }: { current?: string; file: File | null; onChange: (f: File | null) => void; onRemove: () => void }) {
+    const ref = useRef<HTMLInputElement>(null);
+    return (
+        <div className="flex items-center gap-2">
+            <input ref={ref} type="file" accept="image/*" onChange={(e) => onChange(e.target.files?.[0] ?? null)} className="hidden" />
+            <button type="button" onClick={() => ref.current?.click()} className="h-8 px-3 rounded-md border border-gray-300 text-xs text-gray-600 hover:bg-gray-50 transition-colors cursor-pointer">
+                Choose Image
+            </button>
+            {file ? (
+                <span className="text-xs text-blue-600">{file.name}</span>
+            ) : current ? (
+                <span className="text-xs text-gray-500">Current: {current.split("/").pop()}</span>
+            ) : (
+                <span className="text-xs text-gray-400">No file chosen</span>
+            )}
+            {(file || current) && (
+                <button type="button" onClick={onRemove} className="text-xs text-red-500 hover:text-red-700 underline cursor-pointer">Remove</button>
+            )}
+        </div>
+    );
+}
+
 export default function AdminProductsClient({ initialProducts, categories, brands }: Props) {
     const queryClient = useQueryClient();
     const [search, setSearch] = useState("");
@@ -49,8 +71,10 @@ export default function AdminProductsClient({ initialProducts, categories, brand
     const [editing, setEditing] = useState<string | null>(null);
     const [creating, setCreating] = useState(false);
     const [form, setForm] = useState<FormState>(EMPTY_FORM);
+    const [coverFile, setCoverFile] = useState<File | null>(null);
     const [error, setError] = useState("");
     const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+    const [removingCover, setRemovingCover] = useState(false);
 
     const { data: products = initialProducts } = useQuery({
         queryKey: ["admin", "products"],
@@ -71,7 +95,9 @@ export default function AdminProductsClient({ initialProducts, categories, brand
     const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
     const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-    const resetForm = () => setForm(EMPTY_FORM);
+    const resetForm = () => { setForm(EMPTY_FORM); setCoverFile(null); };
+
+    const activeProduct = editing ? products.find((p: Product) => p._id === editing) : null;
 
     const openEdit = (p: Product) => {
         setForm({
@@ -84,28 +110,47 @@ export default function AdminProductsClient({ initialProducts, categories, brand
             brand: refId(p.brand),
             colors: (p.colors ?? []).join(", "),
         });
+        setCoverFile(null);
         setEditing(p._id);
         setCreating(false);
     };
 
+    const validatePrice = (): string | null => {
+        const price = Number(form.price);
+        const discount = Number(form.priceAfterDiscount);
+        if (form.priceAfterDiscount && discount >= price) {
+            return "Discounted price must be less than price";
+        }
+        return null;
+    };
+
+    const descError = form.description.trim() && form.description.trim().length < 20;
+
     const handleSave = async () => {
         setError("");
-        const payload: Record<string, unknown> = {
-            name: form.name,
-            description: form.description,
-            price: Number(form.price),
-            quantity: Number(form.quantity),
-            category: form.category,
-        };
-        if (form.brand) payload.brand = form.brand;
-        if (form.priceAfterDiscount) payload.priceAfterDiscount = Number(form.priceAfterDiscount);
-        if (form.colors.trim()) payload.colors = form.colors.split(",").map((c) => c.trim());
+        const priceErr = validatePrice();
+        if (priceErr) { setError(priceErr); return; }
+        if (descError) { setError("Description must be at least 20 characters"); return; }
+
+        const fd = new FormData();
+        fd.append("name", form.name);
+        fd.append("description", form.description);
+        fd.append("price", form.price);
+        fd.append("quantity", form.quantity);
+        fd.append("category", form.category);
+        if (form.brand) fd.append("brand", form.brand);
+        if (form.priceAfterDiscount) fd.append("priceAfterDiscount", form.priceAfterDiscount);
+        if (form.colors.trim()) {
+            form.colors.split(",").map(c => c.trim()).filter(Boolean).forEach((c) => fd.append("colors", c));
+        }
+        if (coverFile) fd.append("coverImage", coverFile);
 
         try {
             if (editing) {
-                await apiClient.patch(`/api/v1/products/${editing}`, payload);
+                await apiClient.patch(`/api/v1/products/${editing}`, fd);
             } else {
-                await apiClient.post("/api/v1/products", payload);
+                if (!coverFile) { setError("Product cover image is required"); return; }
+                await apiClient.post("/api/v1/products", fd);
             }
             queryClient.invalidateQueries({ queryKey: ["admin", "products"] });
             setEditing(null);
@@ -129,6 +174,20 @@ export default function AdminProductsClient({ initialProducts, categories, brand
         }
     };
 
+    const handleRemoveCover = async () => {
+        if (!editing) return;
+        setRemovingCover(true);
+        setError("");
+        try {
+            await apiClient.patch(`/api/v1/admin/products/${editing}/remove-cover`);
+            queryClient.invalidateQueries({ queryKey: ["admin", "products"] });
+        } catch (e: unknown) {
+            setError(parseError(e));
+        } finally {
+            setRemovingCover(false);
+        }
+    };
+
     return (
         <div>
             {error && (
@@ -138,7 +197,6 @@ export default function AdminProductsClient({ initialProducts, categories, brand
                 </div>
             )}
 
-            {/* Toolbar */}
             <div className="flex flex-wrap items-center gap-3 mb-4">
                 <input
                     value={search}
@@ -155,15 +213,25 @@ export default function AdminProductsClient({ initialProducts, categories, brand
                 </button>
             </div>
 
-            {/* Create/Edit form */}
             {(creating || editing) && (
                 <div className="border border-gray-200 rounded-xl bg-white p-5 mb-4 space-y-3">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-                        <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Name" className="h-10 px-3 border border-gray-300 rounded-lg text-sm" />
-                        <input value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="Price" type="number" className="h-10 px-3 border border-gray-300 rounded-lg text-sm" />
-                        <input value={form.priceAfterDiscount} onChange={(e) => setForm({ ...form, priceAfterDiscount: e.target.value })} placeholder="Discounted price" type="number" className="h-10 px-3 border border-gray-300 rounded-lg text-sm" />
-                        <input value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} placeholder="Qty" type="number" className="h-10 px-3 border border-gray-300 rounded-lg text-sm" />
-                        <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Description" rows={2} className="h-10 px-3 border border-gray-300 rounded-lg text-sm pt-2 md:col-span-2" />
+                        <div>
+                            <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Name" className="h-10 px-3 border border-gray-300 rounded-lg text-sm w-full" />
+                        </div>
+                        <div>
+                            <input value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="Price" type="number" className="h-10 px-3 border border-gray-300 rounded-lg text-sm w-full" />
+                        </div>
+                        <div>
+                            <input value={form.priceAfterDiscount} onChange={(e) => setForm({ ...form, priceAfterDiscount: e.target.value })} placeholder="Discounted price" type="number" className="h-10 px-3 border border-gray-300 rounded-lg text-sm w-full" />
+                        </div>
+                        <div>
+                            <input value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} placeholder="Qty" type="number" className="h-10 px-3 border border-gray-300 rounded-lg text-sm w-full" />
+                        </div>
+                        <div className="md:col-span-2">
+                            <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Description (min 20 characters)" rows={2} className="h-10 px-3 border border-gray-300 rounded-lg text-sm pt-2 w-full" />
+                            {descError && <p className="text-xs text-red-500 mt-1">Description must be at least 20 characters</p>}
+                        </div>
                         <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="h-10 px-3 border border-gray-300 rounded-lg text-sm bg-white">
                             <option value="">Category</option>
                             {categories.map((c) => (<option key={c._id} value={c._id}>{c.name}</option>))}
@@ -172,7 +240,20 @@ export default function AdminProductsClient({ initialProducts, categories, brand
                             <option value="">Brand</option>
                             {brands.map((b) => (<option key={b._id} value={b._id}>{b.name}</option>))}
                         </select>
-                        <input value={form.colors} onChange={(e) => setForm({ ...form, colors: e.target.value })} placeholder="Colors (comma separated)" className="h-10 px-3 border border-gray-300 rounded-lg text-sm" />
+                        <input value={form.colors} onChange={(e) => setForm({ ...form, colors: e.target.value })} placeholder="Colors (comma separated)" className="h-10 px-3 border border-gray-300 rounded-lg text-sm w-full" />
+                        <div className="flex flex-wrap items-center gap-2">
+                            <FileInput
+                                current={!creating && activeProduct ? activeProduct.coverImage : undefined}
+                                file={coverFile}
+                                onChange={setCoverFile}
+                                onRemove={() => setCoverFile(null)}
+                            />
+                            {editing && activeProduct?.coverImage && (
+                                <button type="button" onClick={handleRemoveCover} disabled={removingCover} className="text-xs text-red-500 hover:text-red-700 underline whitespace-nowrap cursor-pointer disabled:opacity-40">
+                                    {removingCover ? "Removing..." : "Remove cover"}
+                                </button>
+                            )}
+                        </div>
                     </div>
                     <div className="flex justify-end gap-2">
                         <button type="button" onClick={() => { setCreating(false); setEditing(null); resetForm(); }} className="h-9 px-4 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors cursor-pointer">Cancel</button>
@@ -183,7 +264,6 @@ export default function AdminProductsClient({ initialProducts, categories, brand
                 </div>
             )}
 
-            {/* Table */}
             <div className="overflow-x-auto border border-gray-200 rounded-xl bg-white">
                 <table className="w-full text-sm">
                     <thead className="bg-gray-50 text-left text-gray-500">
@@ -203,8 +283,14 @@ export default function AdminProductsClient({ initialProducts, categories, brand
                                 <td className="px-4 py-3 text-gray-500">{refName(p.category)}</td>
                                 <td className="px-4 py-3 text-gray-500">{refName(p.brand)}</td>
                                 <td className="px-4 py-3">
-                                    <span className="font-medium">${p.price}</span>
-                                    {p.priceAfterDiscount && <span className="text-xs text-gray-400 line-through ml-1">${p.priceAfterDiscount}</span>}
+                                    {p.priceAfterDiscount ? (
+                                        <>
+                                            <span className="font-medium">${p.priceAfterDiscount}</span>
+                                            <span className="text-xs text-gray-400 line-through ml-1">${p.price}</span>
+                                        </>
+                                    ) : (
+                                        <span className="font-medium">${p.price}</span>
+                                    )}
                                 </td>
                                 <td className="px-4 py-3">
                                     <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${p.quantity > 0 ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>

@@ -68,10 +68,10 @@ export default function AdminSidebar({ user }: Props) {
                             key={href}
                             href={href}
                             onClick={() => setOpen(false)}
-                            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
                                 isActive
-                                    ? "bg-[#DB4444]/10 text-[#DB4444]"
-                                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                                    ? "bg-[#DB4444] text-white shadow-sm shadow-[#DB4444]/20"
+                                    : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
                             }`}
                         >
                             <Icon size={17} />
@@ -109,10 +109,10 @@ export default function AdminSidebar({ user }: Props) {
             <button
                 type="button"
                 onClick={() => setOpen(!open)}
-                className="fixed top-3 left-3 z-50 md:hidden bg-white border border-gray-200 rounded-lg p-2 shadow-sm cursor-pointer"
+                className="fixed top-4 left-4 z-50 md:hidden bg-white border border-gray-200 rounded-xl p-2.5 shadow-sm cursor-pointer hover:bg-gray-50 transition-colors"
                 aria-label="Toggle sidebar"
             >
-                {open ? <X size={20} /> : <Menu size={20} />}
+                {open ? <X size={18} /> : <Menu size={18} />}
             </button>
 
             {/* Desktop sidebar */}
@@ -123,12 +123,22 @@ export default function AdminSidebar({ user }: Props) {
             {/* Mobile overlay */}
             {open && (
                 <div className="fixed inset-0 z-40 md:hidden">
-                    <div className="absolute inset-0 bg-black/30" onClick={() => setOpen(false)} />
-                    <aside className="relative w-64 bg-white h-full shadow-xl flex flex-col">
+                    <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={() => setOpen(false)} />
+                    <aside className="relative w-64 bg-white h-full shadow-xl flex flex-col animate-slide-in">
                         {nav}
                     </aside>
                 </div>
             )}
+
+            <style jsx>{`
+                @keyframes slideIn {
+                    from { transform: translateX(-100%); }
+                    to   { transform: translateX(0); }
+                }
+                .animate-slide-in {
+                    animation: slideIn 0.2s ease-out;
+                }
+            `}</style>
         </>
     );
 }

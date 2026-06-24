@@ -23,8 +23,9 @@ let brandSchema = new mongoose.Schema(
 
 let setImageUrl = function (doc) {
     if (doc.photo) {
-        let url = `${process.env.BASE_URL}/brands/${doc.photo}`;
-        doc.photo = url;
+        if (!doc.photo.startsWith("http")) {
+            doc.photo = `${process.env.BASE_URL}/${doc.photo}`;
+        }
     }
 };
 

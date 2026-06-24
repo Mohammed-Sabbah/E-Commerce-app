@@ -25,7 +25,7 @@ let resizeImage = asyncErrorHandler(async function (req, res, next) {
             .jpeg({ quality: 90 })
             .toFile(`uploads/categories/${fileName}`);
 
-        req.body.photo = fileName;
+        req.body.photo = `categories/${fileName}`;
     }
     next();
 });

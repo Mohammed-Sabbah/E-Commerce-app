@@ -14,6 +14,34 @@ interface Props {
 }
 
 const PAGE_SIZE = 15;
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+function FileInput({ current, file, onChange, onRemove }: { current?: string; file: File | null; onChange: (f: File | null) => void; onRemove: () => void }) {
+    const ref = useRef<HTMLInputElement>(null);
+    return (
+        <div className="flex items-center gap-2">
+            <input ref={ref} type="file" accept="image/*" onChange={(e) => onChange(e.target.files?.[0] ?? null)} className="hidden" />
+            <button type="button" onClick={() => ref.current?.click()} className="h-8 px-3 rounded-md border border-gray-300 text-xs text-gray-600 hover:bg-gray-50 transition-colors cursor-pointer">
+                Choose Image
+            </button>
+            {file ? (
+                <span className="text-xs text-blue-600">{file.name}</span>
+            ) : current ? (
+                <div className="flex items-center gap-1">
+                    <div className="w-6 h-6 relative rounded overflow-hidden border border-gray-200">
+                        <Image src={current.startsWith("http") ? current : `${API_URL}/${current}`} alt="" fill className="object-cover" />
+                    </div>
+                    <span className="text-xs text-gray-500">{current.split("/").pop()}</span>
+                </div>
+            ) : (
+                <span className="text-xs text-gray-400">No file chosen</span>
+            )}
+            {(file || current) && (
+                <button type="button" onClick={onRemove} className="text-xs text-red-500 hover:text-red-700 underline cursor-pointer">Remove</button>
+            )}
+        </div>
+    );
+}
 
 export default function AdminBrandsClient({ initial }: Props) {
     const queryClient = useQueryClient();
@@ -22,9 +50,11 @@ export default function AdminBrandsClient({ initial }: Props) {
     const [editing, setEditing] = useState<string | null>(null);
     const [editName, setEditName] = useState("");
     const [editFile, setEditFile] = useState<File | null>(null);
+    const [creating, setCreating] = useState(false);
+    const [createName, setCreateName] = useState("");
+    const [createFile, setCreateFile] = useState<File | null>(null);
     const [error, setError] = useState("");
     const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
-    const fileRef = useRef<HTMLInputElement>(null);
 
     const { data: items = initial } = useQuery({
         queryKey: ["admin", "brands"],
@@ -44,10 +74,13 @@ export default function AdminBrandsClient({ initial }: Props) {
     const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
     const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
+    const activeBrand = editing ? items.find((b: Brand) => b._id === editing) : null;
+
     const handleEdit = (b: Brand) => {
         setEditing(b._id);
         setEditName(b.name);
         setEditFile(null);
+        setCreating(false);
     };
 
     const saveEdit = async () => {
@@ -60,6 +93,23 @@ export default function AdminBrandsClient({ initial }: Props) {
             await apiClient.patch(`/api/v1/brands/${editing}`, fd);
             queryClient.invalidateQueries({ queryKey: ["admin", "brands"] });
             setEditing(null);
+        } catch (e: unknown) {
+            setError(parseError(e));
+        }
+    };
+
+    const handleCreate = async () => {
+        if (!createName.trim()) return;
+        setError("");
+        try {
+            const fd = new FormData();
+            fd.append("name", createName.trim());
+            if (createFile) fd.append("photo", createFile);
+            await apiClient.post("/api/v1/brands", fd);
+            queryClient.invalidateQueries({ queryKey: ["admin", "brands"] });
+            setCreating(false);
+            setCreateName("");
+            setCreateFile(null);
         } catch (e: unknown) {
             setError(parseError(e));
         }
@@ -87,12 +137,38 @@ export default function AdminBrandsClient({ initial }: Props) {
                 </div>
             )}
 
-            <input
-                value={search}
-                onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                placeholder="Search brands..."
-                className="w-full max-w-sm h-10 px-3 border border-gray-300 rounded-lg text-sm mb-4"
-            />
+            <div className="flex flex-wrap items-center gap-3 mb-4">
+                <input
+                    value={search}
+                    onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                    placeholder="Search brands..."
+                    className="flex-1 min-w-[200px] h-10 px-3 border border-gray-300 rounded-lg text-sm"
+                />
+                <button
+                    type="button"
+                    onClick={() => { setCreating(true); setEditing(null); setCreateName(""); setCreateFile(null); }}
+                    className="h-10 px-4 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors cursor-pointer"
+                >
+                    + New Brand
+                </button>
+            </div>
+
+            {creating && (
+                <div className="border border-gray-200 rounded-xl bg-white p-5 mb-4">
+                    <div className="flex flex-wrap items-end gap-3">
+                        <div>
+                            <label className="block text-xs text-gray-500 mb-1">Name</label>
+                            <input value={createName} onChange={(e) => setCreateName(e.target.value)} placeholder="Brand name" className="h-10 px-3 border border-gray-300 rounded-lg text-sm w-48" />
+                        </div>
+                        <div>
+                            <label className="block text-xs text-gray-500 mb-1">Photo</label>
+                            <FileInput file={createFile} onChange={setCreateFile} onRemove={() => setCreateFile(null)} />
+                        </div>
+                        <button type="button" onClick={handleCreate} disabled={!createName.trim()} className="h-10 px-4 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 disabled:opacity-40 transition-colors cursor-pointer">Create</button>
+                        <button type="button" onClick={() => setCreating(false)} className="h-10 px-4 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors cursor-pointer">Cancel</button>
+                    </div>
+                </div>
+            )}
 
             <div className="overflow-x-auto border border-gray-200 rounded-xl bg-white">
                 <table className="w-full text-sm">
@@ -112,7 +188,12 @@ export default function AdminBrandsClient({ initial }: Props) {
                                             <input value={editName} onChange={(e) => setEditName(e.target.value)} className="h-8 px-2 border border-gray-300 rounded text-sm w-full" />
                                         </td>
                                         <td className="px-4 py-3">
-                                            <input ref={fileRef} type="file" accept="image/*" onChange={(e) => setEditFile(e.target.files?.[0] ?? null)} className="text-xs" />
+                                            <FileInput
+                                                current={activeBrand?.photo}
+                                                file={editFile}
+                                                onChange={setEditFile}
+                                                onRemove={() => setEditFile(null)}
+                                            />
                                         </td>
                                         <td className="px-4 py-3">
                                             <div className="flex gap-2">
@@ -127,7 +208,7 @@ export default function AdminBrandsClient({ initial }: Props) {
                                         <td className="px-4 py-3">
                                             {b.photo ? (
                                                 <div className="w-10 h-10 relative rounded-md overflow-hidden border border-gray-200">
-                                                    <Image src={b.photo} alt={b.name} fill className="object-cover" />
+                                                    <Image src={b.photo.startsWith("http") ? b.photo : `${API_URL}/${b.photo}`} alt={b.name} fill className="object-cover" />
                                                 </div>
                                             ) : <span className="text-xs text-gray-400">--</span>}
                                         </td>

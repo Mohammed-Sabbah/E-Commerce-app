@@ -22,7 +22,7 @@ export default async function AdminLayout({
     try {
         const res = await fetch(`${API}/api/v1/users/myProfile`, {
             headers: { Cookie: `token=${token}` },
-            cache: "no-store",
+            next: { revalidate: 300 },
         });
         if (!res.ok) redirect("/login");
         const data = await res.json();
@@ -37,7 +37,7 @@ export default async function AdminLayout({
         <div className="flex h-screen bg-gray-50 overflow-hidden">
             <AdminSidebar user={{ name: user.name, email: user.email }} />
             <main className="flex-1 overflow-y-auto">
-                <div className="p-4 md:p-6 max-w-7xl mx-auto">
+                <div className="p-5 md:p-7 lg:p-9">
                     {children}
                 </div>
             </main>

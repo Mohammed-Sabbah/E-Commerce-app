@@ -63,10 +63,10 @@ export default function AdminCouponsClient({ initial }: Props) {
         const payload = {
             name: form.name.toUpperCase(),
             discount: Number(form.discount),
-            expire: new Date(form.expire).toISOString(),
+            expire: form.expire,
         };
         try {
-            if (editing) {
+            if (editing && editing !== "new") {
                 await apiClient.patch(`/api/v1/coupons/${editing}`, payload);
             } else {
                 await apiClient.post("/api/v1/coupons", payload);

@@ -1,6 +1,7 @@
 import { adminFetch } from "@/lib/adminFetch";
 import type { Product, Category, Brand } from "@/types/api";
 import AdminProductsClient from "@/components/Admin/AdminProductsClient";
+import AdminPageHeader from "@/components/Admin/AdminPageHeader";
 
 export default async function AdminProductsPage() {
     const [productsRes, categoriesRes, brandsRes] = await Promise.all([
@@ -11,7 +12,7 @@ export default async function AdminProductsPage() {
 
     return (
         <div>
-            <h1 className="text-xl font-semibold text-gray-900 mb-6">Products</h1>
+            <AdminPageHeader title="Products" subtitle="Manage your product catalog" />
             <AdminProductsClient
                 initialProducts={productsRes.data?.docs ?? []}
                 categories={categoriesRes.data?.docs ?? []}

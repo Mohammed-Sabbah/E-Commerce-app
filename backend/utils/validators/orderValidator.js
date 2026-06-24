@@ -80,27 +80,10 @@ const updateOrdersPaidStatusValidator = [
                 throw new CustomError("No order found", 404);
 
             if (order.isPaid)
-                throw new CustomError("Paid status order has been updated before.", 403);
+                throw new CustomError("Order has already been paid", 400);
 
-            return true;
-        }),
-
-    validationMiddleware
-]
-
-const updateOrdersDeliveredStatusValidator = [
-    validator.check("id")
-        .notEmpty()
-        .withMessage("Order id is required.")
-        .isMongoId()
-        .withMessage("invalid Order id")
-        .custom(async (value) => {
-            let order = await Order.findById(value);
-            if (!order)
-                throw new CustomError("No order found", 404);
-
-            if (order.isDelivered)
-                throw new CustomError("Delivered status order has been updated before.", 403);
+            if (order.status === "cancelled" || order.status === "returned")
+                throw new CustomError("Cannot pay a cancelled or returned order", 400);
 
             return true;
         }),
@@ -143,7 +126,6 @@ module.exports = {
     createOrderValidator,
     getOrderValidator,
     updateOrdersPaidStatusValidator,
-    updateOrdersDeliveredStatusValidator,
     cancelOrderValidator,
     returnOrderValidator,
     updateOrderStatusValidator

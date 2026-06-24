@@ -32,12 +32,6 @@ let productSchema = new mongoose.Schema(
         },
         priceAfterDiscount: {
             type: Number,
-            validate: {
-                validator: function (value) {
-                    return value <= this.price;
-                },
-                message: "priceAfterDiscount must be less than price."
-            }
         },
         colors: [String],
         coverImage: {
@@ -97,15 +91,15 @@ productSchema.index({ category: 1, createdAt: -1 });
 productSchema.pre(/^find/, function (next) {
     this.populate({
         path: "category",
-        select: "name -_id"
+        select: "name"
     });
     this.populate({
         path: "subCategory",
-        select: "name -_id"
+        select: "name"
     });
     this.populate({
         path: "brand",
-        select: "name -_id"
+        select: "name"
     });
     next()
 });

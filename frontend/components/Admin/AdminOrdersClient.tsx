@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { ChevronDown } from "lucide-react";
 import { apiClient } from "@/lib/apiClient";
 import { parseError } from "@/lib/adminUtils";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -12,8 +13,20 @@ import ConfirmDialog from "./ConfirmDialog";
 import LoadingSkeleton from "./LoadingSkeleton";
 
 const STATUSES = ["all", "pending", "processing", "delivered", "cancelled", "returned"];
-
 const PAGE_SIZE = 15;
+
+const DESTRUCTIVE = new Set(["cancelled", "returned"]);
+
+const isTerminal = (s: string) => s === "cancelled" || s === "returned";
+const canPay = (o: AdminOrder) => !o.isPaid && !isTerminal(o.status);
+
+const TRANSITIONS: Record<string, string[]> = {
+    pending:    ["processing", "cancelled"],
+    processing: ["delivered", "cancelled"],
+    delivered:  ["returned"],
+    cancelled:  [],
+    returned:   [],
+};
 
 export default function AdminOrdersClient({ initial }: { initial: AdminOrder[] }) {
     const queryClient = useQueryClient();
@@ -22,6 +35,14 @@ export default function AdminOrdersClient({ initial }: { initial: AdminOrder[] }
     const [actionId, setActionId] = useState<string | null>(null);
     const [error, setError] = useState("");
     const [confirm, setConfirm] = useState<{ id: string; status: string } | null>(null);
+    const [openId, setOpenId] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (!openId) return;
+        const close = () => setOpenId(null);
+        document.addEventListener("click", close);
+        return () => document.removeEventListener("click", close);
+    }, [openId]);
 
     const { data: orders = initial, isLoading } = useQuery({
         queryKey: ["admin", "orders"],
@@ -55,8 +76,6 @@ export default function AdminOrdersClient({ initial }: { initial: AdminOrder[] }
         try {
             if (status === "paid") {
                 await apiClient.patch(`/api/v1/orders/${id}/pay`);
-            } else if (status === "delivered") {
-                await apiClient.patch(`/api/v1/orders/${id}/deliver`);
             } else {
                 await apiClient.patch(`/api/v1/orders/${id}/status`, { status });
             }
@@ -69,11 +88,18 @@ export default function AdminOrdersClient({ initial }: { initial: AdminOrder[] }
         }
     };
 
+    const requestAction = (id: string, status: string) => {
+        if (DESTRUCTIVE.has(status)) {
+            setConfirm({ id, status });
+        } else {
+            doAction(id, status);
+        }
+    };
+
     if (isLoading && !orders.length) return <LoadingSkeleton rows={10} />;
 
     return (
         <div>
-            {/* Error */}
             {error && (
                 <div className="flex items-center justify-between bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 mb-4">
                     <span>{error}</span>
@@ -87,7 +113,6 @@ export default function AdminOrdersClient({ initial }: { initial: AdminOrder[] }
                 </div>
             )}
 
-            {/* Filter tabs */}
             <div className="flex flex-wrap gap-2 mb-4">
                 {STATUSES.map((s) => (
                     <button
@@ -105,7 +130,6 @@ export default function AdminOrdersClient({ initial }: { initial: AdminOrder[] }
                 ))}
             </div>
 
-            {/* Table */}
             <div className="overflow-x-auto border border-gray-200 rounded-xl bg-white">
                 <table className="w-full text-sm">
                     <thead className="bg-gray-50 text-left text-gray-500">
@@ -134,8 +158,17 @@ export default function AdminOrdersClient({ initial }: { initial: AdminOrder[] }
                                 <td className="px-4 py-3 font-medium">
                                     ${order.totalOrderPrice?.toFixed(2)}
                                 </td>
-                                <td className="px-4 py-3 capitalize">
-                                    {order.paymentMethod}
+                                <td className="px-4 py-3">
+                                    <div className="flex items-center gap-1.5">
+                                        <span className="capitalize text-gray-600">{order.paymentMethod}</span>
+                                        <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold leading-none ${
+                                            order.isPaid
+                                                ? "bg-green-100 text-green-700"
+                                                : "bg-yellow-100 text-yellow-700"
+                                        }`}>
+                                            {order.isPaid ? "Paid" : "Unpaid"}
+                                        </span>
+                                    </div>
                                 </td>
                                 <td className="px-4 py-3">
                                     <span
@@ -147,50 +180,72 @@ export default function AdminOrdersClient({ initial }: { initial: AdminOrder[] }
                                     </span>
                                 </td>
                                 <td className="px-4 py-3">
-                                    <div className="flex items-center gap-2">
-                                        {/* Pay button */}
-                                        {!order.isPaid && order.paymentMethod === "cash" && (
+                                    <div className="flex items-center gap-1.5">
+                                        {canPay(order) && (
                                             <button
                                                 type="button"
                                                 disabled={actionId === order._id}
-                                                onClick={() => setConfirm({ id: order._id, status: "paid" })}
-                                                className="h-8 px-3 rounded-md bg-blue-600 text-white text-xs font-medium hover:bg-blue-700 disabled:opacity-40 transition-colors cursor-pointer"
+                                                onClick={() => doAction(order._id, "paid")}
+                                                className="h-7 px-2.5 rounded-md bg-blue-600 text-white text-[11px] font-semibold hover:bg-blue-700 disabled:opacity-40 transition-colors cursor-pointer"
                                             >
                                                 {actionId === order._id ? "..." : "Pay"}
                                             </button>
                                         )}
-                                        {/* Deliver button */}
-                                        {order.isPaid && !order.isDelivered && (
-                                            <button
-                                                type="button"
-                                                disabled={actionId === order._id}
-                                                onClick={() => setConfirm({ id: order._id, status: "delivered" })}
-                                                className="h-8 px-3 rounded-md bg-green-600 text-white text-xs font-medium hover:bg-green-700 disabled:opacity-40 transition-colors cursor-pointer"
-                                            >
-                                                {actionId === order._id ? "..." : "Deliver"}
-                                            </button>
-                                        )}
-                                        {/* Status dropdown */}
-                                        {order.isDelivered || order.status === "cancelled" || order.status === "returned" ? (
-                                            <span className="text-xs text-gray-400">--</span>
-                                        ) : (
-                                            <select
-                                                value=""
-                                                onChange={(e) => {
-                                                    const val = e.target.value;
-                                                    if (val) setConfirm({ id: order._id, status: val });
-                                                    e.target.value = "";
-                                                }}
-                                                className="h-8 px-2 rounded-md border border-gray-300 text-xs bg-white cursor-pointer"
-                                            >
-                                                <option value="" disabled>Change</option>
-                                                {["processing", "cancelled"].map((s) => (
-                                                    <option key={s} value={s}>
-                                                        Mark {s}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        )}
+
+                                        {(() => {
+                                            const options = TRANSITIONS[order.status] ?? [];
+                                            if (options.length === 0) return <span className="text-xs text-gray-300 select-none">——</span>;
+
+                                            const safe = options.filter((s) => !DESTRUCTIVE.has(s));
+                                            const danger = options.filter((s) => DESTRUCTIVE.has(s));
+                                            const loading = actionId === order._id;
+
+                                            return (
+                                                <div className="relative" onClick={(e) => e.stopPropagation()}>
+                                                    <button
+                                                        type="button"
+                                                        disabled={loading}
+                                                        onClick={() => setOpenId(openId === order._id ? null : order._id)}
+                                                        className={`h-7 px-2 rounded-md text-[11px] font-semibold transition-colors cursor-pointer flex items-center gap-1 disabled:opacity-40 ${
+                                                            openId === order._id
+                                                                ? "bg-gray-100 border border-gray-300 text-gray-700"
+                                                                : "border border-gray-300 text-gray-600 hover:bg-gray-50"
+                                                        }`}
+                                                    >
+                                                        <span>Actions</span>
+                                                        <ChevronDown className={`w-3 h-3 transition-transform ${openId === order._id ? "rotate-180" : ""}`} />
+                                                    </button>
+
+                                                    {openId === order._id && (
+                                                        <div className="absolute right-0 top-full mt-1 z-50 min-w-[150px] bg-white border border-gray-200 rounded-lg shadow-lg py-1">
+                                                            {safe.map((s) => (
+                                                                <button
+                                                                    key={s}
+                                                                    type="button"
+                                                                    onClick={() => { setOpenId(null); doAction(order._id, s); }}
+                                                                    className="w-full text-left px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
+                                                                >
+                                                                    Mark {statusLabels[s]}
+                                                                </button>
+                                                            ))}
+                                                            {safe.length > 0 && danger.length > 0 && (
+                                                                <div className="h-px bg-gray-100 my-1" />
+                                                            )}
+                                                            {danger.map((s) => (
+                                                                <button
+                                                                    key={s}
+                                                                    type="button"
+                                                                    onClick={() => { setOpenId(null); requestAction(order._id, s); }}
+                                                                    className="w-full text-left px-3 py-1.5 text-xs text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                                                                >
+                                                                    {s === "cancelled" ? "Cancel" : statusLabels[s]}
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })()}
                                     </div>
                                 </td>
                             </tr>
@@ -206,9 +261,22 @@ export default function AdminOrdersClient({ initial }: { initial: AdminOrder[] }
 
             <ConfirmDialog
                 open={!!confirm}
-                title={confirm ? `Mark as ${statusLabels[confirm.status] ?? confirm.status}?` : ""}
-                message="This action will update the order status."
+                title={
+                    confirm?.status === "cancelled"
+                        ? "Cancel order?"
+                        : confirm?.status === "returned"
+                        ? "Return order?"
+                        : ""
+                }
+                message={
+                    confirm?.status === "cancelled"
+                        ? "This will cancel the order. This action cannot be undone."
+                        : confirm?.status === "returned"
+                        ? "This will process a return for this order."
+                        : ""
+                }
                 confirmLabel={confirm ? statusLabels[confirm.status] ?? confirm.status : ""}
+                danger={confirm?.status === "cancelled"}
                 onConfirm={() => confirm && doAction(confirm.id, confirm.status)}
                 onCancel={() => setConfirm(null)}
             />
