@@ -4,6 +4,7 @@ import { useState, useMemo, useRef } from "react";
 import { apiClient } from "@/lib/apiClient";
 import { parseError } from "@/lib/adminUtils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import Image from "next/image";
 import type { Category } from "@/types/api";
 import Pagination from "./Pagination";
@@ -16,8 +17,23 @@ interface Props {
 const PAGE_SIZE = 15;
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-function FileInput({ current, file, onChange, onRemove }: { current?: string; file: File | null; onChange: (f: File | null) => void; onRemove: () => void }) {
+function FileInput({ current, file, onChange, onRemove, onRemoveCurrent }: {
+    current?: string;
+    file: File | null;
+    onChange: (f: File | null) => void;
+    onRemove: () => void;
+    onRemoveCurrent?: () => void;
+}) {
     const ref = useRef<HTMLInputElement>(null);
+
+    const handleRemove = () => {
+        if (file) {
+            onRemove();
+        } else if (current && onRemoveCurrent) {
+            onRemoveCurrent();
+        }
+    };
+
     return (
         <div className="flex items-center gap-2">
             <input ref={ref} type="file" accept="image/*" onChange={(e) => onChange(e.target.files?.[0] ?? null)} className="hidden" />
@@ -37,7 +53,9 @@ function FileInput({ current, file, onChange, onRemove }: { current?: string; fi
                 <span className="text-xs text-gray-400">No file chosen</span>
             )}
             {(file || current) && (
-                <button type="button" onClick={onRemove} className="text-xs text-red-500 hover:text-red-700 underline cursor-pointer">Remove</button>
+                <button type="button" onClick={handleRemove} className="text-xs text-red-500 hover:text-red-700 underline cursor-pointer">
+                    Remove
+                </button>
             )}
         </div>
     );
@@ -50,10 +68,10 @@ export default function AdminCategoriesClient({ initial }: Props) {
     const [editing, setEditing] = useState<string | null>(null);
     const [editName, setEditName] = useState("");
     const [editFile, setEditFile] = useState<File | null>(null);
+    const [editCurrentPhoto, setEditCurrentPhoto] = useState<string | undefined>(undefined);
     const [creating, setCreating] = useState(false);
     const [createName, setCreateName] = useState("");
     const [createFile, setCreateFile] = useState<File | null>(null);
-    const [error, setError] = useState("");
     const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
     const { data: items = initial } = useQuery({
@@ -80,6 +98,7 @@ export default function AdminCategoriesClient({ initial }: Props) {
         setEditing(c._id);
         setEditName(c.name);
         setEditFile(null);
+        setEditCurrentPhoto(c.photo);
         setCreating(false);
     };
 
@@ -89,13 +108,15 @@ export default function AdminCategoriesClient({ initial }: Props) {
             const fd = new FormData();
             fd.append("name", editName.trim());
             if (editFile) fd.append("photo", editFile);
+            else if (!editCurrentPhoto) fd.append("photo", "");
             await apiClient.patch(`/api/v1/categories/${editing}`, fd);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["admin", "categories"] });
             setEditing(null);
+            toast.success("Category updated");
         },
-        onError: (e: unknown) => setError(parseError(e)),
+        onError: (e: unknown) => toast.error(parseError(e)),
     });
 
     const createMutation = useMutation({
@@ -111,8 +132,9 @@ export default function AdminCategoriesClient({ initial }: Props) {
             setCreating(false);
             setCreateName("");
             setCreateFile(null);
+            toast.success("Category created");
         },
-        onError: (e: unknown) => setError(parseError(e)),
+        onError: (e: unknown) => toast.error(parseError(e)),
     });
 
     const deleteMutation = useMutation({
@@ -123,22 +145,16 @@ export default function AdminCategoriesClient({ initial }: Props) {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["admin", "categories"] });
             setDeleteTarget(null);
+            toast.success("Category deleted");
         },
         onError: (e: unknown) => {
-            setError(parseError(e));
+            toast.error(parseError(e));
             setDeleteTarget(null);
         },
     });
 
     return (
         <div>
-            {error && (
-                <div className="flex items-center justify-between bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 mb-4">
-                    <span>{error}</span>
-                    <button type="button" onClick={() => setError("")} className="text-red-500 hover:text-red-700 font-bold cursor-pointer">&times;</button>
-                </div>
-            )}
-
             <div className="flex flex-wrap items-center gap-3 mb-4">
                 <input
                     value={search}
@@ -191,10 +207,11 @@ export default function AdminCategoriesClient({ initial }: Props) {
                                         </td>
                                         <td className="px-4 py-3">
                                             <FileInput
-                                                current={activeCategory?.photo}
+                                                current={editCurrentPhoto}
                                                 file={editFile}
                                                 onChange={setEditFile}
                                                 onRemove={() => setEditFile(null)}
+                                                onRemoveCurrent={() => setEditCurrentPhoto(undefined)}
                                             />
                                         </td>
                                         <td className="px-4 py-3">

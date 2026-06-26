@@ -5,6 +5,7 @@ import { ChevronDown } from "lucide-react";
 import { apiClient } from "@/lib/apiClient";
 import { parseError } from "@/lib/adminUtils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import type { AdminOrder } from "@/types/admin";
 import { STATUS_STYLES, formatId } from "@/constants/orders";
 import { formatDate } from "@/lib/utils";
@@ -33,7 +34,6 @@ export default function AdminOrdersClient({ initial }: { initial: AdminOrder[] }
     const [filter, setFilter] = useState("all");
     const [page, setPage] = useState(1);
 
-    const [error, setError] = useState("");
     const [confirm, setConfirm] = useState<{ id: string; status: string } | null>(null);
     const [openId, setOpenId] = useState<string | null>(null);
 
@@ -78,11 +78,15 @@ export default function AdminOrdersClient({ initial }: { initial: AdminOrder[] }
                 await apiClient.patch(`/api/v1/orders/${id}/status`, { status });
             }
         },
-        onSettled: () => {
+        onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["admin", "orders"] });
             setConfirm(null);
+            toast.success("Order updated");
         },
-        onError: (e: unknown) => setError(parseError(e)),
+        onError: (e: unknown) => {
+            toast.error(parseError(e));
+            setConfirm(null);
+        },
     });
 
     const doAction = (id: string, status: string) => actionMutation.mutate({ id, status });
@@ -99,19 +103,6 @@ export default function AdminOrdersClient({ initial }: { initial: AdminOrder[] }
 
     return (
         <div>
-            {error && (
-                <div className="flex items-center justify-between bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 mb-4">
-                    <span>{error}</span>
-                    <button
-                        type="button"
-                        onClick={() => setError("")}
-                        className="text-red-500 hover:text-red-700 font-bold cursor-pointer"
-                    >
-                        &times;
-                    </button>
-                </div>
-            )}
-
             <div className="flex flex-wrap gap-2 mb-4">
                 {STATUSES.map((s) => (
                     <button
