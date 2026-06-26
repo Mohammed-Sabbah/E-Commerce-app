@@ -1,6 +1,4 @@
-const sharp = require("sharp");
 const bcryptjs = require("bcryptjs");
-const crypto = require("crypto");
 const User = require("../models/User");
 const {
     createOne,
@@ -27,21 +25,10 @@ let updateUser = updateOne(User, "User");
 
 let deleteUser = deleteOne(User, "User");
 
-let uploadUserImage = uploadSingleImage("profileImage");
+let uploadUserImage = uploadSingleImage("profileImage", "users");
 
 let resizeUserImage = asyncErrorHandler(async function (req, res, next) {
-    if (req.file) {
-        let unique = crypto.randomUUID()
-        let fileName = `user-${unique}-${Date.now()}.jpeg`;
-        await sharp(req.file.buffer)
-            .resize(500, 500)
-            .toFormat("jpeg")
-            .jpeg({ quality: 90 })
-            .toFile(`uploads/users/${fileName}`);
-
-        req.body.profileImage = fileName;
-    }
-
+    if (req.file) req.body.profileImage = req.file.path;
     next();
 });
 

@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
 import { apiClient } from "@/lib/apiClient";
 import { parseError } from "@/lib/adminUtils";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { AdminOrder } from "@/types/admin";
 import { STATUS_STYLES, formatId } from "@/constants/orders";
 import { formatDate } from "@/lib/utils";
@@ -32,7 +32,7 @@ export default function AdminOrdersClient({ initial }: { initial: AdminOrder[] }
     const queryClient = useQueryClient();
     const [filter, setFilter] = useState("all");
     const [page, setPage] = useState(1);
-    const [actionId, setActionId] = useState<string | null>(null);
+
     const [error, setError] = useState("");
     const [confirm, setConfirm] = useState<{ id: string; status: string } | null>(null);
     const [openId, setOpenId] = useState<string | null>(null);
@@ -70,23 +70,22 @@ export default function AdminOrdersClient({ initial }: { initial: AdminOrder[] }
         returned: "Returned",
     };
 
-    const doAction = async (id: string, status: string) => {
-        setActionId(id);
-        setError("");
-        try {
+    const actionMutation = useMutation({
+        mutationFn: async ({ id, status }: { id: string; status: string }) => {
             if (status === "paid") {
                 await apiClient.patch(`/api/v1/orders/${id}/pay`);
             } else {
                 await apiClient.patch(`/api/v1/orders/${id}/status`, { status });
             }
+        },
+        onSettled: () => {
             queryClient.invalidateQueries({ queryKey: ["admin", "orders"] });
-        } catch (e: unknown) {
-            setError(parseError(e));
-        } finally {
-            setActionId(null);
             setConfirm(null);
-        }
-    };
+        },
+        onError: (e: unknown) => setError(parseError(e)),
+    });
+
+    const doAction = (id: string, status: string) => actionMutation.mutate({ id, status });
 
     const requestAction = (id: string, status: string) => {
         if (DESTRUCTIVE.has(status)) {
@@ -184,11 +183,11 @@ export default function AdminOrdersClient({ initial }: { initial: AdminOrder[] }
                                         {canPay(order) && (
                                             <button
                                                 type="button"
-                                                disabled={actionId === order._id}
+                                                disabled={actionMutation.isPending && actionMutation.variables?.id === order._id}
                                                 onClick={() => doAction(order._id, "paid")}
                                                 className="h-7 px-2.5 rounded-md bg-blue-600 text-white text-[11px] font-semibold hover:bg-blue-700 disabled:opacity-40 transition-colors cursor-pointer"
                                             >
-                                                {actionId === order._id ? "..." : "Pay"}
+                                                {actionMutation.isPending && actionMutation.variables?.id === order._id ? "..." : "Pay"}
                                             </button>
                                         )}
 
@@ -198,7 +197,7 @@ export default function AdminOrdersClient({ initial }: { initial: AdminOrder[] }
 
                                             const safe = options.filter((s) => !DESTRUCTIVE.has(s));
                                             const danger = options.filter((s) => DESTRUCTIVE.has(s));
-                                            const loading = actionId === order._id;
+                                            const loading = actionMutation.isPending && actionMutation.variables?.id === order._id;
 
                                             return (
                                                 <div className="relative" onClick={(e) => e.stopPropagation()}>
@@ -279,6 +278,7 @@ export default function AdminOrdersClient({ initial }: { initial: AdminOrder[] }
                 danger={confirm?.status === "cancelled"}
                 onConfirm={() => confirm && doAction(confirm.id, confirm.status)}
                 onCancel={() => setConfirm(null)}
+                loading={actionMutation.isPending}
             />
         </div>
     );

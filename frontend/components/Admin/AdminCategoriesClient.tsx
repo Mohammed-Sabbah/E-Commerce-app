@@ -3,7 +3,7 @@
 import { useState, useMemo, useRef } from "react";
 import { apiClient } from "@/lib/apiClient";
 import { parseError } from "@/lib/adminUtils";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import type { Category } from "@/types/api";
 import Pagination from "./Pagination";
@@ -83,50 +83,52 @@ export default function AdminCategoriesClient({ initial }: Props) {
         setCreating(false);
     };
 
-    const saveEdit = async () => {
-        if (!editing || !editName.trim()) return;
-        setError("");
-        try {
+    const saveEditMutation = useMutation({
+        mutationFn: async () => {
+            if (!editing || !editName.trim()) return;
             const fd = new FormData();
             fd.append("name", editName.trim());
             if (editFile) fd.append("photo", editFile);
             await apiClient.patch(`/api/v1/categories/${editing}`, fd);
+        },
+        onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["admin", "categories"] });
             setEditing(null);
-        } catch (e: unknown) {
-            setError(parseError(e));
-        }
-    };
+        },
+        onError: (e: unknown) => setError(parseError(e)),
+    });
 
-    const handleCreate = async () => {
-        if (!createName.trim()) return;
-        setError("");
-        try {
+    const createMutation = useMutation({
+        mutationFn: async () => {
+            if (!createName.trim()) return;
             const fd = new FormData();
             fd.append("name", createName.trim());
             if (createFile) fd.append("photo", createFile);
             await apiClient.post("/api/v1/categories", fd);
+        },
+        onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["admin", "categories"] });
             setCreating(false);
             setCreateName("");
             setCreateFile(null);
-        } catch (e: unknown) {
-            setError(parseError(e));
-        }
-    };
+        },
+        onError: (e: unknown) => setError(parseError(e)),
+    });
 
-    const handleDelete = async () => {
-        if (!deleteTarget) return;
-        setError("");
-        try {
+    const deleteMutation = useMutation({
+        mutationFn: async () => {
+            if (!deleteTarget) return;
             await apiClient.delete(`/api/v1/categories/${deleteTarget}`);
+        },
+        onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["admin", "categories"] });
-        } catch (e: unknown) {
-            setError(parseError(e));
-        } finally {
             setDeleteTarget(null);
-        }
-    };
+        },
+        onError: (e: unknown) => {
+            setError(parseError(e));
+            setDeleteTarget(null);
+        },
+    });
 
     return (
         <div>
@@ -164,7 +166,7 @@ export default function AdminCategoriesClient({ initial }: Props) {
                             <label className="block text-xs text-gray-500 mb-1">Photo</label>
                             <FileInput file={createFile} onChange={setCreateFile} onRemove={() => setCreateFile(null)} />
                         </div>
-                        <button type="button" onClick={handleCreate} disabled={!createName.trim()} className="h-10 px-4 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 disabled:opacity-40 transition-colors cursor-pointer">Create</button>
+                        <button type="button" onClick={() => createMutation.mutate()} disabled={!createName.trim() || createMutation.isPending} className="h-10 px-4 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 disabled:opacity-40 transition-colors cursor-pointer">{createMutation.isPending ? "Creating..." : "Create"}</button>
                         <button type="button" onClick={() => setCreating(false)} className="h-10 px-4 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors cursor-pointer">Cancel</button>
                     </div>
                 </div>
@@ -197,7 +199,7 @@ export default function AdminCategoriesClient({ initial }: Props) {
                                         </td>
                                         <td className="px-4 py-3">
                                             <div className="flex gap-2">
-                                                <button type="button" onClick={saveEdit} className="h-8 px-3 rounded-md bg-gray-900 text-white text-xs font-medium hover:bg-gray-800 transition-colors cursor-pointer">Save</button>
+                                                <button type="button" onClick={() => saveEditMutation.mutate()} disabled={saveEditMutation.isPending} className="h-8 px-3 rounded-md bg-gray-900 text-white text-xs font-medium hover:bg-gray-800 disabled:opacity-40 transition-colors cursor-pointer">{saveEditMutation.isPending ? "Saving..." : "Save"}</button>
                                                 <button type="button" onClick={() => setEditing(null)} className="h-8 px-3 rounded-md border border-gray-300 text-xs text-gray-600 hover:bg-gray-50 transition-colors cursor-pointer">Cancel</button>
                                             </div>
                                         </td>
@@ -229,7 +231,7 @@ export default function AdminCategoriesClient({ initial }: Props) {
 
             <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
 
-            <ConfirmDialog open={!!deleteTarget} title="Delete category?" message="This cannot be undone." confirmLabel="Delete" danger onConfirm={handleDelete} onCancel={() => setDeleteTarget(null)} />
+            <ConfirmDialog open={!!deleteTarget} title="Delete category?" message="This cannot be undone." confirmLabel="Delete" danger onConfirm={() => deleteMutation.mutate()} onCancel={() => setDeleteTarget(null)} loading={deleteMutation.isPending} />
         </div>
     );
 }

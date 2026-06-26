@@ -82,7 +82,7 @@ app.use(function (req, res, next) {
 app.use(hpp());
 app.use(sanitizer());
 app.use(xss());
-app.use(express.static("uploads"));
+
 
 app.use("/api/v1/auth", authLimiter);
 
