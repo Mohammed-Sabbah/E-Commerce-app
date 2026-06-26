@@ -43,8 +43,24 @@ function refName(v: PopulatedRef | string | null | undefined): string {
 
 const PAGE_SIZE = 15;
 
-function FileInput({ current, file, onChange, onRemove }: { current?: string; file: File | null; onChange: (f: File | null) => void; onRemove: () => void }) {
+function FileInput({ current, file, onChange, onRemove, onRemoveCurrent, removingCurrent }: {
+    current?: string;
+    file: File | null;
+    onChange: (f: File | null) => void;
+    onRemove: () => void;
+    onRemoveCurrent?: () => void;
+    removingCurrent?: boolean;
+}) {
     const ref = useRef<HTMLInputElement>(null);
+
+    const handleRemove = () => {
+        if (file) {
+            onRemove();
+        } else if (current && onRemoveCurrent) {
+            onRemoveCurrent();
+        }
+    };
+
     return (
         <div className="flex items-center gap-2">
             <input ref={ref} type="file" accept="image/*" onChange={(e) => onChange(e.target.files?.[0] ?? null)} className="hidden" />
@@ -59,8 +75,81 @@ function FileInput({ current, file, onChange, onRemove }: { current?: string; fi
                 <span className="text-xs text-gray-400">No file chosen</span>
             )}
             {(file || current) && (
-                <button type="button" onClick={onRemove} className="text-xs text-red-500 hover:text-red-700 underline cursor-pointer">Remove</button>
+                <button
+                    type="button"
+                    onClick={handleRemove}
+                    disabled={removingCurrent}
+                    className="text-xs text-red-500 hover:text-red-700 underline cursor-pointer disabled:opacity-40"
+                >
+                    {removingCurrent ? "Removing..." : "Remove"}
+                </button>
             )}
+        </div>
+    );
+}
+
+function MultiImageInput({ files, existing, onChange, onRemoveExisting }: {
+    files: File[];
+    existing: string[];
+    onChange: (files: File[]) => void;
+    onRemoveExisting: (url: string) => void;
+}) {
+    const ref = useRef<HTMLInputElement>(null);
+
+    const handleAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const selected = Array.from(e.target.files ?? []);
+        const total = files.length + existing.length + selected.length;
+        if (total > 5) {
+            alert("Maximum 5 additional images allowed");
+            return;
+        }
+        onChange([...files, ...selected]);
+        if (ref.current) ref.current.value = "";
+    };
+
+    const removeNew = (index: number) => {
+        onChange(files.filter((_, i) => i !== index));
+    };
+
+    return (
+        <div className="space-y-2">
+            <div className="flex flex-wrap gap-2">
+                {existing.map((url, i) => (
+                    <div key={`ex-${i}`} className="relative w-14 h-14 rounded-md overflow-hidden border border-gray-200 group">
+                        <img src={url} alt="" className="w-full h-full object-cover" />
+                        <button
+                            type="button"
+                            onClick={() => onRemoveExisting(url)}
+                            className="absolute inset-0 bg-black/50 text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
+                        >
+                            ✕
+                        </button>
+                    </div>
+                ))}
+                {files.map((file, i) => (
+                    <div key={`new-${i}`} className="relative w-14 h-14 rounded-md overflow-hidden border border-blue-200 group">
+                        <img src={URL.createObjectURL(file)} alt="" className="w-full h-full object-cover" />
+                        <button
+                            type="button"
+                            onClick={() => removeNew(i)}
+                            className="absolute inset-0 bg-black/50 text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
+                        >
+                            ✕
+                        </button>
+                    </div>
+                ))}
+                {(files.length + existing.length) < 5 && (
+                    <button
+                        type="button"
+                        onClick={() => ref.current?.click()}
+                        className="w-14 h-14 rounded-md border-2 border-dashed border-gray-300 text-gray-400 hover:border-gray-400 hover:text-gray-500 transition-colors text-xl flex items-center justify-center cursor-pointer"
+                    >
+                        +
+                    </button>
+                )}
+            </div>
+            <input ref={ref} type="file" accept="image/*" multiple onChange={handleAdd} className="hidden" />
+            <p className="text-xs text-gray-400">{files.length + existing.length}/5 additional images</p>
         </div>
     );
 }
@@ -73,6 +162,8 @@ export default function AdminProductsClient({ initialProducts, categories, brand
     const [creating, setCreating] = useState(false);
     const [form, setForm] = useState<FormState>(EMPTY_FORM);
     const [coverFile, setCoverFile] = useState<File | null>(null);
+    const [extraFiles, setExtraFiles] = useState<File[]>([]);
+    const [existingImages, setExistingImages] = useState<string[]>([]);
     const [error, setError] = useState("");
     const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
     const [removingCover, setRemovingCover] = useState(false);
@@ -96,7 +187,7 @@ export default function AdminProductsClient({ initialProducts, categories, brand
     const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
     const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-    const resetForm = () => { setForm(EMPTY_FORM); setCoverFile(null); };
+    const resetForm = () => { setForm(EMPTY_FORM); setCoverFile(null); setExtraFiles([]); setExistingImages([]); };
 
     const activeProduct = editing ? products.find((p: Product) => p._id === editing) : null;
 
@@ -112,6 +203,8 @@ export default function AdminProductsClient({ initialProducts, categories, brand
             colors: (p.colors ?? []).join(", "),
         });
         setCoverFile(null);
+        setExtraFiles([]);
+        setExistingImages(p.images ?? []);
         setEditing(p._id);
         setCreating(false);
     };
@@ -145,6 +238,8 @@ export default function AdminProductsClient({ initialProducts, categories, brand
                 form.colors.split(",").map(c => c.trim()).filter(Boolean).forEach((c) => fd.append("colors", c));
             }
             if (coverFile) fd.append("coverImage", coverFile);
+            extraFiles.forEach((f) => fd.append("images", f));
+            fd.append("existingImages", JSON.stringify(existingImages));
 
             if (editing) {
                 await apiClient.patch(`/api/v1/products/${editing}`, fd);
@@ -261,19 +356,23 @@ export default function AdminProductsClient({ initialProducts, categories, brand
                         </div>
                         <div>
                             <label className="block text-xs font-medium text-gray-600 mb-1">Cover Image</label>
-                            <div className="flex flex-wrap items-center gap-2">
-                                <FileInput
-                                    current={!creating && activeProduct ? activeProduct.coverImage : undefined}
-                                    file={coverFile}
-                                    onChange={setCoverFile}
-                                    onRemove={() => setCoverFile(null)}
-                                />
-                                {editing && activeProduct?.coverImage && (
-                                    <button type="button" onClick={handleRemoveCover} disabled={removingCover} className="text-xs text-red-500 hover:text-red-700 underline whitespace-nowrap cursor-pointer disabled:opacity-40">
-                                        {removingCover ? "Removing..." : "Remove cover"}
-                                    </button>
-                                )}
-                            </div>
+                            <FileInput
+                                current={!creating && activeProduct ? activeProduct.coverImage : undefined}
+                                file={coverFile}
+                                onChange={setCoverFile}
+                                onRemove={() => setCoverFile(null)}
+                                onRemoveCurrent={editing ? handleRemoveCover : undefined}
+                                removingCurrent={removingCover}
+                            />
+                        </div>
+                        <div className="md:col-span-2 lg:col-span-4">
+                            <label className="block text-xs font-medium text-gray-600 mb-2">Additional Images (max 5)</label>
+                            <MultiImageInput
+                                files={extraFiles}
+                                existing={existingImages}
+                                onChange={setExtraFiles}
+                                onRemoveExisting={(url) => setExistingImages(existingImages.filter((u) => u !== url))}
+                            />
                         </div>
                     </div>
                     <div className="flex justify-end gap-2">

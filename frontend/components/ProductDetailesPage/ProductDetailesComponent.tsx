@@ -16,6 +16,10 @@ export default function ProductDetailesComponent({ product }: { product: Product
     const [selectedSize, setSelectedSize] = useState<string | null>(null);
 
     const catName = typeof product.category === 'string' ? product.category : (product.category as PopulatedRef).name;
+    const allImages = [
+        ...(product.coverImage ? [product.coverImage] : []),
+        ...(product.images ?? []).filter((img) => img !== product.coverImage),
+    ].filter(Boolean);
     const breadcrumbs = [
         { label: 'Account', href: '/account' },
         { label: catName, href: `/category/${catName}` },
@@ -43,7 +47,7 @@ export default function ProductDetailesComponent({ product }: { product: Product
             {/* Product Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-16">
                 {/* Left: Gallery */}
-                <ProductGallery images={product.images} productName={product.name} />
+                <ProductGallery images={allImages} productName={product.name} />
 
                 {/* Right: Info + Options + Actions */}
                 <div className="flex flex-col gap-6">
@@ -89,7 +93,7 @@ export default function ProductDetailesComponent({ product }: { product: Product
                             _id: product._id,
                             name: product.name,
                             price: product.priceAfterDiscount ?? product.price,
-                            image: product.images?.[0] ?? '',
+                            image: allImages[0] ?? '',
                         }}
                         inStock={inStock}
                         selectedColor={selectedColor}
