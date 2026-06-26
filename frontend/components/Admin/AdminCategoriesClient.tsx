@@ -16,8 +16,23 @@ interface Props {
 const PAGE_SIZE = 15;
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-function FileInput({ current, file, onChange, onRemove }: { current?: string; file: File | null; onChange: (f: File | null) => void; onRemove: () => void }) {
+function FileInput({ current, file, onChange, onRemove, onRemoveCurrent }: {
+    current?: string;
+    file: File | null;
+    onChange: (f: File | null) => void;
+    onRemove: () => void;
+    onRemoveCurrent?: () => void;
+}) {
     const ref = useRef<HTMLInputElement>(null);
+
+    const handleRemove = () => {
+        if (file) {
+            onRemove();
+        } else if (current && onRemoveCurrent) {
+            onRemoveCurrent();
+        }
+    };
+
     return (
         <div className="flex items-center gap-2">
             <input ref={ref} type="file" accept="image/*" onChange={(e) => onChange(e.target.files?.[0] ?? null)} className="hidden" />
@@ -37,7 +52,9 @@ function FileInput({ current, file, onChange, onRemove }: { current?: string; fi
                 <span className="text-xs text-gray-400">No file chosen</span>
             )}
             {(file || current) && (
-                <button type="button" onClick={onRemove} className="text-xs text-red-500 hover:text-red-700 underline cursor-pointer">Remove</button>
+                <button type="button" onClick={handleRemove} className="text-xs text-red-500 hover:text-red-700 underline cursor-pointer">
+                    Remove
+                </button>
             )}
         </div>
     );
@@ -50,6 +67,7 @@ export default function AdminCategoriesClient({ initial }: Props) {
     const [editing, setEditing] = useState<string | null>(null);
     const [editName, setEditName] = useState("");
     const [editFile, setEditFile] = useState<File | null>(null);
+    const [editCurrentPhoto, setEditCurrentPhoto] = useState<string | undefined>(undefined);
     const [creating, setCreating] = useState(false);
     const [createName, setCreateName] = useState("");
     const [createFile, setCreateFile] = useState<File | null>(null);
@@ -80,6 +98,7 @@ export default function AdminCategoriesClient({ initial }: Props) {
         setEditing(c._id);
         setEditName(c.name);
         setEditFile(null);
+        setEditCurrentPhoto(c.photo);
         setCreating(false);
     };
 
@@ -89,6 +108,7 @@ export default function AdminCategoriesClient({ initial }: Props) {
             const fd = new FormData();
             fd.append("name", editName.trim());
             if (editFile) fd.append("photo", editFile);
+            else if (!editCurrentPhoto) fd.append("photo", "");
             await apiClient.patch(`/api/v1/categories/${editing}`, fd);
         },
         onSuccess: () => {
@@ -191,10 +211,11 @@ export default function AdminCategoriesClient({ initial }: Props) {
                                         </td>
                                         <td className="px-4 py-3">
                                             <FileInput
-                                                current={activeCategory?.photo}
+                                                current={editCurrentPhoto}
                                                 file={editFile}
                                                 onChange={setEditFile}
                                                 onRemove={() => setEditFile(null)}
+                                                onRemoveCurrent={() => setEditCurrentPhoto(undefined)}
                                             />
                                         </td>
                                         <td className="px-4 py-3">
