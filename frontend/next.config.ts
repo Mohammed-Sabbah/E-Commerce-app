@@ -21,6 +21,7 @@ const nextConfig: NextConfig = {
       { hostname: "via.placeholder.com" },
       { hostname: "i.pravatar.cc" },
       { hostname: "fdn2.gsmarena.com" },
+      { hostname: "res.cloudinary.com" },
     ],
   },
   experimental: {
