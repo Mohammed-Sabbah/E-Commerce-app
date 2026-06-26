@@ -3,7 +3,8 @@
 import { useState, useMemo, useRef } from "react";
 import { apiClient } from "@/lib/apiClient";
 import { parseError } from "@/lib/adminUtils";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import Image from "next/image";
 import type { Product, Category, Brand, PopulatedRef } from "@/types/api";
 import Pagination from "./Pagination";
 import ConfirmDialog from "./ConfirmDialog";
@@ -126,53 +127,56 @@ export default function AdminProductsClient({ initialProducts, categories, brand
 
     const descError = form.description.trim() && form.description.trim().length < 20;
 
-    const handleSave = async () => {
-        setError("");
-        const priceErr = validatePrice();
-        if (priceErr) { setError(priceErr); return; }
-        if (descError) { setError("Description must be at least 20 characters"); return; }
+    const saveMutation = useMutation({
+        mutationFn: async () => {
+            const priceErr = validatePrice();
+            if (priceErr) throw new Error(priceErr);
+            if (descError) throw new Error("Description must be at least 20 characters");
 
-        const fd = new FormData();
-        fd.append("name", form.name);
-        fd.append("description", form.description);
-        fd.append("price", form.price);
-        fd.append("quantity", form.quantity);
-        fd.append("category", form.category);
-        if (form.brand) fd.append("brand", form.brand);
-        if (form.priceAfterDiscount) fd.append("priceAfterDiscount", form.priceAfterDiscount);
-        if (form.colors.trim()) {
-            form.colors.split(",").map(c => c.trim()).filter(Boolean).forEach((c) => fd.append("colors", c));
-        }
-        if (coverFile) fd.append("coverImage", coverFile);
+            const fd = new FormData();
+            fd.append("name", form.name);
+            fd.append("description", form.description);
+            fd.append("price", form.price);
+            fd.append("quantity", form.quantity);
+            fd.append("category", form.category);
+            if (form.brand) fd.append("brand", form.brand);
+            if (form.priceAfterDiscount) fd.append("priceAfterDiscount", form.priceAfterDiscount);
+            if (form.colors.trim()) {
+                form.colors.split(",").map(c => c.trim()).filter(Boolean).forEach((c) => fd.append("colors", c));
+            }
+            if (coverFile) fd.append("coverImage", coverFile);
 
-        try {
             if (editing) {
                 await apiClient.patch(`/api/v1/products/${editing}`, fd);
             } else {
-                if (!coverFile) { setError("Product cover image is required"); return; }
+                if (!coverFile) throw new Error("Product cover image is required");
                 await apiClient.post("/api/v1/products", fd);
             }
+        },
+        onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["admin", "products"] });
             setEditing(null);
             setCreating(false);
             resetForm();
-        } catch (e: unknown) {
-            setError(parseError(e));
-        }
-    };
+            setError("");
+        },
+        onError: (e: unknown) => setError(parseError(e)),
+    });
 
-    const handleDelete = async () => {
-        if (!deleteTarget) return;
-        setError("");
-        try {
+    const deleteMutation = useMutation({
+        mutationFn: async () => {
+            if (!deleteTarget) return;
             await apiClient.delete(`/api/v1/products/${deleteTarget}`);
+        },
+        onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["admin", "products"] });
-        } catch (e: unknown) {
-            setError(parseError(e));
-        } finally {
             setDeleteTarget(null);
-        }
-    };
+        },
+        onError: (e: unknown) => {
+            setError(parseError(e));
+            setDeleteTarget(null);
+        },
+    });
 
     const handleRemoveCover = async () => {
         if (!editing) return;
@@ -217,48 +221,65 @@ export default function AdminProductsClient({ initialProducts, categories, brand
                 <div className="border border-gray-200 rounded-xl bg-white p-5 mb-4 space-y-3">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                         <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">Product Name</label>
                             <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Name" className="h-10 px-3 border border-gray-300 rounded-lg text-sm w-full" />
                         </div>
                         <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">Price ($)</label>
                             <input value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="Price" type="number" className="h-10 px-3 border border-gray-300 rounded-lg text-sm w-full" />
                         </div>
                         <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">Discounted Price ($)</label>
                             <input value={form.priceAfterDiscount} onChange={(e) => setForm({ ...form, priceAfterDiscount: e.target.value })} placeholder="Discounted price" type="number" className="h-10 px-3 border border-gray-300 rounded-lg text-sm w-full" />
                         </div>
                         <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">Quantity</label>
                             <input value={form.quantity} onChange={(e) => setForm({ ...form, quantity: e.target.value })} placeholder="Qty" type="number" className="h-10 px-3 border border-gray-300 rounded-lg text-sm w-full" />
                         </div>
                         <div className="md:col-span-2">
+                            <label className="block text-xs font-medium text-gray-600 mb-1">Description</label>
                             <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Description (min 20 characters)" rows={2} className="h-10 px-3 border border-gray-300 rounded-lg text-sm pt-2 w-full" />
                             {descError && <p className="text-xs text-red-500 mt-1">Description must be at least 20 characters</p>}
                         </div>
-                        <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="h-10 px-3 border border-gray-300 rounded-lg text-sm bg-white">
-                            <option value="">Category</option>
-                            {categories.map((c) => (<option key={c._id} value={c._id}>{c.name}</option>))}
-                        </select>
-                        <select value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} className="h-10 px-3 border border-gray-300 rounded-lg text-sm bg-white">
-                            <option value="">Brand</option>
-                            {brands.map((b) => (<option key={b._id} value={b._id}>{b.name}</option>))}
-                        </select>
-                        <input value={form.colors} onChange={(e) => setForm({ ...form, colors: e.target.value })} placeholder="Colors (comma separated)" className="h-10 px-3 border border-gray-300 rounded-lg text-sm w-full" />
-                        <div className="flex flex-wrap items-center gap-2">
-                            <FileInput
-                                current={!creating && activeProduct ? activeProduct.coverImage : undefined}
-                                file={coverFile}
-                                onChange={setCoverFile}
-                                onRemove={() => setCoverFile(null)}
-                            />
-                            {editing && activeProduct?.coverImage && (
-                                <button type="button" onClick={handleRemoveCover} disabled={removingCover} className="text-xs text-red-500 hover:text-red-700 underline whitespace-nowrap cursor-pointer disabled:opacity-40">
-                                    {removingCover ? "Removing..." : "Remove cover"}
-                                </button>
-                            )}
+                        <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">Category</label>
+                            <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="h-10 px-3 border border-gray-300 rounded-lg text-sm bg-white w-full">
+                                <option value="">Select Category</option>
+                                {categories.map((c) => (<option key={c._id} value={c._id}>{c.name}</option>))}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">Brand</label>
+                            <select value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} className="h-10 px-3 border border-gray-300 rounded-lg text-sm bg-white w-full">
+                                <option value="">Select Brand</option>
+                                {brands.map((b) => (<option key={b._id} value={b._id}>{b.name}</option>))}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">Colors (comma separated)</label>
+                            <input value={form.colors} onChange={(e) => setForm({ ...form, colors: e.target.value })} placeholder="e.g. Red, Blue, Green" className="h-10 px-3 border border-gray-300 rounded-lg text-sm w-full" />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">Cover Image</label>
+                            <div className="flex flex-wrap items-center gap-2">
+                                <FileInput
+                                    current={!creating && activeProduct ? activeProduct.coverImage : undefined}
+                                    file={coverFile}
+                                    onChange={setCoverFile}
+                                    onRemove={() => setCoverFile(null)}
+                                />
+                                {editing && activeProduct?.coverImage && (
+                                    <button type="button" onClick={handleRemoveCover} disabled={removingCover} className="text-xs text-red-500 hover:text-red-700 underline whitespace-nowrap cursor-pointer disabled:opacity-40">
+                                        {removingCover ? "Removing..." : "Remove cover"}
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </div>
                     <div className="flex justify-end gap-2">
                         <button type="button" onClick={() => { setCreating(false); setEditing(null); resetForm(); }} className="h-9 px-4 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors cursor-pointer">Cancel</button>
-                        <button type="button" onClick={handleSave} disabled={!form.name || !form.price} className="h-9 px-4 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 disabled:opacity-40 transition-colors cursor-pointer">
-                            {editing ? "Update" : "Create"}
+                        <button type="button" onClick={() => saveMutation.mutate()} disabled={!form.name || !form.price || saveMutation.isPending} className="h-9 px-4 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 disabled:opacity-40 transition-colors cursor-pointer">
+                            {saveMutation.isPending ? "Saving..." : editing ? "Update Product" : "Create Product"}
                         </button>
                     </div>
                 </div>
@@ -268,6 +289,7 @@ export default function AdminProductsClient({ initialProducts, categories, brand
                 <table className="w-full text-sm">
                     <thead className="bg-gray-50 text-left text-gray-500">
                         <tr>
+                            <th className="px-4 py-3 font-medium">Image</th>
                             <th className="px-4 py-3 font-medium">Name</th>
                             <th className="px-4 py-3 font-medium">Category</th>
                             <th className="px-4 py-3 font-medium">Brand</th>
@@ -279,6 +301,20 @@ export default function AdminProductsClient({ initialProducts, categories, brand
                     <tbody className="divide-y divide-gray-100">
                         {paged.map((p: Product) => (
                             <tr key={p._id} className="hover:bg-gray-50 transition-colors">
+                                <td className="px-4 py-3">
+                                    {p.coverImage ? (
+                                        <div className="w-10 h-10 relative rounded-md overflow-hidden border border-gray-200">
+                                            <Image
+                                                src={p.coverImage.startsWith("http") ? p.coverImage : `${process.env.NEXT_PUBLIC_API_URL}/${p.coverImage}`}
+                                                alt={p.name}
+                                                fill
+                                                className="object-cover"
+                                            />
+                                        </div>
+                                    ) : (
+                                        <span className="text-xs text-gray-400">—</span>
+                                    )}
+                                </td>
                                 <td className="px-4 py-3 font-medium text-gray-900 max-w-[200px] truncate">{p.name}</td>
                                 <td className="px-4 py-3 text-gray-500">{refName(p.category)}</td>
                                 <td className="px-4 py-3 text-gray-500">{refName(p.brand)}</td>
@@ -312,7 +348,7 @@ export default function AdminProductsClient({ initialProducts, categories, brand
 
             <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
 
-            <ConfirmDialog open={!!deleteTarget} title="Delete product?" message="This cannot be undone." confirmLabel="Delete" danger onConfirm={handleDelete} onCancel={() => setDeleteTarget(null)} />
+            <ConfirmDialog open={!!deleteTarget} title="Delete product?" message="This cannot be undone." confirmLabel="Delete" danger onConfirm={() => deleteMutation.mutate()} onCancel={() => setDeleteTarget(null)} loading={deleteMutation.isPending} />
         </div>
     );
 }

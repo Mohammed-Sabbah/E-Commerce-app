@@ -1,52 +1,23 @@
-const crypto = require("crypto");
-const sharp = require("sharp");
 const Brand = require("../models/Brand");
-const {
-    getAll,
-    getOne,
-    createOne,
-    updateOne,
-    deleteOne
-} = require("./Controller");
-const {
-    uploadSingleImage
-} = require("../middlewares/uploadImagesMiddleware");
+const { getAll, getOne, createOne, updateOne, deleteOne } = require("./Controller");
+const { uploadSingleImage } = require("../middlewares/uploadImagesMiddleware");
 const { asyncErrorHandler } = require("../middlewares/ErrorMiddleware");
 
-let uploadImage = uploadSingleImage("photo");
+const uploadImage = uploadSingleImage("photo", "brands");
 
-let resizeImage = asyncErrorHandler(async function (req, res, next) {
-    let unique = crypto.randomBytes(9).toString("hex");
-    let fileName = `brand-${unique}-${Date.now()}.jpeg`;
-    if (req.file) {
-        await sharp(req.file.buffer)
-            .resize(600, 600)
-            .toFormat('jpeg')
-            .jpeg({ quality: 90 })
-            .toFile(`uploads/brands/${fileName}`);
-
-        req.body.photo = `brands/${fileName}`;
-    }
+const resizeImage = asyncErrorHandler(async (req, res, next) => {
+    if (req.file) req.body.photo = req.file.path;
     next();
 });
 
-
-let getAllBrands = getAll(Brand);
-
-let createBrand = createOne(Brand);
-
-let getBrand = getOne(Brand, "brand");
-
-let updateBrand = updateOne(Brand, "brand")
-
-let deleteBrand = deleteOne(Brand, "brand");
+const getAllBrands  = getAll(Brand);
+const createBrand  = createOne(Brand);
+const getBrand     = getOne(Brand, "brand");
+const updateBrand  = updateOne(Brand, "brand");
+const deleteBrand  = deleteOne(Brand, "brand");
 
 module.exports = {
-    getAllBrands,
-    getBrand,
-    createBrand,
-    updateBrand,
-    deleteBrand,
-    uploadImage,
-    resizeImage
+    getAllBrands, getBrand, createBrand,
+    updateBrand, deleteBrand,
+    uploadImage, resizeImage,
 };

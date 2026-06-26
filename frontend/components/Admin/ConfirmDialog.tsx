@@ -11,6 +11,7 @@ interface Props {
     onConfirm: () => void;
     onCancel: () => void;
     danger?: boolean;
+    loading?: boolean;
 }
 
 export default function ConfirmDialog({
@@ -22,6 +23,7 @@ export default function ConfirmDialog({
     onConfirm,
     onCancel,
     danger,
+    loading,
 }: Props) {
     const dialogRef = useRef<HTMLDialogElement>(null);
 
@@ -64,13 +66,14 @@ export default function ConfirmDialog({
                     <button
                         type="button"
                         onClick={onConfirm}
-                        className={`h-10 px-4 rounded-lg text-sm font-medium text-white transition-colors cursor-pointer ${
+                        disabled={loading}
+                        className={`h-10 px-4 rounded-lg text-sm font-medium text-white transition-colors cursor-pointer disabled:opacity-40 ${
                             danger
                                 ? "bg-red-500 hover:bg-red-600"
                                 : "bg-gray-900 hover:bg-gray-800"
                         }`}
                     >
-                        {confirmLabel}
+                        {loading ? "Processing..." : confirmLabel}
                     </button>
                 </div>
             </div>
