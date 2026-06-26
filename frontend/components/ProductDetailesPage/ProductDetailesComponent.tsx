@@ -16,10 +16,10 @@ export default function ProductDetailesComponent({ product }: { product: Product
     const [selectedSize, setSelectedSize] = useState<string | null>(null);
 
     const catName = typeof product.category === 'string' ? product.category : (product.category as PopulatedRef).name;
-    const allImages = [
+    const allImages = Array.from(new Set([
         ...(product.coverImage ? [product.coverImage] : []),
-        ...(product.images ?? []).filter((img) => img !== product.coverImage),
-    ].filter(Boolean);
+        ...(product.images ?? []),
+    ].filter(Boolean)));
     const breadcrumbs = [
         { label: 'Account', href: '/account' },
         { label: catName, href: `/category/${catName}` },

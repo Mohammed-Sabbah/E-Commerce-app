@@ -3,7 +3,8 @@
 import { useState, useMemo } from "react";
 import { apiClient } from "@/lib/apiClient";
 import { parseError } from "@/lib/adminUtils";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import type { AdminCoupon } from "@/types/admin";
 import Pagination from "./Pagination";
 import ConfirmDialog from "./ConfirmDialog";
@@ -35,7 +36,6 @@ export default function AdminCouponsClient({ initial }: Props) {
     const [page, setPage] = useState(1);
     const [editing, setEditing] = useState<string | null>(null);
     const [form, setForm] = useState<FormState>(EMPTY);
-    const [error, setError] = useState("");
     const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
     const { data: coupons = initial } = useQuery({
@@ -58,49 +58,46 @@ export default function AdminCouponsClient({ initial }: Props) {
 
     const resetForm = () => setForm(EMPTY);
 
-    const handleSave = async () => {
-        setError("");
-        const payload = {
-            name: form.name.toUpperCase(),
-            discount: Number(form.discount),
-            expire: form.expire,
-        };
-        try {
+    const saveMutation = useMutation({
+        mutationFn: async () => {
+            const payload = {
+                name: form.name.toUpperCase(),
+                discount: Number(form.discount),
+                expire: form.expire,
+            };
             if (editing && editing !== "new") {
                 await apiClient.patch(`/api/v1/coupons/${editing}`, payload);
             } else {
                 await apiClient.post("/api/v1/coupons", payload);
             }
+        },
+        onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["admin", "coupons"] });
             setEditing(null);
             resetForm();
-        } catch (e: unknown) {
-            setError(parseError(e));
-        }
-    };
+            toast.success(editing === "new" ? "Coupon created" : "Coupon updated");
+        },
+        onError: (e: unknown) => toast.error(parseError(e)),
+    });
 
-    const handleDelete = async () => {
-        if (!deleteTarget) return;
-        setError("");
-        try {
+    const deleteMutation = useMutation({
+        mutationFn: async () => {
+            if (!deleteTarget) return;
             await apiClient.delete(`/api/v1/coupons/${deleteTarget}`);
+        },
+        onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["admin", "coupons"] });
-        } catch (e: unknown) {
-            setError(parseError(e));
-        } finally {
             setDeleteTarget(null);
-        }
-    };
+            toast.success("Coupon deleted");
+        },
+        onError: (e: unknown) => {
+            toast.error(parseError(e));
+            setDeleteTarget(null);
+        },
+    });
 
     return (
         <div>
-            {error && (
-                <div className="flex items-center justify-between bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 mb-4">
-                    <span>{error}</span>
-                    <button type="button" onClick={() => setError("")} className="text-red-500 hover:text-red-700 font-bold cursor-pointer">&times;</button>
-                </div>
-            )}
-
             <div className="flex items-center gap-3 mb-4">
                 <button
                     type="button"
@@ -118,8 +115,8 @@ export default function AdminCouponsClient({ initial }: Props) {
                         <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Code" className="h-10 px-3 border border-gray-300 rounded-lg text-sm w-40" />
                         <input value={form.discount} onChange={(e) => setForm({ ...form, discount: e.target.value })} placeholder="Discount %" type="number" min={1} max={100} className="h-10 px-3 border border-gray-300 rounded-lg text-sm w-36" />
                         <input value={form.expire} onChange={(e) => setForm({ ...form, expire: e.target.value })} type="date" className="h-10 px-3 border border-gray-300 rounded-lg text-sm w-40" />
-                        <button type="button" onClick={handleSave} disabled={!form.name || !form.discount || !form.expire} className="h-10 px-4 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 disabled:opacity-40 transition-colors cursor-pointer">
-                            {editing === "new" ? "Create" : "Update"}
+                        <button type="button" onClick={() => saveMutation.mutate()} disabled={!form.name || !form.discount || !form.expire || saveMutation.isPending} className="h-10 px-4 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 disabled:opacity-40 transition-colors cursor-pointer">
+                            {saveMutation.isPending ? "Saving..." : editing === "new" ? "Create" : "Update"}
                         </button>
                         <button type="button" onClick={() => { setEditing(null); resetForm(); }} className="h-10 px-4 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors cursor-pointer">Cancel</button>
                     </div>
@@ -165,7 +162,7 @@ export default function AdminCouponsClient({ initial }: Props) {
 
             <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
 
-            <ConfirmDialog open={!!deleteTarget} title="Delete coupon?" message="This cannot be undone." confirmLabel="Delete" danger onConfirm={handleDelete} onCancel={() => setDeleteTarget(null)} />
+            <ConfirmDialog open={!!deleteTarget} title="Delete coupon?" message="This cannot be undone." confirmLabel="Delete" danger onConfirm={() => deleteMutation.mutate()} onCancel={() => setDeleteTarget(null)} loading={deleteMutation.isPending} />
         </div>
     );
 }

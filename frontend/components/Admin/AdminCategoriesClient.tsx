@@ -4,6 +4,7 @@ import { useState, useMemo, useRef } from "react";
 import { apiClient } from "@/lib/apiClient";
 import { parseError } from "@/lib/adminUtils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import Image from "next/image";
 import type { Category } from "@/types/api";
 import Pagination from "./Pagination";
@@ -71,7 +72,6 @@ export default function AdminCategoriesClient({ initial }: Props) {
     const [creating, setCreating] = useState(false);
     const [createName, setCreateName] = useState("");
     const [createFile, setCreateFile] = useState<File | null>(null);
-    const [error, setError] = useState("");
     const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
     const { data: items = initial } = useQuery({
@@ -114,8 +114,9 @@ export default function AdminCategoriesClient({ initial }: Props) {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["admin", "categories"] });
             setEditing(null);
+            toast.success("Category updated");
         },
-        onError: (e: unknown) => setError(parseError(e)),
+        onError: (e: unknown) => toast.error(parseError(e)),
     });
 
     const createMutation = useMutation({
@@ -131,8 +132,9 @@ export default function AdminCategoriesClient({ initial }: Props) {
             setCreating(false);
             setCreateName("");
             setCreateFile(null);
+            toast.success("Category created");
         },
-        onError: (e: unknown) => setError(parseError(e)),
+        onError: (e: unknown) => toast.error(parseError(e)),
     });
 
     const deleteMutation = useMutation({
@@ -143,22 +145,16 @@ export default function AdminCategoriesClient({ initial }: Props) {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["admin", "categories"] });
             setDeleteTarget(null);
+            toast.success("Category deleted");
         },
         onError: (e: unknown) => {
-            setError(parseError(e));
+            toast.error(parseError(e));
             setDeleteTarget(null);
         },
     });
 
     return (
         <div>
-            {error && (
-                <div className="flex items-center justify-between bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3 mb-4">
-                    <span>{error}</span>
-                    <button type="button" onClick={() => setError("")} className="text-red-500 hover:text-red-700 font-bold cursor-pointer">&times;</button>
-                </div>
-            )}
-
             <div className="flex flex-wrap items-center gap-3 mb-4">
                 <input
                     value={search}
