@@ -145,5 +145,14 @@
   "unknown": "Unknown",
   "order": "Order",
   "payment": "Payment",
-  "sold": "Sold"
+  "sold": "Sold",
+  "dashboardSubtitle": "Overview of your store",
+  "ordersSubtitle": "Manage customer orders",
+  "productsSubtitle": "Manage your product catalog",
+  "usersSubtitle": "View and manage customer accounts",
+  "couponsSubtitle": "Create and manage discount coupons",
+  "brandsSubtitle": "Manage product brands",
+  "categoriesSubtitle": "Organize products by category",
+  "toggleSidebar": "Toggle sidebar",
+  "overview": "Overview"
 }

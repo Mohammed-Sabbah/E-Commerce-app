@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { Poppins, Inter } from "next/font/google";
+import { Poppins, Inter, Noto_Sans_Arabic } from "next/font/google";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
-import { getMessages, setRequestLocale } from "next-intl/server";
+import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import LayoutShell from "@/components/LayoutShell";
 import Header from "@/components/Header";
@@ -23,12 +23,19 @@ const poppins = Poppins({
   variable: "--font-poppins",
 });
 
+const notoSansArabic = Noto_Sans_Arabic({
+  subsets: ["arabic"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-arabic",
+});
+
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "seo" });
   return {
     metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"),
-    title: "Exclusive",
-    description: "Your one-stop shop for exclusive deals",
+    title: t("homeTitle"),
+    description: t("homeDescription"),
     alternates: {
       canonical: `/${locale}`,
       languages: {
@@ -58,9 +65,9 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} dir={locale === "ar" ? "rtl" : "ltr"}>
+    <html lang={locale} dir={locale === "ar" ? "rtl" : "ltr"} suppressHydrationWarning>
       <body
-        className={`${poppins.className} ${inter.variable} antialiased`}
+        className={`${locale === "ar" ? notoSansArabic.className : poppins.className} ${inter.variable} antialiased`}
       >
         <NextIntlClientProvider locale={locale} messages={messages}>
           <Providers>

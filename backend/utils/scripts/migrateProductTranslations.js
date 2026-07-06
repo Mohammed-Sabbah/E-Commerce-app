@@ -1,7 +1,7 @@
-require("dotenv").config({ path: require("path").join(__dirname, "../../config/.env") });
+require("dotenv").config({ path: require("path").join(__dirname, "../../config.env") });
 const mongoose = require("mongoose");
 
-const dbUrl = process.env.DB_URL;
+const dbUrl = process.env.DB_URI;
 if (!dbUrl) {
   console.error("DB_URL is not defined in config/.env");
   process.exit(1);

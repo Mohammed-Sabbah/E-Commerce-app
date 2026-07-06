@@ -145,5 +145,14 @@
   "unknown": "غير معروف",
   "order": "الطلب",
   "payment": "الدفع",
-  "sold": "مباع"
+  "sold": "مباع",
+  "dashboardSubtitle": "نظرة عامة على متجرك",
+  "ordersSubtitle": "إدارة طلبات العملاء",
+  "productsSubtitle": "إدارة كتالوج المنتجات",
+  "usersSubtitle": "عرض وإدارة حسابات العملاء",
+  "couponsSubtitle": "إنشاء وإدارة كوبونات الخصم",
+  "brandsSubtitle": "إدارة العلامات التجارية",
+  "categoriesSubtitle": "تنظيم المنتجات حسب التصنيف",
+  "toggleSidebar": "تبديل الشريط الجانبي",
+  "overview": "نظرة عامة"
 }

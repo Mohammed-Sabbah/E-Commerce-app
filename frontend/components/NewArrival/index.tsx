@@ -33,21 +33,22 @@ async function CardContentSmall({ title, description }: { title: string; descrip
 }
 
 async function NewArrival() {
+  const t = await getTranslations('products');
   return (
     <div className="grid gap-7.5 lg:grid-cols-2 lg:h-[560px]">
 
       <div className="relative overflow-hidden rounded-[4px] bg-black text-white h-[300px] lg:h-full">
         <Image
           src="/images/1c360f790c1817d3afa266b3c9f8c81ff0ed4428.png"
-          alt="PlayStation 5"
+          alt={t('playstation5')}
           fill
           className="object-cover object-right"
           priority
         />
         <CardOverlay />
         <CardContent
-          title="PlayStation 5"
-          description="Black and White version of the PS5 coming out on sale."
+          title={t('playstation5')}
+          description={t('ps5Description')}
         />
       </div>
 
@@ -56,14 +57,14 @@ async function NewArrival() {
         <div className="relative overflow-hidden rounded-[4px] bg-black text-white h-[300px] lg:h-auto">
           <Image
             src="/images/455c8d6408463f7e8f57dd3048a2444dbfa0cb90.jpg"
-            alt="Women's Collections"
+            alt={t('womensCollections')}
             fill
             className="object-cover scale-x-[-1]"
           />
           <CardOverlay />
           <CardContent
-            title="Women's Collections"
-            description="Featured woman collections that give you another vibe."
+            title={t('womensCollections')}
+            description={t('womensCollectionsDesc')}
           />
         </div>
 
@@ -72,28 +73,28 @@ async function NewArrival() {
           <div className="relative overflow-hidden rounded-[4px] bg-black text-white">
             <Image
               src="/images/e5659d572977438364a41d7e8c9d1e9a794d43ed.png"
-              alt="Speakers"
+              alt={t('speakers')}
               fill
               className="object-cover"
             />
             <CardOverlay />
             <CardContentSmall
-              title="Speakers"
-              description="Amazon wireless speakers"
+              title={t('speakers')}
+              description={t('speakersDesc')}
             />
           </div>
 
           <div className="relative overflow-hidden rounded-[4px] bg-black text-white">
             <Image
               src="/images/15315cd15102562cf220504d288fa568eaa816dd.png"
-              alt="Perfume"
+              alt={t('perfume')}
               fill
               className="object-cover"
             />
             <CardOverlay />
             <CardContentSmall
-              title="Perfume"
-              description="GUCCI INTENSE OUD EDP"
+              title={t('perfume')}
+              description={t('perfumeDesc')}
             />
           </div>
 

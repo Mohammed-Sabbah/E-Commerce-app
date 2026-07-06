@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from 'next-intl';
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
 interface ActiveFilterTagsProps {
@@ -25,6 +26,7 @@ export default function ActiveFilterTags({
     onRemoveDiscount,      // ← أضف
     onClearAll,
 }: ActiveFilterTagsProps) {
+    const t = useTranslations('products');
 
     const hasFilters = activeCategory || priceMin || priceMax || activeDiscount;
     if (!hasFilters) return null;
@@ -33,7 +35,7 @@ export default function ActiveFilterTags({
 
     return (
         <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs text-gray-400 font-medium">Active filters:</span>
+            <span className="text-xs text-gray-400 font-medium">{t('activeFilters')}</span>
 
             {/* Discount tag */}
             {activeDiscount && (
@@ -41,7 +43,7 @@ export default function ActiveFilterTags({
                     onClick={onRemoveDiscount}
                     className="flex items-center gap-1.5 px-2.5 py-1 bg-gray-100 hover:bg-gray-200 rounded-full text-xs text-gray-700 transition"
                 >
-                    Flash Sales
+                    {t('flashSales')}
                     <XMarkIcon className="w-3 h-3" />
                 </button>
             )}
@@ -78,7 +80,7 @@ export default function ActiveFilterTags({
                     onClick={onClearAll}
                     className="text-xs text-[#DB4444] hover:underline ms-1 transition"
                 >
-                    Clear all
+                    {t('clearAll')}
                 </button>
             )}
         </div>

@@ -17,25 +17,28 @@ import {
     X,
 } from "lucide-react";
 import { apiClient } from "@/lib/apiClient";
-
-const NAV_ITEMS = [
-    { label: "Overview",    href: "/admin",            icon: LayoutDashboard },
-    { label: "Orders",      href: "/admin/orders",     icon: ShoppingCart },
-    { label: "Products",    href: "/admin/products",   icon: Package },
-    { label: "Categories",  href: "/admin/categories", icon: Grid3X3 },
-    { label: "Brands",      href: "/admin/brands",     icon: Tag },
-    { label: "Coupons",     href: "/admin/coupons",    icon: Ticket },
-    { label: "Users",       href: "/admin/users",      icon: Users },
-];
+import { useTranslations } from 'next-intl';
 
 interface Props {
     user: { name: string; email: string };
 }
 
 export default function AdminSidebar({ user }: Props) {
+    const t = useTranslations('admin');
+    const tNav = useTranslations('nav');
     const pathname = usePathname();
     const router = useRouter();
     const [open, setOpen] = useState(false);
+
+    const NAV_ITEMS = [
+        { label: t('overview'),   href: "/admin",            icon: LayoutDashboard },
+        { label: t('orders'),     href: "/admin/orders",     icon: ShoppingCart },
+        { label: t('products'),   href: "/admin/products",   icon: Package },
+        { label: t('categories'), href: "/admin/categories", icon: Grid3X3 },
+        { label: t('brands'),     href: "/admin/brands",     icon: Tag },
+        { label: t('coupons'),    href: "/admin/coupons",    icon: Ticket },
+        { label: t('users'),      href: "/admin/users",      icon: Users },
+    ];
 
     async function handleLogout() {
         try {
@@ -53,7 +56,7 @@ export default function AdminSidebar({ user }: Props) {
                     <Store size={20} />
                     <span>Exclusive</span>
                 </Link>
-                <p className="text-xs text-gray-400 mt-0.5">Admin Panel</p>
+                <p className="text-xs text-gray-400 mt-0.5">{t('adminTitle')}</p>
             </div>
 
             {/* Nav */}
@@ -97,7 +100,7 @@ export default function AdminSidebar({ user }: Props) {
                     className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
                 >
                     <LogOut size={15} />
-                    Logout
+                    {tNav('logout')}
                 </button>
             </div>
         </>
@@ -110,7 +113,7 @@ export default function AdminSidebar({ user }: Props) {
                 type="button"
                 onClick={() => setOpen(!open)}
                 className="fixed top-4 start-4 z-50 md:hidden bg-white border border-gray-200 rounded-xl p-2.5 shadow-sm cursor-pointer hover:bg-gray-50 transition-colors"
-                aria-label="Toggle sidebar"
+                aria-label={t('toggleSidebar')}
             >
                 {open ? <X size={18} /> : <Menu size={18} />}
             </button>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from "react"
+import { useTranslations } from 'next-intl';
 
 const TARGET_DATE = new Date(Date.now() +
     11 * 86400000 +
@@ -27,15 +28,16 @@ function Timer() {
         return () => clearInterval(interval)
     }, [])
 
+    const t = useTranslations('products');
     return (
         <div className='flex justify-center items-center space-x-2 md:space-x-4'>
-            <TimerItem number={time.days} title="Days" />
+            <TimerItem number={time.days} title={t('days')} />
             <Columns />
-            <TimerItem number={time.hours} title="Hours" />
+            <TimerItem number={time.hours} title={t('hours')} />
             <Columns />
-            <TimerItem number={time.minutes} title="Minutes" />
+            <TimerItem number={time.minutes} title={t('minutes')} />
             <Columns />
-            <TimerItem number={time.seconds} title="Seconds" />
+            <TimerItem number={time.seconds} title={t('seconds')} />
         </div>
     )
 }

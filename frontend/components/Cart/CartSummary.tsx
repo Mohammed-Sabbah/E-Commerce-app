@@ -88,27 +88,27 @@ export default function CartSummary({ subtotal, onCheckout }: CartSummaryProps) 
 
             {/* Totals */}
             <div className="border rounded-xl p-6 w-full max-w-md md:ms-auto m-auto">
-                <h2 className="font-semibold mb-4">Cart Total</h2>
+                <h2 className="font-semibold mb-4">{t('cartTotal')}</h2>
 
                 <div className="flex justify-between mb-2">
-                    <span>Subtotal:</span>
+                    <span>{t('subtotal')}</span>
                     <span>${subtotal.toFixed(2)}</span>
                 </div>
 
                 {discount > 0 && (
                     <div className="flex justify-between mb-2">
-                        <span className="text-green-600">Discount:</span>
+                        <span className="text-green-600">{t('discount')}</span>
                         <span className="text-green-600">-${discount.toFixed(2)}</span>
                     </div>
                 )}
 
                 <div className="flex justify-between mb-2">
-                    <span>Shipping:</span>
-                    <span>Free</span>
+                    <span>{t('shipping')}</span>
+                    <span>{t('free')}</span>
                 </div>
 
                 <div className="flex justify-between border-t pt-3 font-bold">
-                    <span>Total:</span>
+                    <span>{t('total')}</span>
                     <span>${total.toFixed(2)}</span>
                 </div>
 
@@ -116,7 +116,7 @@ export default function CartSummary({ subtotal, onCheckout }: CartSummaryProps) 
                     onClick={() => onCheckout(appliedCode ?? undefined)}
                     className="mt-5 w-full bg-[#DB4444] text-white py-3 rounded-md cursor-pointer hover:bg-red-600 transition"
                 >
-                    Proceed to checkout
+                    {t('proceedToCheckout')}
                 </button>
             </div>
         </div>

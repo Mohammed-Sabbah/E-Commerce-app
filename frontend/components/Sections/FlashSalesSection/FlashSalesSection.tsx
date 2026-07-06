@@ -7,10 +7,11 @@ import StyledButton from '@/components/StyledButton'
 
 async function FlashSalesSection({ children }: { children: React.ReactNode }) {
     const t = await getTranslations('common');
+    const tp = await getTranslations('products');
     return (
         <section className="mb-16 md:mb-20">
             <Container className="relative">
-                <SectionTitle Category="Today's" title="Flash Sales">
+                <SectionTitle Category={t('todays')} title={tp('flashSales')}>
                     <Timer />
                 </SectionTitle>
 

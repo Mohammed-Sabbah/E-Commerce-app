@@ -1,18 +1,20 @@
 import Image from 'next/image'
 import StyledButton from '../StyledButton'
+import { useTranslations } from 'next-intl';
 function CatigoryHero() {
+    const t = useTranslations('products');
     return (
         <div className="px-6 md:px-10 lg:px-14 py-10 md:py-12 lg:py-17 bg-black flex flex-col lg:flex-row justify-between items-center gap-8">
 
             <div className="w-full lg:w-2/5 flex flex-col space-y-6 lg:space-y-8">
-                <h3 className="text-[1rem] text-[#00FF66] font-semibold">Categories</h3>
+                <h3 className="text-[1rem] text-[#00FF66] font-semibold">{t('categories')}</h3>
                 <p className="text-3xl md:text-4xl lg:text-5xl text-[#FAFAFA] font-semibold tracking-[4%]">
-                    Enhance Your Music Experience
+                    {t('enhanceMusic')}
                 </p>
                 <CatigoryHeroTimer />
                 <div className="hidden lg:block">
                     <StyledButton
-                        title="Buy Now"
+                        title={t('buyNow')}
                         ClassName="hero-button self-start bg-[#00FF66] py-4 px-12 text-white inline-block"
                     />
                 </div>
@@ -38,7 +40,7 @@ function CatigoryHero() {
 
             <div className="lg:hidden w-full">
                 <StyledButton
-                    title="Buy Now"
+                    title={t('buyNow')}
                     ClassName="hero-button bg-[#00FF66] py-4 px-12 text-white inline-block"
                 />
             </div>
@@ -57,12 +59,13 @@ export function CatigoryHeroTimerItem({ value, label }: { value: number; label: 
 }
 
 export function CatigoryHeroTimer() {
+    const t = useTranslations('products');
     return (
         <div className='flex space-x-3 md:space-x-4 lg:space-x-6'>
-            <CatigoryHeroTimerItem label="Days" value={5} />
-            <CatigoryHeroTimerItem label="Hours" value={23} />
-            <CatigoryHeroTimerItem label="Minutes" value={59} />
-            <CatigoryHeroTimerItem label="Seconds" value={45} />
+            <CatigoryHeroTimerItem label={t('days')} value={5} />
+            <CatigoryHeroTimerItem label={t('hours')} value={23} />
+            <CatigoryHeroTimerItem label={t('minutes')} value={59} />
+            <CatigoryHeroTimerItem label={t('seconds')} value={45} />
         </div>
     )
 }

@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { PaymentMethod } from '@/types/checkout';
 
 interface Props {
@@ -20,6 +21,7 @@ function RadioDot({ checked }: { checked: boolean }) {
 }
 
 export default function PaymentMethodSelector({ value, onChange }: Props) {
+    const t = useTranslations('checkout');
     return (
         <div className="flex flex-col gap-2">
             {/* Bank */}
@@ -34,7 +36,7 @@ export default function PaymentMethodSelector({ value, onChange }: Props) {
             >
                 <div className="flex items-center gap-2">
                     <RadioDot checked={value === 'card'} />
-                    <span className="text-sm text-gray-700">Bank</span>
+                    <span className="text-sm text-gray-700">{t('bank')}</span>
                 </div>
                 <div className="flex items-center gap-1">
                     <span className="text-xs bg-blue-600 text-white px-1.5 py-0.5 rounded font-bold tracking-wide">
@@ -48,7 +50,7 @@ export default function PaymentMethodSelector({ value, onChange }: Props) {
 
             {value === 'card' && (
                 <p className="text-xs text-gray-400 ps-2">
-                    Online payment coming soon. Please use Cash on Delivery.
+                    {t('onlinePaymentComingSoon')}
                 </p>
             )}
 
@@ -63,7 +65,7 @@ export default function PaymentMethodSelector({ value, onChange }: Props) {
                 }`}
             >
                 <RadioDot checked={value === 'cash'} />
-                <span className="text-sm text-gray-700">Cash on Delivery</span>
+                <span className="text-sm text-gray-700">{t('cashOnDelivery')}</span>
             </button>
         </div>
     );

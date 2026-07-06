@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/carousel"
 import Autoplay from "embla-carousel-autoplay"
 import { Link } from "@/i18n/navigation"
+import { useTranslations } from 'next-intl';
 
 type Slide = {
     id: number
@@ -26,65 +27,65 @@ type Slide = {
     imageAlt: string
 }
 
-const slides: Slide[] = [
-    {
-        id: 1,
-        productId: "6a00639df6c3536c5fb3b101",
-        bg: "bg-black",
-        badge: { logo: "/images/apple-logo.png", label: "iPhone 14 Series" },
-        title: "Up to 10%",
-        subtitle: "off Voucher",
-        cta: "Shop Now",
-        image: "/images/iphone-14.png",
-        imageAlt: "iPhone 14 Pro",
-    },
-    {
-        id: 2,
-        productId: "69d2565cd47c11c3e447af49",
-        bg: "bg-[#1a0a0f]",
-        badge: { label: "Chanel" },
-        title: "Luxury Scent",
-        subtitle: "Save $21",
-        cta: "Shop Now",
-        image: "https://cdn.dummyjson.com/product-images/fragrances/chanel-coco-noir-eau-de/thumbnail.webp",
-        imageAlt: "Chanel Coco Noir",
-    },
-    {
-        id: 3,
-        productId: "69d2565cd47c11c3e447af46",
-        bg: "bg-[#1a0000]",
-        badge: { label: "Beauty Collection" },
-        title: "Bold & Vibrant",
-        subtitle: "From $8.99",
-        cta: "Shop Now",
-        image: "https://cdn.dummyjson.com/product-images/beauty/red-lipstick/thumbnail.webp",
-        imageAlt: "Red Lipstick",
-    },
-    {
-        id: 4,
-        productId: "69d2565cd47c11c3e447af48",
-        bg: "bg-[#0a0f1a]",
-        badge: { label: "Calvin Klein" },
-        title: "Fresh & Clean",
-        subtitle: "Unisex Fragrance",
-        cta: "Shop Now",
-        image: "https://cdn.dummyjson.com/product-images/fragrances/calvin-klein-ck-one/thumbnail.webp",
-        imageAlt: "Calvin Klein CK One",
-    },
-    {
-        id: 5,
-        productId: "69d2565cd47c11c3e447af45",
-        bg: "bg-[#0f0a1a]",
-        badge: { label: "Makeup Essentials" },
-        title: "Flawless Finish",
-        subtitle: "Matte & Smooth",
-        cta: "Shop Now",
-        image: "https://cdn.dummyjson.com/product-images/beauty/powder-canister/thumbnail.webp",
-        imageAlt: "Powder Canister",
-    },
-]
-
 export function CarouselPlugin({ ClassName }: { ClassName?: string }) {
+    const t = useTranslations('products');
+    const slides: Slide[] = [
+        {
+            id: 1,
+            productId: "6a00639df6c3536c5fb3b101",
+            bg: "bg-black",
+            badge: { logo: "/images/apple-logo.png", label: t('slide1Badge') },
+            title: t('slide1Title'),
+            subtitle: t('slide1Subtitle'),
+            cta: t('slide1Cta'),
+            image: "/images/iphone-14.png",
+            imageAlt: "iPhone 14 Pro",
+        },
+        {
+            id: 2,
+            productId: "69d2565cd47c11c3e447af49",
+            bg: "bg-[#1a0a0f]",
+            badge: { label: t('slide2Badge') },
+            title: t('slide2Title'),
+            subtitle: t('slide2Subtitle'),
+            cta: t('slide2Cta'),
+            image: "https://cdn.dummyjson.com/product-images/fragrances/chanel-coco-noir-eau-de/thumbnail.webp",
+            imageAlt: "Chanel Coco Noir",
+        },
+        {
+            id: 3,
+            productId: "69d2565cd47c11c3e447af46",
+            bg: "bg-[#1a0000]",
+            badge: { label: t('slide3Badge') },
+            title: t('slide3Title'),
+            subtitle: t('slide3Subtitle'),
+            cta: t('slide3Cta'),
+            image: "https://cdn.dummyjson.com/product-images/beauty/red-lipstick/thumbnail.webp",
+            imageAlt: "Red Lipstick",
+        },
+        {
+            id: 4,
+            productId: "69d2565cd47c11c3e447af48",
+            bg: "bg-[#0a0f1a]",
+            badge: { label: t('slide4Badge') },
+            title: t('slide4Title'),
+            subtitle: t('slide4Subtitle'),
+            cta: t('slide4Cta'),
+            image: "https://cdn.dummyjson.com/product-images/fragrances/calvin-klein-ck-one/thumbnail.webp",
+            imageAlt: "Calvin Klein CK One",
+        },
+        {
+            id: 5,
+            productId: "69d2565cd47c11c3e447af45",
+            bg: "bg-[#0f0a1a]",
+            badge: { label: t('slide5Badge') },
+            title: t('slide5Title'),
+            subtitle: t('slide5Subtitle'),
+            cta: t('slide5Cta'),
+            image: "https://cdn.dummyjson.com/product-images/beauty/powder-canister/thumbnail.webp",
+            imageAlt: "Powder Canister",
+        },
+    ]
     const plugin = React.useRef(
         Autoplay({ delay: 3000, stopOnInteraction: true })
     )

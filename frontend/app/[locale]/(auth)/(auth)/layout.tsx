@@ -1,6 +1,8 @@
 import React from 'react'
+import { getTranslations } from 'next-intl/server';
 
-function AuthLayout({ children }: { children: React.ReactNode }) {
+async function AuthLayout({ children }: { children: React.ReactNode }) {
+    const t = await getTranslations('auth');
     return (
         <section className="min-h-screen bg-white">
             <div className="flex min-h-screen flex-col lg:flex-row">
@@ -9,7 +11,7 @@ function AuthLayout({ children }: { children: React.ReactNode }) {
                 <div className="hidden lg:flex lg:w-7/12 items-center justify-center p-6">
                     <img
                         src="/images/authPageCover.jpg"
-                        alt="Cover Image"
+                        alt={t('coverImageAlt')}
                         className="w-full h-full object-contain"
                     />
                 </div>

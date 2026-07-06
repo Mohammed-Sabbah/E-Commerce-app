@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from 'next-intl';
 import { apiClient } from "@/lib/apiClient";
 import { UserProfile } from "@/services/server/userService";
 
@@ -18,15 +19,16 @@ interface FormErrors {
     general?: string;
 }
 
-function validate(data: Address): FormErrors {
-    const errors: FormErrors = {};
-    if (!data.city.trim()) errors.city = "City is required";
-    if (!data.details.trim()) errors.details = "Address details are required";
-    return errors;
-}
-
 export default function AddressForm({ profile }: { profile: UserProfile }) {
+    const t = useTranslations('account');
     const address = profile.addresses?.[0];
+
+    function validate(data: Address): FormErrors {
+        const errors: FormErrors = {};
+        if (!data.city.trim()) errors.city = t('cityRequired');
+        if (!data.details.trim()) errors.details = t('detailsRequired');
+        return errors;
+    }
 
     const [formData, setFormData] = useState<Address>({
         alias: address?.alias ?? "Home",
@@ -83,10 +85,10 @@ export default function AddressForm({ profile }: { profile: UserProfile }) {
                     },
                 ],
             });
-            setSuccessMessage("Address saved successfully!");
+            setSuccessMessage(t('profileUpdated'));
         } catch (err: unknown) {
             const error = err as { response?: { data?: { message?: string } } };
-            setErrors({ general: error?.response?.data?.message ?? "Something went wrong." });
+            setErrors({ general: error?.response?.data?.message ?? t('somethingWentWrong') });
         } finally {
             setIsLoading(false);
         }
@@ -94,7 +96,7 @@ export default function AddressForm({ profile }: { profile: UserProfile }) {
 
     return (
         <form onSubmit={handleSubmit} noValidate>
-            <h2 className="text-[#DB4444] font-medium text-xl mb-8">Address Book</h2>
+            <h2 className="text-[#DB4444] font-medium text-xl mb-8">{t('myAddressBook')}</h2>
 
             {errors.general && (
                 <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded text-red-600 text-sm">
@@ -109,36 +111,36 @@ export default function AddressForm({ profile }: { profile: UserProfile }) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Label</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('label')}</label>
                     <input type="text" name="alias" value={formData.alias} onChange={handleChange}
-                        placeholder="e.g. Home, Work"
+                        placeholder={t('homeWork')}
                         className="w-full px-4 py-3 bg-[#F5F5F5] rounded text-sm outline-none focus:ring-2 focus:ring-[#DB4444] transition" />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('phone')}</label>
                     <input type="text" name="phone" value={formData.phone} onChange={handleChange}
-                        placeholder="Phone number"
+                        placeholder={t('phone')}
                         className="w-full px-4 py-3 bg-[#F5F5F5] rounded text-sm outline-none focus:ring-2 focus:ring-[#DB4444] transition" />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('city')}</label>
                     <input type="text" name="city" value={formData.city} onChange={handleChange}
-                        placeholder="City"
+                        placeholder={t('city')}
                         className={`w-full px-4 py-3 bg-[#F5F5F5] rounded text-sm outline-none focus:ring-2 focus:ring-[#DB4444] transition ${errors.city ? "ring-2 ring-red-400" : ""}`} />
                     {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city}</p>}
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Postal Code</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('postalCode')}</label>
                     <input type="text" name="postalCode" value={formData.postalCode} onChange={handleChange}
-                        placeholder="Postal Code"
+                        placeholder={t('postalCode')}
                         className="w-full px-4 py-3 bg-[#F5F5F5] rounded text-sm outline-none focus:ring-2 focus:ring-[#DB4444] transition" />
                 </div>
             </div>
 
             <div className="mb-8">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Address Details</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('addressDetails')}</label>
                 <input type="text" name="details" value={formData.details} onChange={handleChange}
-                    placeholder="Street, building, floor..."
+                    placeholder={t('addressPlaceholder')}
                     className={`w-full px-4 py-3 bg-[#F5F5F5] rounded text-sm outline-none focus:ring-2 focus:ring-[#DB4444] transition ${errors.details ? "ring-2 ring-red-400" : ""}`} />
                 {errors.details && <p className="text-red-500 text-xs mt-1">{errors.details}</p>}
             </div>
@@ -146,11 +148,11 @@ export default function AddressForm({ profile }: { profile: UserProfile }) {
             <div className="flex items-center justify-end gap-4">
                 <button type="button" onClick={handleCancel}
                     className="text-sm text-gray-700 hover:text-gray-900 transition">
-                    Cancel
+                    {t('cancel')}
                 </button>
                 <button type="submit" disabled={isLoading}
                     className="px-8 py-3 bg-[#DB4444] text-white text-sm font-medium rounded hover:bg-[#c73c3c] transition disabled:opacity-60 disabled:cursor-not-allowed min-w-[140px]">
-                    {isLoading ? "Saving..." : "Save Changes"}
+                    {isLoading ? t('saving') : t('saveChanges')}
                 </button>
             </div>
         </form>

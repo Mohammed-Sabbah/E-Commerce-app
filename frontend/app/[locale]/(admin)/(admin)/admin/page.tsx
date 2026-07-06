@@ -7,8 +7,10 @@ import OrdersChart from "@/components/Admin/adminDashboard/OrdersChart";
 import StatusPie from "@/components/Admin/adminDashboard/StatusPie";
 import TopProducts from "@/components/Admin/adminDashboard/TopProducts";
 import AdminPageHeader from "@/components/Admin/AdminPageHeader";
+import { getTranslations } from 'next-intl/server';
 
 export default async function AdminDashboardPage() {
+    const t = await getTranslations('admin');
     const { data, error } = await adminFetch<AdminStats>("/api/v1/admin/stats");
 
     if (error) {
@@ -23,7 +25,7 @@ export default async function AdminDashboardPage() {
 
     return (
         <div className="space-y-6">
-            <AdminPageHeader title="Dashboard" subtitle="Overview of your store" />
+            <AdminPageHeader title={t('dashboard')} subtitle={t('dashboardSubtitle')} />
 
             <StatsCards
                 totalOrders={data.totalOrders}
@@ -44,16 +46,16 @@ export default async function AdminDashboardPage() {
 
             {data.recentOrders && data.recentOrders.length > 0 && (
                 <div>
-                    <h2 className="text-base font-semibold text-gray-900 mb-3">Recent Orders</h2>
+                    <h2 className="text-base font-semibold text-gray-900 mb-3">{t('recentOrders')}</h2>
                     <div className="overflow-x-auto border border-gray-200 rounded-xl bg-white">
                         <table className="w-full text-sm">
                             <thead className="bg-gray-50 text-start text-gray-500">
                                 <tr>
-                                    <th className="px-4 py-3 font-medium">Order</th>
-                                    <th className="px-4 py-3 font-medium">Customer</th>
-                                    <th className="px-4 py-3 font-medium">Total</th>
-                                    <th className="px-4 py-3 font-medium">Status</th>
-                                    <th className="px-4 py-3 font-medium">Date</th>
+                                    <th className="px-4 py-3 font-medium">{t('order')}</th>
+                                    <th className="px-4 py-3 font-medium">{t('customer')}</th>
+                                    <th className="px-4 py-3 font-medium">{t('orderTotal')}</th>
+                                    <th className="px-4 py-3 font-medium">{t('status')}</th>
+                                    <th className="px-4 py-3 font-medium">{t('orderDate')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
@@ -63,7 +65,7 @@ export default async function AdminDashboardPage() {
                                             #{order._id.slice(-6).toUpperCase()}
                                         </td>
                                         <td className="px-4 py-3 text-gray-900">
-                                            {order.user?.name ?? "Unknown"}
+                                            {order.user?.name ?? t('unknown')}
                                         </td>
                                         <td className="px-4 py-3 font-medium">
                                             ${order.totalOrderPrice?.toFixed(2)}

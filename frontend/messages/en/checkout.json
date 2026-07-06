@@ -57,5 +57,20 @@
   "qty": "Qty: {quantity}",
   "orderStatus": "Order Status",
   "orderDate": "Order Date",
-  "card": "Card"
+  "card": "Card",
+  "apartment": "Apartment, floor, etc. (optional)",
+  "couponCode": "Coupon Code",
+  "remove": "Remove",
+  "validating": "Validating...",
+  "applyCoupon": "Apply Coupon",
+  "couponApplyFailed": "Coupon could not be applied",
+  "couponValidateFailed": "Failed to validate coupon",
+  "couponApplied": "Coupon \"{code}\" applied — discount shown at checkout",
+  "discount": "Discount",
+  "placingOrder": "Placing Order...",
+  "cardPaymentComingSoon": "Card Payment — Coming Soon",
+  "bank": "Bank",
+  "onlinePaymentComingSoon": "Online payment coming soon. Please use Cash on Delivery.",
+  "noAddresses": "No saved addresses. Please add one in your <link>account settings</link>.",
+  "accountSettings": "account settings"
 }

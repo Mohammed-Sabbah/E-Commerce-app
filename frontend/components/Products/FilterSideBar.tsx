@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from 'next-intl';
 import type { Category } from "@/types/api";
 
 interface FilterSidebarProps {
@@ -13,11 +14,12 @@ export default function FilterSidebar({
     activeCategory,
     onCategoryChange,
 }: FilterSidebarProps) {
+    const t = useTranslations('products');
     return (
         <aside className="w-full lg:w-56 shrink-0 hidden lg:flex flex-col gap-3 sticky top-30 self-start">
 
             <h3 className="text-xs font-semibold uppercase tracking-widest text-gray-400">
-                Category
+                {t('category')}
             </h3>
 
             <ul className="space-y-0.5 max-h-[calc(100vh-12rem)] overflow-y-auto pe-1">
@@ -30,7 +32,7 @@ export default function FilterSidebar({
                                 : "text-gray-700 hover:bg-gray-100"
                             }`}
                     >
-                        All
+                        {t('allCategories')}
                     </button>
                 </li>
                 {categories.map((cat) => (

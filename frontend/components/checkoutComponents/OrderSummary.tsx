@@ -1,4 +1,7 @@
+'use client';
+
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import { OrderItem } from '@/types/checkout';
 
 interface Props {
@@ -27,6 +30,7 @@ function SummaryRow({
     );
 }
 export default function OrderSummary({ items, discount }: Props) {
+    const t = useTranslations('checkout');
     const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
     const afterDiscount = subtotal - discount;
     const tax = parseFloat((afterDiscount * 0.025).toFixed(2));
@@ -57,13 +61,13 @@ export default function OrderSummary({ items, discount }: Props) {
 
             {/* Totals */}
             <div className="flex flex-col gap-3">
-                <SummaryRow label="Subtotal" value={`$${afterDiscount.toFixed(2)}`} />
+                <SummaryRow label={t('subtotal')} value={`$${afterDiscount.toFixed(2)}`} />
                 {discount > 0 && (
-                    <SummaryRow label="Discount" value={`-$${discount.toFixed(2)}`} highlight />
+                    <SummaryRow label={t('discount')} value={`-$${discount.toFixed(2)}`} highlight />
                 )}
-                <SummaryRow label="Tax (2.5%)" value={`$${tax.toFixed(2)}`} divider />
-                <SummaryRow label="Shipping (2.5%)" value={`$${shipping.toFixed(2)}`} />
-                <SummaryRow label="Total" value={`$${total.toFixed(2)}`} divider />
+                <SummaryRow label={`${t('tax')} (2.5%)`} value={`$${tax.toFixed(2)}`} divider />
+                <SummaryRow label={`${t('shipping')} (2.5%)`} value={`$${shipping.toFixed(2)}`} />
+                <SummaryRow label={t('total')} value={`$${total.toFixed(2)}`} divider />
             </div>
         </div>
     );

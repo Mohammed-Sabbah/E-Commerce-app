@@ -57,5 +57,20 @@
   "qty": "الكمية: {quantity}",
   "orderStatus": "حالة الطلب",
   "orderDate": "تاريخ الطلب",
-  "card": "بطاقة"
+  "card": "بطاقة",
+  "apartment": "شقة، طابق، إلخ (اختياري)",
+  "couponCode": "رمز الكوبون",
+  "remove": "إزالة",
+  "validating": "جارٍ التحقق...",
+  "applyCoupon": "تطبيق الكوبون",
+  "couponApplyFailed": "تعذر تطبيق الكوبون",
+  "couponValidateFailed": "فشل التحقق من الكوبون",
+  "couponApplied": "تم تطبيق الكوبون \"{code}\" — الخصم ظاهر عند الدفع",
+  "discount": "الخصم",
+  "placingOrder": "جارٍ تقديم الطلب...",
+  "cardPaymentComingSoon": "الدفع بالبطاقة — قريباً",
+  "bank": "بنك",
+  "onlinePaymentComingSoon": "الدفع عبر الإنترنت قريباً. يرجى استخدام الدفع عند الاستلام.",
+  "noAddresses": "لا توجد عناوين محفوظة. يرجى إضافة عنوان في <link>إعدادات الحساب</link>.",
+  "accountSettings": "إعدادات الحساب"
 }
