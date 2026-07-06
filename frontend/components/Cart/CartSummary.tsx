@@ -87,7 +87,7 @@ export default function CartSummary({ subtotal, onCheckout }: CartSummaryProps) 
             </div>
 
             {/* Totals */}
-            <div className="border rounded-xl p-6 w-full max-w-md md:ml-auto m-auto">
+            <div className="border rounded-xl p-6 w-full max-w-md md:ms-auto m-auto">
                 <h2 className="font-semibold mb-4">Cart Total</h2>
 
                 <div className="flex justify-between mb-2">

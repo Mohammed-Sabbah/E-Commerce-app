@@ -76,7 +76,7 @@ export default function ActiveFilterTags({
             {filterCount > 1 && (
                 <button
                     onClick={onClearAll}
-                    className="text-xs text-[#DB4444] hover:underline ml-1 transition"
+                    className="text-xs text-[#DB4444] hover:underline ms-1 transition"
                 >
                     Clear all
                 </button>

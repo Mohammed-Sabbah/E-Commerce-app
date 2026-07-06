@@ -46,7 +46,7 @@ function ProductRow({ cartItem, onChange, updates }: ProductRowProps) {
                     {/* زر الحذف */}
                     <button
                         onClick={() => removeFromCart(cartItem._id)}
-                        className="absolute cursor-pointer top-0 left-0 bg-red-500 text-white p-1 rounded-full 
+                        className="absolute cursor-pointer top-0 start-0 bg-red-500 text-white p-1 rounded-full 
                         opacity-0 group-hover:opacity-100 
                         transition duration-200"
                     >

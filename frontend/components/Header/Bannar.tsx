@@ -19,7 +19,7 @@ export function Banner() {
     return (
         <div className="bg-black text-white">
             <Container className="relative flex items-center justify-center py-3 px-4">
-                <p className="text-xs sm:text-sm text-center pr-16 sm:pr-0">
+                <p className="text-xs sm:text-sm text-center pe-16 sm:pe-0">
                     {t('summerSale')}{" "}
 
                     <a href="/sale"
@@ -29,7 +29,7 @@ export function Banner() {
                     </a>
                 </p>
 
-                <div className="absolute right-4 flex items-center gap-3">
+                <div className="absolute end-4 flex items-center gap-3">
                     <select
                         className="bg-transparent text-xs sm:text-sm text-gray-300 
                                    hover:text-white transition cursor-pointer 

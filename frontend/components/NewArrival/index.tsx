@@ -9,7 +9,7 @@ function CardOverlay() {
 async function CardContent({ title, description }: { title: string; description: string }) {
   const t = await getTranslations('nav');
   return (
-    <div className="absolute bottom-6 left-6 max-w-xs">
+    <div className="absolute bottom-6 start-6 max-w-xs">
       <h3 className="text-lg font-semibold">{title}</h3>
       <p className="mt-2 text-sm text-gray-200">{description}</p>
       <Link href={"/"} className="mt-3 text-sm font-semibold underline underline-offset-4">
@@ -22,7 +22,7 @@ async function CardContent({ title, description }: { title: string; description:
 async function CardContentSmall({ title, description }: { title: string; description: string }) {
   const t = await getTranslations('nav');
   return (
-    <div className="absolute bottom-5 left-5">
+    <div className="absolute bottom-5 start-5">
       <h3 className="text-base font-semibold">{title}</h3>
       <p className="mt-1 text-xs text-gray-200">{description}</p>
       <Link href={"/"} className="mt-2 text-xs font-semibold underline underline-offset-4">

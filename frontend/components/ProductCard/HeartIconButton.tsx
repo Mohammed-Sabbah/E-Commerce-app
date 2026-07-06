@@ -17,7 +17,7 @@ function HeartIconButton({ productId }: { productId: string }) {
 
     if (!mounted) {
         return (
-            <button className="bg-white/80 hover:bg-white w-9 h-9 rounded-full absolute top-2.5 right-2.5 cursor-pointer flex items-center justify-center transition-all">
+            <button className="bg-white/80 hover:bg-white w-9 h-9 rounded-full absolute top-2.5 end-2.5 cursor-pointer flex items-center justify-center transition-all">
                 <HeartOutline className="h-6 w-6 text-gray-700 translate-y-[1px]" />
             </button>
         );
@@ -25,7 +25,7 @@ function HeartIconButton({ productId }: { productId: string }) {
 
     return (
         <button
-            className="bg-white/80 hover:bg-white w-9 h-9 rounded-full absolute top-2.5 right-2.5 cursor-pointer flex items-center justify-center transition-all"
+            className="bg-white/80 hover:bg-white w-9 h-9 rounded-full absolute top-2.5 end-2.5 cursor-pointer flex items-center justify-center transition-all"
             disabled={loading}
             onClick={() => {
                 exists ? removeFromWishlist(productId) : addToWishlist(productId);

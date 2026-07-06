@@ -45,7 +45,7 @@ export default function MobileFilterDrawer({
 
             {/* Drawer */}
             <div
-                className={`fixed top-0 left-0 h-full w-72 bg-white z-50 lg:hidden shadow-xl
+                className={`fixed top-0 start-0 h-full w-72 bg-white z-50 lg:hidden shadow-xl
                     flex flex-col transition-transform duration-300 ease-in-out
                     ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
             >
@@ -70,7 +70,7 @@ export default function MobileFilterDrawer({
                         <li>
                             <button
                                 onClick={() => { onCategoryChange(""); onClose(); }}
-                                className={`w-full text-left text-sm px-3 py-2 rounded-lg transition-colors
+                                className={`w-full text-start text-sm px-3 py-2 rounded-lg transition-colors
                                     ${!activeCategory ? "bg-[#DB4444] text-white font-medium" : "text-gray-700 hover:bg-gray-100"}`}
                             >
                                 All
@@ -80,7 +80,7 @@ export default function MobileFilterDrawer({
                             <li key={cat._id}>
                                 <button
                                     onClick={() => { onCategoryChange(cat._id); onClose(); }}
-                                    className={`w-full text-left text-sm px-3 py-2 rounded-lg transition-colors
+                                    className={`w-full text-start text-sm px-3 py-2 rounded-lg transition-colors
                                         ${activeCategory === cat._id ? "bg-[#DB4444] text-white font-medium" : "text-gray-700 hover:bg-gray-100"}`}
                                 >
                                     {cat.name}

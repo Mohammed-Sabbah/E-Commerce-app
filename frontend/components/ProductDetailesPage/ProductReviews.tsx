@@ -133,7 +133,7 @@ export default function ProductReviews({ productId }: Props) {
             <div className="flex items-center justify-between pt-8 mb-8">
                 <h3 className="text-lg font-semibold text-gray-900">
                     {t('customerReviews')}
-                    <span className="ml-2 text-sm font-normal text-gray-400">({reviews.length})</span>
+                    <span className="ms-2 text-sm font-normal text-gray-400">({reviews.length})</span>
                 </h3>
                 {reviews.length > 0 && (
                     <div className="flex items-center gap-2">
@@ -172,7 +172,7 @@ export default function ProductReviews({ productId }: Props) {
                                             <div>
                                                 <p className="text-sm font-medium text-gray-900">
                                                     {myReview.user.name}
-                                                    <span className="ml-2 text-[10px] font-medium text-white bg-[#DB4444] px-1.5 py-0.5 rounded-full">{t('you')}</span>
+                                                    <span className="ms-2 text-[10px] font-medium text-white bg-[#DB4444] px-1.5 py-0.5 rounded-full">{t('you')}</span>
                                                 </p>
                                                 <StarsComponent rating={myReview.rating} size={13} />
                                             </div>
@@ -290,7 +290,7 @@ export default function ProductReviews({ productId }: Props) {
                                     placeholder={t('commentPlaceholder')}
                                     className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 resize-none focus:outline-none focus:border-[#DB4444] transition placeholder:text-gray-300"
                                 />
-                                <p className="text-xs text-gray-300 text-right mt-1">{t('chars', { count: comment.length })}</p>
+                                <p className="text-xs text-gray-300 text-end mt-1">{t('chars', { count: comment.length })}</p>
                             </div>
 
                             {error && (

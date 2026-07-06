@@ -39,7 +39,7 @@ export default function ProductMobileCard({ item, onChange, updates }: ProductMo
 
                 <button
                     onClick={() => removeFromCart(item._id)}
-                    className="absolute top-0 left-0 bg-red-500 text-white p-1 rounded-full cursor-pointer transition"
+                    className="absolute top-0 start-0 bg-red-500 text-white p-1 rounded-full cursor-pointer transition"
                 >
                     {isRemoving ? <LoadingSvg /> : <XMarkIcon className="w-4 h-4" />}
                 </button>

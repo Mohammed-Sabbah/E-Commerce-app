@@ -47,7 +47,7 @@ export default function PaymentMethodSelector({ value, onChange }: Props) {
             </button>
 
             {value === 'card' && (
-                <p className="text-xs text-gray-400 pl-2">
+                <p className="text-xs text-gray-400 ps-2">
                     Online payment coming soon. Please use Cash on Delivery.
                 </p>
             )}

@@ -124,7 +124,7 @@ export default function AdminOrdersClient({ initial }: { initial: AdminOrder[] }
 
             <div className="overflow-x-auto border border-gray-200 rounded-xl bg-white">
                 <table className="w-full text-sm">
-                    <thead className="bg-gray-50 text-left text-gray-500">
+                    <thead className="bg-gray-50 text-start text-gray-500">
                         <tr>
                             <th className="px-4 py-3 font-medium">{t('order')}</th>
                             <th className="px-4 py-3 font-medium">{t('customer')}</th>
@@ -209,13 +209,13 @@ export default function AdminOrdersClient({ initial }: { initial: AdminOrder[] }
                                                     </button>
 
                                                     {openId === order._id && (
-                                                        <div className="absolute right-0 top-full mt-1 z-50 min-w-[150px] bg-white border border-gray-200 rounded-lg shadow-lg py-1">
+                                                        <div className="absolute end-0 top-full mt-1 z-50 min-w-[150px] bg-white border border-gray-200 rounded-lg shadow-lg py-1">
                                                             {safe.map((s) => (
                                                                 <button
                                                                     key={s}
                                                                     type="button"
                                                                     onClick={() => { setOpenId(null); doAction(order._id, s); }}
-                                                                    className="w-full text-left px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
+                                                                    className="w-full text-start px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
                                                                 >
                                                                     {t('markAs', { status: statusLabels[s] })}
                                                                 </button>
@@ -228,7 +228,7 @@ export default function AdminOrdersClient({ initial }: { initial: AdminOrder[] }
                                                                     key={s}
                                                                     type="button"
                                                                     onClick={() => { setOpenId(null); requestAction(order._id, s); }}
-                                                                    className="w-full text-left px-3 py-1.5 text-xs text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                                                                    className="w-full text-start px-3 py-1.5 text-xs text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
                                                                 >
                                                                     {s === "cancelled" ? t('cancel') : statusLabels[s]}
                                                                 </button>

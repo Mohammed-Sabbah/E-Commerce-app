@@ -70,7 +70,7 @@ export default function Login() {
 
                 <a
                     href="#"
-                    className="text-xs font-semibold text-[#e14343] hover:text-[#c92f2f] text-center sm:text-left"
+                    className="text-xs font-semibold text-[#e14343] hover:text-[#c92f2f] text-center sm:text-start"
                 >
                     {t("forgetPassword")}
                 </a>

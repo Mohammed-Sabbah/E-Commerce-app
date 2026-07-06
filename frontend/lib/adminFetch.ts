@@ -9,7 +9,10 @@ export async function adminFetch<T>(
     try {
         if (!BASE) return { data: null, error: "API_URL is not configured" };
         const token = (await cookies()).get("token")?.value;
-        const res = await fetch(`${BASE}${path}`, {
+        const locale = (await cookies()).get("NEXT_LOCALE")?.value || "en";
+        const separator = path.includes("?") ? "&" : "?";
+        const url = `${BASE}${path}${separator}lang=${locale}`;
+        const res = await fetch(url, {
             ...options,
             headers: {
                 "Content-Type": "application/json",

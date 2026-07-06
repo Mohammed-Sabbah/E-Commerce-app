@@ -23,7 +23,7 @@ export default async function AccountLayout({
                     </Link>
                     <span>/</span>
                     <span className="text-gray-800">My Account</span>
-                    <span className="ml-auto text-sm">
+                    <span className="ms-auto text-sm">
                         Welcome!{" "}
                         <span className="text-[#DB4444] font-medium">{profile.name}</span>
                     </span>

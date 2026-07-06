@@ -34,8 +34,8 @@ function CategoryCard({ category, className }: CategoryCardProps) {
         //             className='object-cover transition-transform duration-300 group-hover:scale-105'
         //         />
 
-        //         <div className='absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/70 to-transparent' />
-        //         <p className='absolute bottom-3 left-0 right-0 text-center text-white font-medium text-sm'>
+        //         <div className='absolute bottom-0 start-0 end-0 h-12 bg-gradient-to-t from-black/70 to-transparent' />
+        //         <p className='absolute bottom-3 start-0 end-0 text-center text-white font-medium text-sm'>
         //             {category.name}
         //         </p>
         //     </div>
@@ -54,7 +54,7 @@ function CategoryCard({ category, className }: CategoryCardProps) {
                 />
 
                 {/* الطبقة العادية - أسود */}
-                <div className='absolute bottom-0 left-0 right-0 h-16 
+                <div className='absolute bottom-0 start-0 end-0 h-16 
             bg-gradient-to-t from-black/70 to-transparent
             opacity-100 group-hover:opacity-0
             transition-opacity duration-300' />
@@ -65,7 +65,7 @@ function CategoryCard({ category, className }: CategoryCardProps) {
             opacity-0 group-hover:opacity-100
             transition-opacity duration-300' />
 
-                <p className='absolute bottom-3 left-0 right-0 text-center text-white font-medium text-sm z-10'
+                <p className='absolute bottom-3 start-0 end-0 text-center text-white font-medium text-sm z-10'
                     style={{ textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
                     {category.name}
                 </p>

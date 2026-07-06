@@ -57,7 +57,7 @@ function UserMenu() {
                 <UserIcon className="h-6 w-6" />
             </button>
 
-            <div className={`absolute right-0 top-full mt-3 w-56 rounded-[5px] p-3
+            <div className={`absolute end-0 top-full mt-3 w-56 rounded-[5px] p-3
                 bg-black/40 backdrop-blur-xl border border-white/20
                 shadow-2xl text-white z-50
                 transition-all duration-200 origin-top-right
@@ -84,7 +84,7 @@ function UserMenu() {
 
                     <li className="border-t border-white/20 pt-1 mt-1">
                         <LogoutButton
-                            className="flex items-center gap-2 w-full text-left px-2.5 py-2 rounded-md
+                            className="flex items-center gap-2 w-full text-start px-2.5 py-2 rounded-md
                                 text-white/75 hover:text-[rgb(250,40,40)] hover:bg-[#DB4444]/20
                                 transition-all duration-150 text-sm cursor-pointer"
                         >

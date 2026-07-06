@@ -36,7 +36,7 @@ function ExpandedItems({ order, tCheckout, tAccount }: { order: Order; tCheckout
                             )}
                             <span>×{item.quantity}</span>
                         </div>
-                        <span className="text-sm font-medium text-gray-700 w-16 text-right">${item.price.toFixed(2)}</span>
+                        <span className="text-sm font-medium text-gray-700 w-16 text-end">${item.price.toFixed(2)}</span>
                     </div>
                 ))}
             </div>
@@ -148,7 +148,7 @@ export default function OrdersTable({ orders: initialOrders }: { orders: Order[]
                     <div className="hidden md:block overflow-x-auto">
                         <table className="w-full text-sm">
                             <thead>
-                                <tr className="text-left text-gray-500 border-b border-gray-200">
+                                <tr className="text-start text-gray-500 border-b border-gray-200">
                                     <th className="pb-3 font-medium">{t("order")}</th>
                                     <th className="pb-3 font-medium">{t("orderDate")}</th>
                                     <th className="pb-3 font-medium">{t("orderItems")}</th>

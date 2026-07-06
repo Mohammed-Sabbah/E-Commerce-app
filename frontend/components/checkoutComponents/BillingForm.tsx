@@ -18,7 +18,7 @@ function Field({
         <div className="flex flex-col gap-1.5">
             <label className="text-sm text-gray-700">
                 {label}
-                {required && <span className="text-red-500 ml-0.5">*</span>}
+                {required && <span className="text-red-500 ms-0.5">*</span>}
             </label>
             {children}
         </div>

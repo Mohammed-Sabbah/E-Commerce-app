@@ -99,7 +99,7 @@ export default function AdminProductsClient({ initialProducts, categories, brand
 
             <div className="overflow-x-auto border border-gray-200 rounded-xl bg-white">
                 <table className="w-full text-sm">
-                    <thead className="bg-gray-50 text-left text-gray-500">
+                    <thead className="bg-gray-50 text-start text-gray-500">
                         <tr>
                             <th className="px-4 py-3 font-medium">{t('image')}</th>
                             <th className="px-4 py-3 font-medium">{t('productName')}</th>
@@ -134,7 +134,7 @@ export default function AdminProductsClient({ initialProducts, categories, brand
                                     {p.priceAfterDiscount ? (
                                         <>
                                             <span className="font-medium">${p.priceAfterDiscount}</span>
-                                            <span className="text-xs text-gray-400 line-through ml-1">${p.price}</span>
+                                            <span className="text-xs text-gray-400 line-through ms-1">${p.price}</span>
                                         </>
                                     ) : (
                                         <span className="font-medium">${p.price}</span>

@@ -105,9 +105,9 @@ export function CarouselPlugin({ ClassName }: { ClassName?: string }) {
             onMouseEnter={plugin.current.stop}
             onMouseLeave={plugin.current.reset}
         >
-            <CarouselContent className="!ml-0">
+            <CarouselContent className="!ms-0">
                 {slides.map((slide) => (
-                    <CarouselItem key={slide.id} className="!pl-0">
+                    <CarouselItem key={slide.id} className="!ps-0">
                         <div className={`
                             relative flex items-center justify-between overflow-hidden
                             h-[220px] sm:h-[270px] md:h-[310px] lg:h-[330px] xl:h-[344px]
@@ -117,7 +117,7 @@ export function CarouselPlugin({ ClassName }: { ClassName?: string }) {
 
                             {/* Left: Text */}
                             <div className="flex flex-col z-10 flex-1 min-w-0
-                                gap-2 sm:gap-3 lg:gap-4 xl:gap-6 pr-2">
+                                gap-2 sm:gap-3 lg:gap-4 xl:gap-6 pe-2">
 
                                 {/* Badge */}
                                 <div className="flex items-center gap-3 lg:gap-4 xl:gap-6">
@@ -187,13 +187,13 @@ export function CarouselPlugin({ ClassName }: { ClassName?: string }) {
                 ))}
             </CarouselContent>
 
-            <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2" />
-            <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2" />
+            <CarouselPrevious className="absolute start-4 top-1/2 -translate-y-1/2" />
+            <CarouselNext className="absolute end-4 top-1/2 -translate-y-1/2" />
 
             {/* Dots — مطابقة للـ Figma */}
             {/* inactive: 12×12 أبيض opacity 0.5 */}
             {/* active: 14×14 border أبيض 2px + داخله 10×10 #DB4444 */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3">
+            <div className="absolute bottom-4 start-1/2 -translate-x-1/2 flex items-center gap-3">
                 {slides.map((_, index) => (
                     <button
                         key={index}

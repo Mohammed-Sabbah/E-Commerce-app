@@ -22,7 +22,7 @@ function CatigoryHero() {
             <div className="relative w-full lg:w-3/5 aspect-[4/3] sm:aspect-[3/2] md:aspect-[16/9] lg:aspect-[4/3] min-h-[280px] lg:min-h-[320px]">
 
                 {/* الهالة البيضاء */}
-                <div className="pointer-events-none absolute left-1/2 top-1/2 z-0
+                <div className="pointer-events-none absolute start-1/2 top-1/2 z-0
         h-[60%] w-[60%]
         -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/50 blur-[100px]" />
 

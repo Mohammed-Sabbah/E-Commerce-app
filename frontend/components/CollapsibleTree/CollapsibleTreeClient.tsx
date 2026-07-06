@@ -108,7 +108,7 @@ export function CollapsibleTreeClient({ categories, className }: Props) {
                         onOpenChange={() => toggleGroup(group)}
                     >
                         <CollapsibleTrigger asChild>
-                            <button className="flex w-full items-center justify-between gap-2 text-left outline-none transition-opacity duration-150 hover:opacity-60">
+                            <button className="flex w-full items-center justify-between gap-2 text-start outline-none transition-opacity duration-150 hover:opacity-60">
                                 <span style={{ fontSize: "16px", lineHeight: "24px", fontWeight: 400, color: "#000000" }}>
                                     {group}
                                 </span>
@@ -120,11 +120,11 @@ export function CollapsibleTreeClient({ categories, className }: Props) {
                         </CollapsibleTrigger>
 
                         <CollapsibleContent>
-                            <div className="mt-3 flex flex-col gap-3 border-l-2 border-black/15 pl-4">
+                            <div className="mt-3 flex flex-col gap-3 border-s-2 border-black/15 ps-4">
                                 {items.map((cat) => (
                                     <button
                                         key={cat._id}
-                                        className="w-full text-left outline-none opacity-75 transition-opacity duration-150 hover:opacity-100"
+                                        className="w-full text-start outline-none opacity-75 transition-opacity duration-150 hover:opacity-100"
                                         style={{ fontSize: "14px", lineHeight: "24px", fontWeight: 400, color: "#000000" }}
                                         onClick={() => handleCategoryClick(cat._id)}
                                     >
@@ -140,7 +140,7 @@ export function CollapsibleTreeClient({ categories, className }: Props) {
             {ungrouped.map((cat) => (
                 <button
                     key={cat._id}
-                    className="w-full text-left outline-none transition-opacity duration-150 hover:opacity-60"
+                    className="w-full text-start outline-none transition-opacity duration-150 hover:opacity-60"
                     style={{ fontSize: "16px", lineHeight: "24px", fontWeight: 400, color: "#000000" }}
                     onClick={() => handleCategoryClick(cat._id)}
                 >

@@ -45,7 +45,7 @@ export default Timer
 export function TimerItem({ number, title }: { number: number; title: string }) {
     return (
         <h3 className='text-xl md:text-4xl font-bold relative'>
-            <span className='text-[0.5rem] md:text-[0.7rem] font-medium font-poppins absolute top-[-50%] left-0'>
+            <span className='text-[0.5rem] md:text-[0.7rem] font-medium font-poppins absolute top-[-50%] start-0'>
                 {title}
             </span>
             {String(number).padStart(2, "0")}

@@ -45,7 +45,7 @@ export default function OrderSummary({ items, discount }: Props) {
                             </div>
                             <span className="text-sm text-gray-800 truncate">
                                 {item.name}
-                                {item.quantity > 1 && <span className="text-gray-400 ml-1">×{item.quantity}</span>}
+                                {item.quantity > 1 && <span className="text-gray-400 ms-1">×{item.quantity}</span>}
                             </span>
                         </div>
                         <span className="text-sm font-medium text-gray-900 flex-shrink-0">

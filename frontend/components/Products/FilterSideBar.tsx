@@ -20,11 +20,11 @@ export default function FilterSidebar({
                 Category
             </h3>
 
-            <ul className="space-y-0.5 max-h-[calc(100vh-12rem)] overflow-y-auto pr-1">
+            <ul className="space-y-0.5 max-h-[calc(100vh-12rem)] overflow-y-auto pe-1">
                 <li>
                     <button
                         onClick={() => onCategoryChange("")}
-                        className={`w-full text-left text-sm px-3 py-2 rounded-lg transition-colors duration-150
+                        className={`w-full text-start text-sm px-3 py-2 rounded-lg transition-colors duration-150
                             ${!activeCategory
                                 ? "bg-[#DB4444] text-white font-medium"
                                 : "text-gray-700 hover:bg-gray-100"
@@ -37,7 +37,7 @@ export default function FilterSidebar({
                     <li key={cat._id}>
                         <button
                             onClick={() => onCategoryChange(cat._id)}
-                            className={`w-full text-left text-sm px-3 py-2 rounded-lg transition-colors duration-150
+                            className={`w-full text-start text-sm px-3 py-2 rounded-lg transition-colors duration-150
                                 ${activeCategory === cat._id
                                     ? "bg-[#DB4444] text-white font-medium"
                                     : "text-gray-700 hover:bg-gray-100"

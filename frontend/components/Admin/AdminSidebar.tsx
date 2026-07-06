@@ -109,14 +109,14 @@ export default function AdminSidebar({ user }: Props) {
             <button
                 type="button"
                 onClick={() => setOpen(!open)}
-                className="fixed top-4 left-4 z-50 md:hidden bg-white border border-gray-200 rounded-xl p-2.5 shadow-sm cursor-pointer hover:bg-gray-50 transition-colors"
+                className="fixed top-4 start-4 z-50 md:hidden bg-white border border-gray-200 rounded-xl p-2.5 shadow-sm cursor-pointer hover:bg-gray-50 transition-colors"
                 aria-label="Toggle sidebar"
             >
                 {open ? <X size={18} /> : <Menu size={18} />}
             </button>
 
             {/* Desktop sidebar */}
-            <aside className="hidden md:flex w-60 shrink-0 bg-white border-r border-gray-200 flex-col h-screen sticky top-0">
+            <aside className="hidden md:flex w-60 shrink-0 bg-white border-e border-gray-200 flex-col h-screen sticky top-0">
                 {nav}
             </aside>
 

@@ -103,8 +103,8 @@ export default function CouponInput({ onApply, subtotal, initialCode }: Props) {
                     </button>
                 )}
             </div>
-            {error && <p className="text-xs text-red-500 pl-1">{error}</p>}
-            {appliedCode && <p className="text-xs text-green-600 pl-1">Coupon &quot;{appliedCode}&quot; applied — discount shown at checkout</p>}
+            {error && <p className="text-xs text-red-500 ps-1">{error}</p>}
+            {appliedCode && <p className="text-xs text-green-600 ps-1">Coupon &quot;{appliedCode}&quot; applied — discount shown at checkout</p>}
         </div>
     );
 }

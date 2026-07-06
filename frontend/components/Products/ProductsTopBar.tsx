@@ -89,7 +89,7 @@ export default function ProductsTopBar({
                     />
                     <button
                         onClick={() => onPriceChange(priceMin, priceMax)}
-                        className="ml-1 text-xs font-medium text-white bg-gray-900 px-2.5 py-1 rounded-md hover:bg-gray-700 transition"
+                        className="ms-1 text-xs font-medium text-white bg-gray-900 px-2.5 py-1 rounded-md hover:bg-gray-700 transition"
                     >
                         {t('go')}
                     </button>
@@ -108,7 +108,7 @@ export default function ProductsTopBar({
                     </button>
 
                     {sortOpen && (
-                        <div className="absolute right-0 top-full mt-1.5 w-48 bg-white border border-gray-100 rounded-xl shadow-lg z-20 overflow-hidden">
+                        <div className="absolute end-0 top-full mt-1.5 w-48 bg-white border border-gray-100 rounded-xl shadow-lg z-20 overflow-hidden">
                             {SORT_OPTIONS.map((opt) => (
                                 <button
                                     key={opt.value}
@@ -116,7 +116,7 @@ export default function ProductsTopBar({
                                         onSortChange(opt.value);
                                         setSortOpen(false);
                                     }}
-                                    className={`w-full text-left px-4 py-2.5 text-sm transition-colors
+                                    className={`w-full text-start px-4 py-2.5 text-sm transition-colors
                                         ${activeSort === opt.value
                                             ? "text-[#DB4444] font-medium bg-red-50"
                                             : "text-gray-700 hover:bg-gray-50"

@@ -37,7 +37,7 @@ function HeaderCartButton({ token }: { token?: string }) {
             {count > 0 && (
                 <span
                     className={`
-                        absolute -top-0 -right-1
+                        absolute -top-0 -end-1
                         bg-red-500 text-white text-[10px]
                         min-w-[16px] h-[16px] px-[3px]
                         flex items-center justify-center

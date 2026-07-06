@@ -23,10 +23,21 @@ const poppins = Poppins({
   variable: "--font-poppins",
 });
 
-export const metadata: Metadata = {
-  title: "Exclusive",
-  description: "Your one-stop shop for exclusive deals",
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  return {
+    metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"),
+    title: "Exclusive",
+    description: "Your one-stop shop for exclusive deals",
+    alternates: {
+      canonical: `/${locale}`,
+      languages: {
+        en: "/en",
+        ar: "/ar",
+      },
+    },
+  };
+}
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));

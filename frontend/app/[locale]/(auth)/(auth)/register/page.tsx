@@ -103,7 +103,7 @@ export default function Register() {
 
                 <p className="text-center text-sm">
                     {t("alreadyHaveAccount")}
-                    <Link href="/login" className="ml-2 font-semibold underline">
+                    <Link href="/login" className="ms-2 font-semibold underline">
                         {t("loginLink")}
                     </Link>
                 </p>
