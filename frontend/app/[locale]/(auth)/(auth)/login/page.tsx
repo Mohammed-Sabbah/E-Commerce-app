@@ -6,9 +6,11 @@ import AuthInput from "@/components/AuthInput/AuthInput";
 import { useLogin } from "@/hooks/useLogin";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { loginSchema, type LoginSchema } from "@/schemas/authSchemas";
 
 export default function Login() {
+    const t = useTranslations("auth");
     const { mutate, isPending, error } = useLogin();
 
     const {
@@ -25,20 +27,18 @@ export default function Login() {
             onSubmit={handleSubmit((data) => mutate(data))}
             className="w-full max-w-md px-4"
         >
-            {/* Title */}
             <h1 className="text-2xl md:text-4xl font-medium text-black">
-                Log in to Exclusive
+                {t("loginTitle")}
             </h1>
 
             <p className="mt-2 text-sm md:text-base text-black">
-                Enter your details below
+                {t("loginSubtitle")}
             </p>
 
-            {/* Inputs */}
             <div className="mt-6 flex flex-col gap-5">
                 <AuthInput
                     type="text"
-                    placeholder="Email"
+                    placeholder={t("emailPlaceholder")}
                     autoComplete="username"
                     {...register("email")}
                     error={errors.email?.message}
@@ -46,7 +46,7 @@ export default function Login() {
 
                 <AuthInput
                     type="password"
-                    placeholder="Password"
+                    placeholder={t("passwordPlaceholder")}
                     autoComplete="current-password"
                     {...register("password")}
                     error={errors.password?.message}
@@ -54,17 +54,16 @@ export default function Login() {
 
                 {error && (
                     <p className="text-red-500 text-sm">
-                        {error.response?.data?.message || "Login failed"}
+                        {error.response?.data?.message || t("loginFailed")}
                     </p>
                 )}
             </div>
 
-            {/* Actions */}
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <StyledButton
-                    title="Log In"
+                    title={t("logIn")}
                     isLoading={isPending}
-                    loadingText="Logging in..."
+                    loadingText={t("loggingIn")}
                     type="submit"
                     ClassName="w-full sm:w-auto"
                 />
@@ -73,7 +72,7 @@ export default function Login() {
                     href="#"
                     className="text-xs font-semibold text-[#e14343] hover:text-[#c92f2f] text-center sm:text-left"
                 >
-                    Forget Password?
+                    {t("forgetPassword")}
                 </a>
             </div>
         </form>

@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server';
 import { getMyProfile } from '@/services/server/userService';
 import CheckoutClient from '@/components/checkoutComponents/CheckoutClient';
 
@@ -6,6 +7,7 @@ export default async function CheckoutPage({
 }: {
     searchParams: Promise<{ coupon?: string }>;
 }) {
+    const t = await getTranslations('checkout');
     const user = await getMyProfile();
     const { coupon } = await searchParams;
 
@@ -22,10 +24,12 @@ export default async function CheckoutPage({
         saveInfo: true,
     };
 
+    const breadcrumbs = [t('breadcrumbAccount'), t('breadcrumbMyAccount'), t('breadcrumbProduct'), t('breadcrumbViewCart'), t('breadcrumbCheckout')];
+
     return (
         <main className="max-w-6xl mx-auto px-4 py-10">
             <nav className="flex flex-wrap items-center gap-2 text-sm text-gray-500 mb-10">
-                {['Account', 'My Account', 'Product', 'View Cart', 'CheckOut'].map((crumb, i, arr) => (
+                {breadcrumbs.map((crumb, i, arr) => (
                     <span key={crumb} className="flex items-center gap-2">
                         <span className={i === arr.length - 1 ? 'text-gray-900 font-medium' : ''}>
                             {crumb}

@@ -1,8 +1,10 @@
 "use client";
 import { useState } from "react";
+import { useTranslations } from 'next-intl';
 import Container from "../Container";
 
 export function Banner() {
+    const t = useTranslations('nav');
     const [visible, setVisible] = useState(true);
     if (!visible) return null;
 
@@ -10,12 +12,12 @@ export function Banner() {
         <div className="bg-black text-white">
             <Container className="relative flex items-center justify-center py-3 px-4">
                 <p className="text-xs sm:text-sm text-center pr-16 sm:pr-0">
-                    Summer Sale For All Swim Suits And Free Express Delivery - OFF 50%!{" "}
+                    {t('summerSale')}{" "}
 
                     <a href="/sale"
                         className="underline font-semibold hover:text-gray-300 transition"
                     >
-                        Shop Now
+                        {t('shopNow')}
                     </a>
                 </p>
 
@@ -25,16 +27,16 @@ export function Banner() {
                                    hover:text-white transition cursor-pointer 
                                    appearance-none border-none outline-none"
                         defaultValue="en"
-                        aria-label="Select language"
+                        aria-label={t('selectLanguage')}
                     >
-                        <option value="en" className="bg-black">English</option>
-                        <option value="ar" className="bg-black">العربية</option>
+                        <option value="en" className="bg-black">{t('english')}</option>
+                        <option value="ar" className="bg-black">{t('arabic')}</option>
                     </select>
 
                     <button
                         onClick={() => setVisible(false)}
                         className="text-gray-400 hover:text-white transition text-lg leading-none"
-                        aria-label="Close banner"
+                        aria-label={t('closeBanner')}
                     >
                         ×
                     </button>

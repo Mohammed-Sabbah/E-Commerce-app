@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Product, PopulatedRef } from '@/types/api';
 import ProductGallery from './ProductGallery';
 import ProductOptions from './ProductOptions';
@@ -10,6 +11,7 @@ import { ArrowPathIcon, TruckIcon } from '@heroicons/react/24/outline';
 import ProductReviews from './ProductReviews';
 
 export default function ProductDetailesComponent({ product }: { product: Product }) {
+    const t = useTranslations('products');
     const inStock = product.quantity > 0;
 
     const [selectedColor, setSelectedColor] = useState<string | null>(product.colors?.[0] ?? null);
@@ -21,7 +23,7 @@ export default function ProductDetailesComponent({ product }: { product: Product
         ...(product.images ?? []),
     ].filter(Boolean)));
     const breadcrumbs = [
-        { label: 'Account', href: '/account' },
+        { label: t('account'), href: '/account' },
         { label: catName, href: `/category/${catName}` },
         { label: product.name },
     ];
@@ -55,10 +57,10 @@ export default function ProductDetailesComponent({ product }: { product: Product
                         <h1 className="text-2xl font-inter font-semibold text-gray-900">{product.name}</h1>
                         <div className="flex items-center gap-3 mt-2">
                             <StarsComponent rating={product.avgRatings} />
-                            <span className="text-sm text-gray-500">({product.ratingsQuantity} Reviews)</span>
+                            <span className="text-sm text-gray-500">({t('reviewsCount', { count: product.ratingsQuantity })})</span>
                             <span className="w-px h-4 bg-gray-300" />
                             <span className={`text-sm font-medium ${inStock ? 'text-green-500' : 'text-red-500'}`}>
-                                {inStock ? 'In Stock' : 'Out of Stock'}
+                                {inStock ? t('inStock') : t('outOfStock')}
                             </span>
                         </div>
 
@@ -104,15 +106,15 @@ export default function ProductDetailesComponent({ product }: { product: Product
                         <div className="flex items-center gap-4 p-4">
                             <TruckIcon className="h-9 w-9 flex-shrink-0" strokeWidth={1} />
                             <div>
-                                <p className="text-sm font-medium text-gray-900">Free Delivery</p>
-                                <p className="text-xs text-gray-500 mt-0.5">Enter your postal code for Delivery Availability</p>
+                                <p className="text-sm font-medium text-gray-900">{t('freeDelivery')}</p>
+                                <p className="text-xs text-gray-500 mt-0.5">{t('deliveryAvailability')}</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-4 p-4">
                             <ArrowPathIcon className="h-9 w-9 flex-shrink-0" strokeWidth={1} />
                             <div>
-                                <p className="text-sm font-medium text-gray-900">Return Delivery</p>
-                                <p className="text-xs text-gray-500 mt-0.5">Free 30 Days Delivery Returns. Details</p>
+                                <p className="text-sm font-medium text-gray-900">{t('returnDelivery')}</p>
+                                <p className="text-xs text-gray-500 mt-0.5">{t('returnDeliveryDetails')}</p>
                             </div>
                         </div>
                     </div>

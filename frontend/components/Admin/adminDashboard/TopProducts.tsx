@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import {
     BarChart,
     Bar,
@@ -15,13 +16,14 @@ interface Props {
 }
 
 export default function TopProducts({ data }: Props) {
-    if (!data.length) return <p className="text-sm text-gray-400">No product data</p>;
+    const t = useTranslations('admin');
+    if (!data.length) return <p className="text-sm text-gray-400">{t('noProducts')}</p>;
 
     const reversed = [...data].reverse();
 
     return (
         <div className="bg-white border border-gray-200 rounded-xl p-5">
-            <h3 className="text-sm font-semibold text-gray-900 mb-4">Top Products</h3>
+            <h3 className="text-sm font-semibold text-gray-900 mb-4">{t('topProducts')}</h3>
             <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={reversed} layout="vertical" margin={{ left: 20 }}>
@@ -38,7 +40,7 @@ export default function TopProducts({ data }: Props) {
                             contentStyle={{ borderRadius: 8, border: "1px solid #e5e7eb", fontSize: 13 }}
                             formatter={(v, name) => [
                                 name === "revenue" ? `$${Number(v).toLocaleString("en")}` : v,
-                                name === "quantity" ? "Sold" : "Revenue",
+                                name === "quantity" ? t('sold') : t('totalRevenue'),
                             ]}
                         />
                         <Bar dataKey="quantity" fill="#DB4444" radius={[0, 4, 4, 0]} />

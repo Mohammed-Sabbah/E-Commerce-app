@@ -7,9 +7,11 @@ import AuthInput from "@/components/AuthInput/AuthInput";
 import { useRegister } from "@/hooks/useRegister";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { registerSchema, type RegisterSchema } from "@/schemas/authSchemas";
 
 export default function Register() {
+    const t = useTranslations("auth");
     const { mutate: registerUser, isPending, error } = useRegister();
 
     const {
@@ -36,20 +38,18 @@ export default function Register() {
             onSubmit={handleSubmit(onSubmit)}
             className="w-full max-w-md px-4"
         >
-            {/* Title */}
             <h1 className="text-2xl md:text-4xl font-medium text-black">
-                Create an account
+                {t("registerTitle")}
             </h1>
 
             <p className="mt-2 text-sm md:text-base text-black">
-                Enter your details below
+                {t("registerSubtitle")}
             </p>
 
-            {/* Inputs */}
             <div className="mt-6 flex flex-col gap-5">
                 <AuthInput
                     type="text"
-                    placeholder="Name"
+                    placeholder={t("namePlaceholder")}
                     autoComplete="name"
                     {...register("name")}
                     error={errors.name?.message}
@@ -57,7 +57,7 @@ export default function Register() {
 
                 <AuthInput
                     type="text"
-                    placeholder="Email or Phone Number"
+                    placeholder={t("emailOrPhonePlaceholder")}
                     autoComplete="username"
                     {...register("email")}
                     error={errors.email?.message}
@@ -65,7 +65,7 @@ export default function Register() {
 
                 <AuthInput
                     type="password"
-                    placeholder="Password"
+                    placeholder={t("passwordPlaceholder")}
                     autoComplete="new-password"
                     {...register("password")}
                     error={errors.password?.message}
@@ -73,7 +73,7 @@ export default function Register() {
 
                 <AuthInput
                     type="password"
-                    placeholder="Confirm Password"
+                    placeholder={t("confirmPasswordPlaceholder")}
                     autoComplete="new-password"
                     {...register("confirmPassword")}
                     error={errors.confirmPassword?.message}
@@ -81,31 +81,30 @@ export default function Register() {
 
                 {error && (
                     <p className="text-red-500 text-sm">
-                        {error.response?.data?.message || "Register failed"}
+                        {error.response?.data?.message || t("registerFailed")}
                     </p>
                 )}
             </div>
 
-            {/* Actions */}
             <div className="mt-6 flex flex-col gap-3">
                 <StyledButton
-                    title="Create Account"
+                    title={t("createAccount")}
                     isLoading={isPending}
-                    loadingText="Creating ..."
+                    loadingText={t("creating")}
                     type="submit"
                     ClassName="w-full"
                 />
 
                 <StyledButton
-                    title="Sign up with Google"
+                    title={t("signUpWithGoogle")}
                     type="button"
                     ClassName="w-full border border-black bg-transparent text-black"
                 />
 
                 <p className="text-center text-sm">
-                    Already have an account?
+                    {t("alreadyHaveAccount")}
                     <Link href="/login" className="ml-2 font-semibold underline">
-                        Login
+                        {t("loginLink")}
                     </Link>
                 </p>
             </div>

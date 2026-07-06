@@ -1,4 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 import { register } from "@/services/authService";
 import { useRouter } from "@/i18n/navigation";
 
@@ -26,6 +28,7 @@ interface ApiError {
 }
 
 export const useRegister = () => {
+    const t = useTranslations("toasts");
     const queryClient = useQueryClient();
     const router = useRouter();
 
@@ -33,13 +36,14 @@ export const useRegister = () => {
         mutationFn: register,
 
         onSuccess: (data) => {
+            toast.success(t("registerSuccess"));
             queryClient.setQueryData(["user"], data.user);
             router.push("/");
             router.refresh();
         },
 
-        onError: (error) => {
-            console.log("Register error", error.response?.data?.message || error.message);
+        onError: () => {
+            toast.error(t("registerFailed"));
         },
     });
 };

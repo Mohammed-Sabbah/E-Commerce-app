@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useWishlist } from '@/hooks/useWishlist';
 import { useCart } from '@/hooks/useCart';
 import { useState } from 'react';
@@ -18,6 +19,7 @@ interface Props {
 }
 
 export default function ProductActions({ product, inStock, selectedColor }: Props) {
+    const t = useTranslations('products');
     const [quantity, setQuantity] = useState(1);
 
     // ── Wishlist ──────────────────────────────────────────────────────────────
@@ -31,7 +33,7 @@ export default function ProductActions({ product, inStock, selectedColor }: Prop
     // ── Handlers ─────────────────────────────────────────────────────────────
     const handleAddToCart = () => {
         if (!selectedColor) {
-            alert('Please select a color first.');
+            alert(t('selectColorFirst'));
             return;
         }
         addToCart({
@@ -49,7 +51,7 @@ export default function ProductActions({ product, inStock, selectedColor }: Prop
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                     disabled={quantity <= 1}
                     className="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-40"
-                    aria-label="Decrease quantity"
+                    aria-label={t('decreaseQuantity')}
                 >
                     −
                 </button>
@@ -58,7 +60,7 @@ export default function ProductActions({ product, inStock, selectedColor }: Prop
                     onClick={() => setQuantity((q) => q + 1)}
                     disabled={!inStock}
                     className="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-40"
-                    aria-label="Increase quantity"
+                    aria-label={t('increaseQuantity')}
                 >
                     +
                 </button>
@@ -74,10 +76,10 @@ export default function ProductActions({ product, inStock, selectedColor }: Prop
                     {isAddingToCart ? (
                         <>
                             <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                            Adding...
+                            {t('addingToCart')}
                         </>
                     ) : (
-                        'Add to Cart'
+                        t('addToCart')
                     )}
                 </button>
 
@@ -89,7 +91,7 @@ export default function ProductActions({ product, inStock, selectedColor }: Prop
                         ? 'border-red-500 text-red-500'
                         : 'border-gray-300 text-gray-400 hover:border-red-400 hover:text-red-400'
                         }`}
-                    aria-label={exists ? 'Remove from wishlist' : 'Add to wishlist'}
+                    aria-label={exists ? t('removeFromWishlist') : t('addToWishlist')}
                 >
                     {exists ? <HeartSolid className="w-5 h-5" /> : <HeartOutline className="w-5 h-5" />}
                 </button>

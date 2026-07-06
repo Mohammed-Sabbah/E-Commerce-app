@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from 'next-intl';
 import { apiClient } from "@/lib/apiClient";
 
 interface CartSummaryProps {
@@ -9,6 +10,7 @@ interface CartSummaryProps {
 }
 
 export default function CartSummary({ subtotal, onCheckout }: CartSummaryProps) {
+    const t = useTranslations('cart');
     const [code, setCode] = useState("");
     const [appliedCode, setAppliedCode] = useState<string | null>(null);
     const [discount, setDiscount] = useState(0);
@@ -59,7 +61,7 @@ export default function CartSummary({ subtotal, onCheckout }: CartSummaryProps) 
                                 setDiscount(0);
                             }
                         }}
-                        placeholder="Coupon Code"
+                        placeholder={t('couponCode')}
                         className="border px-4 py-2 w-full rounded-md h-14"
                     />
                     {appliedCode ? (
@@ -68,7 +70,7 @@ export default function CartSummary({ subtotal, onCheckout }: CartSummaryProps) 
                             onClick={handleRemove}
                             className="bg-gray-500 text-white px-14 rounded-md h-14 cursor-pointer"
                         >
-                            Remove
+                            {t('removeCoupon')}
                         </button>
                     ) : (
                         <button
@@ -77,7 +79,7 @@ export default function CartSummary({ subtotal, onCheckout }: CartSummaryProps) 
                             disabled={loading || !code.trim()}
                             className="bg-[#DB4444] text-white px-14 rounded-md h-14 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {loading ? "..." : "Apply"}
+                            {loading ? "..." : t('applyCoupon')}
                         </button>
                     )}
                 </div>

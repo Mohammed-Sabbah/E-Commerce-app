@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server';
 import Container from "@/components/Container";
 import { Link } from "@/i18n/navigation";
 import Image from "next/image";
@@ -11,99 +12,107 @@ import {
     BanknotesIcon,
 } from "@heroicons/react/24/outline";
 
-// ==============================
-// Data
-// ==============================
+interface Stat {
+    icon: React.ReactNode;
+    value: string;
+    labelKey: string;
+    highlight?: boolean;
+}
 
-const stats = [
-    {
-        icon: <BuildingStorefrontIcon className="w-5 h-5" />,
-        value: "10.5k",
-        label: "Sellers active our site",
-    },
-    {
-        icon: <CurrencyDollarIcon className="w-5 h-5" />,
-        value: "33k",
-        label: "Monthly Product Sale",
-        highlight: true,
-    },
-    {
-        icon: <ShoppingBagIcon className="w-5 h-5" />,
-        value: "45.5k",
-        label: "Customer active in our site",
-    },
-    {
-        icon: <BanknotesIcon className="w-5 h-5" />,
-        value: "25k",
-        label: "Annual gross sale in our site",
-    },
-];
+interface TeamMember {
+    name: string;
+    roleKey: string;
+    img: string;
+}
 
-const team = [
-    {
-        name: "Tom Cruise",
-        role: "Founder & Chairman",
-        img: "/images/088149fd5afc043392ee3cbb529f429b3e2098d3.png",
-    },
-    {
-        name: "Emma Watson",
-        role: "Managing Director",
-        img: "/images/8438eab9a2fe88af0272adecd83422d0cb7e20d7.png",
-    },
-    {
-        name: "Will Smith",
-        role: "Product Designer",
-        img: "/images/ede48f2b5df8103b281240ce5bafe5dd7d215ab8.png",
-    },
-];
+interface Service {
+    icon: React.ReactNode;
+    titleKey: string;
+    descKey: string;
+}
 
-const services = [
-    {
-        icon: <TruckIcon className="w-7 h-7" />,
-        title: "FREE AND FAST DELIVERY",
-        desc: "Free delivery for all orders over $140",
-    },
-    {
-        icon: <PhoneIcon className="w-7 h-7" />,
-        title: "24/7 CUSTOMER SERVICE",
-        desc: "Friendly 24/7 customer support",
-    },
-    {
-        icon: <ShieldCheckIcon className="w-7 h-7" />,
-        title: "MONEY BACK GUARANTEE",
-        desc: "We return money within 30 days",
-    },
-];
+export default async function AboutPage() {
+    const tnav = await getTranslations('nav');
+    const t = await getTranslations('about');
 
-// ==============================
-// Page
-// ==============================
+    const stats: Stat[] = [
+        {
+            icon: <BuildingStorefrontIcon className="w-5 h-5" />,
+            value: "10.5k",
+            labelKey: "sellersActive",
+        },
+        {
+            icon: <CurrencyDollarIcon className="w-5 h-5" />,
+            value: "33k",
+            labelKey: "monthlyProductSale",
+            highlight: true,
+        },
+        {
+            icon: <ShoppingBagIcon className="w-5 h-5" />,
+            value: "45.5k",
+            labelKey: "customerActive",
+        },
+        {
+            icon: <BanknotesIcon className="w-5 h-5" />,
+            value: "25k",
+            labelKey: "annualGrossSale",
+        },
+    ];
 
-export default function AboutPage() {
+    const team: TeamMember[] = [
+        {
+            name: "Tom Cruise",
+            roleKey: "founderChairman",
+            img: "/images/088149fd5afc043392ee3cbb529f429b3e2098d3.png",
+        },
+        {
+            name: "Emma Watson",
+            roleKey: "managingDirector",
+            img: "/images/8438eab9a2fe88af0272adecd83422d0cb7e20d7.png",
+        },
+        {
+            name: "Will Smith",
+            roleKey: "productDesigner",
+            img: "/images/ede48f2b5df8103b281240ce5bafe5dd7d215ab8.png",
+        },
+    ];
+
+    const services: Service[] = [
+        {
+            icon: <TruckIcon className="w-7 h-7" />,
+            titleKey: "freeFastDelivery",
+            descKey: "freeDeliveryDesc",
+        },
+        {
+            icon: <PhoneIcon className="w-7 h-7" />,
+            titleKey: "customerService247",
+            descKey: "customerServiceDesc",
+        },
+        {
+            icon: <ShieldCheckIcon className="w-7 h-7" />,
+            titleKey: "moneyBackGuarantee",
+            descKey: "moneyBackDesc",
+        },
+    ];
+
     return (
         <main>
             <Container className="py-8 md:py-14 flex flex-col gap-20">
 
-                {/* Breadcrumb */}
                 <nav className="text-sm text-gray-500">
-                    <Link href="/" className="hover:underline">Home</Link>
+                    <Link href="/" className="hover:underline">{tnav('home')}</Link>
                     <span className="mx-2">/</span>
-                    <span className="text-black font-medium">About</span>
+                    <span className="text-black font-medium">{t('title')}</span>
                 </nav>
 
-                {/* ===== Our Story ===== */}
                 <section className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
                     <div className="flex-1 order-2 lg:order-1">
-                        <h1 className="text-3xl md:text-4xl font-bold mb-6">Our Story</h1>
+                        <h1 className="text-3xl md:text-4xl font-bold mb-6">{t('ourStory')}</h1>
                         <p className="text-gray-500 text-sm leading-7 mb-4">
-                            Launched in 2015, Exclusive is South Asia`s premier online shopping marketplace
-                            with an active presence in Bangladesh. Supported by a wide range of tailored
-                            marketing, data and service solutions, Exclusive has 10,500 sellers and 300
-                            brands and serves 3 millions customers across the region.
+                            {t('storyParagraph1')}
                         </p>
                         <p className="text-gray-500 text-sm leading-7">
-                            Exclusive has more than 1 Million products to offer, growing at a very fast.
-                            Exclusive offers a diverse assortment in categories ranging from consumer.
+                            {t('storyParagraph2')}
                         </p>
                     </div>
 
@@ -111,7 +120,7 @@ export default function AboutPage() {
                         <div className="relative w-full h-64 md:h-80 lg:h-96 overflow-hidden bg-pink-100">
                             <Image
                                 src="/images/fcc89aaa7b85f8c1dcce81e71e2eb178be13bd4d.jpg"
-                                alt="Our Story"
+                                alt={t('ourStory')}
                                 fill
                                 className="object-cover"
                             />
@@ -119,11 +128,10 @@ export default function AboutPage() {
                     </div>
                 </section>
 
-                {/* ===== Stats ===== */}
                 <section className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                     {stats.map((stat) => (
                         <div
-                            key={stat.label}
+                            key={stat.labelKey}
                             className={`
                                 border rounded p-5 md:p-7 flex flex-col items-center gap-2 text-center
                                 transition-all duration-300 cursor-default
@@ -133,7 +141,6 @@ export default function AboutPage() {
                                 }
                             `}
                         >
-                            {/* Icon with double circle */}
                             <div className="relative flex items-center justify-center mb-1">
                                 <div className="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center ring-8 ring-gray-200">
                                     <div className="w-10 h-10 bg-black rounded-full flex items-center justify-center text-white">
@@ -142,17 +149,15 @@ export default function AboutPage() {
                                 </div>
                             </div>
                             <p className="text-2xl font-bold">{stat.value}</p>
-                            <p className="text-xs md:text-sm leading-tight">{stat.label}</p>
+                            <p className="text-xs md:text-sm leading-tight">{t(stat.labelKey)}</p>
                         </div>
                     ))}
                 </section>
 
-                {/* ===== Team ===== */}
                 <section>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                         {team.map((member) => (
                             <div key={member.name}>
-                                {/* Photo */}
                                 <div className="relative w-full h-64 md:h-72 bg-gray-100 rounded overflow-hidden mb-4">
                                     <Image
                                         src={member.img}
@@ -161,12 +166,8 @@ export default function AboutPage() {
                                         className="object-cover object-top"
                                     />
                                 </div>
-
-                                {/* Info */}
                                 <h3 className="font-bold text-lg">{member.name}</h3>
-                                <p className="text-gray-500 text-sm mb-2">{member.role}</p>
-
-                                {/* Social Icons */}
+                                <p className="text-gray-500 text-sm mb-2">{t(member.roleKey)}</p>
                                 <div className="flex items-center gap-3">
                                     <a href="#" aria-label="Twitter" className="text-gray-500 hover:text-black transition">
                                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -189,11 +190,9 @@ export default function AboutPage() {
                     </div>
                 </section>
 
-                {/* ===== Services ===== */}
                 <section className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
                     {services.map((service) => (
-                        <div key={service.title} className="flex flex-col items-center gap-4">
-                            {/* Icon with double circle */}
+                        <div key={service.titleKey} className="flex flex-col items-center gap-4">
                             <div className="relative flex items-center justify-center">
                                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center ring-8 ring-gray-200">
                                     <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center text-white">
@@ -201,8 +200,8 @@ export default function AboutPage() {
                                     </div>
                                 </div>
                             </div>
-                            <h4 className="font-bold text-sm tracking-wide">{service.title}</h4>
-                            <p className="text-gray-500 text-sm">{service.desc}</p>
+                            <h4 className="font-bold text-sm tracking-wide">{t(service.titleKey)}</h4>
+                            <p className="text-gray-500 text-sm">{t(service.descKey)}</p>
                         </div>
                     ))}
                 </section>

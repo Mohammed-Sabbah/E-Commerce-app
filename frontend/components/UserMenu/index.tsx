@@ -1,6 +1,6 @@
 "use client";
-// frontend/components/UserMenu/index.tsx
 
+import { useTranslations } from 'next-intl';
 import { useState, useRef, useEffect } from "react";
 import {
     UserIcon,
@@ -14,13 +14,14 @@ import LogoutButton from "../StyledButton/LogoutButton";
 import { Link } from "@/i18n/navigation";
 
 const menuItems = [
-    { href: "/account", icon: Cog6ToothIcon, label: "Manage My Account" },
-    { href: "/account/orders", icon: ShoppingBagIcon, label: "My Order" },
-    { href: "/account/orders?filter=cancelled", icon: XCircleIcon, label: "My Cancellations" },
-    { href: "/account/reviews", icon: StarIcon, label: "My Reviews" },   // ← صُحِّح
+    { href: "/account", icon: Cog6ToothIcon, key: "manageAccount" },
+    { href: "/account/orders", icon: ShoppingBagIcon, key: "myOrder" },
+    { href: "/account/orders?filter=cancelled", icon: XCircleIcon, key: "myCancellations" },
+    { href: "/account/reviews", icon: StarIcon, key: "myReviews" },
 ];
 
 function UserMenu() {
+    const t = useTranslations('nav');
     const [open, setOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -46,7 +47,6 @@ function UserMenu() {
 
     return (
         <div className="relative flex items-center" ref={menuRef}>
-            {/* زر اليوزر */}
             <button
                 onClick={() => setOpen(prev => !prev)}
                 aria-expanded={open}
@@ -57,7 +57,6 @@ function UserMenu() {
                 <UserIcon className="h-6 w-6" />
             </button>
 
-            {/* القائمة */}
             <div className={`absolute right-0 top-full mt-3 w-56 rounded-[5px] p-3
                 bg-black/40 backdrop-blur-xl border border-white/20
                 shadow-2xl text-white z-50
@@ -68,7 +67,7 @@ function UserMenu() {
                 }`}
             >
                 <ul className="space-y-1 text-sm">
-                    {menuItems.map(({ href, icon: Icon, label }) => (
+                    {menuItems.map(({ href, icon: Icon, key }) => (
                         <li key={href}>
                             <Link
                                 href={href}
@@ -78,7 +77,7 @@ function UserMenu() {
                                     transition-all duration-150"
                             >
                                 <Icon className="w-5 h-5 shrink-0" />
-                                {label}
+                                {t(key)}
                             </Link>
                         </li>
                     ))}
@@ -90,7 +89,7 @@ function UserMenu() {
                                 transition-all duration-150 text-sm cursor-pointer"
                         >
                             <ArrowRightOnRectangleIcon className="w-5 h-5 shrink-0" />
-                            Logout
+                            {t('logout')}
                         </LogoutButton>
                     </li>
                 </ul>

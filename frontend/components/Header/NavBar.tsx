@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from 'next-intl';
 import Container from '../Container'
 import { Link } from '@/i18n/navigation'
 import SearchInput from '../SearchInput'
@@ -12,10 +13,10 @@ import { usePathname } from '@/i18n/navigation';
 import type { ReactNode } from 'react';
 
 const navLinks = [
-    { label: "Home", href: "/" },
-    { label: "Contact", href: "/contact" },
-    { label: "About", href: "/about" },
-    { label: "Sign Up", href: "/register" },
+    { href: "/", key: "home" },
+    { href: "/contact", key: "contact" },
+    { href: "/about", key: "about" },
+    { href: "/register", key: "signUp" },
 ];
 
 function NavLink({ href, label, pathname, onClick }: {
@@ -42,6 +43,7 @@ function NavBar({ token, categoriesSlot }: {
     token: string | undefined;
     categoriesSlot: ReactNode;
 }) {
+    const t = useTranslations('nav');
     const [menuOpen, setMenuOpen] = useState(false);
     const [openedAtPath, setOpenedAtPath] = useState("");
     const pathname = usePathname();
@@ -68,7 +70,7 @@ function NavBar({ token, categoriesSlot }: {
         <nav className="bg-white text-black">
             <Container className="flex items-center justify-between py-4 px-3">
                 <Link href="/" onClick={closeMenu} className="text-2xl font-bold shrink-0">
-                    Exclusive
+                    {t('exclusive')}
                 </Link>
 
                 <ul className="hidden lg:flex items-center space-x-8">
@@ -79,7 +81,7 @@ function NavBar({ token, categoriesSlot }: {
                                 className={`text-sm transition-all duration-200 hover:text-red-500 pb-0.5
                                     ${pathname === link.href ? "border-b border-black font-medium" : ""}`}
                             >
-                                {link.label}
+                                {t(link.key)}
                             </Link>
                         </li>
                     ))}
@@ -97,7 +99,7 @@ function NavBar({ token, categoriesSlot }: {
                     <button
                         className="lg:hidden flex items-center justify-center p-1"
                         onClick={toggleMenu}
-                        aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+                        aria-label={isMenuOpen ? t('closeMenu') : t('openMenu')}
                         aria-expanded={isMenuOpen}
                         aria-controls="mobile-menu"
                     >
@@ -112,7 +114,7 @@ function NavBar({ token, categoriesSlot }: {
             <div
                 id="mobile-menu"
                 role="dialog"
-                aria-label="Navigation menu"
+                aria-label={t('navigationMenu')}
                 className={`lg:hidden border-t border-gray-100 bg-white
                     overflow-hidden transition-all duration-300 ease-in-out
                     ${isMenuOpen ? "max-h-[80vh] opacity-100" : "max-h-0 opacity-0 pointer-events-none"}`}
@@ -127,7 +129,7 @@ function NavBar({ token, categoriesSlot }: {
                             <li key={link.href}>
                                 <NavLink
                                     href={link.href}
-                                    label={link.label}
+                                    label={t(link.key)}
                                     pathname={pathname}
                                     onClick={closeMenu}
                                 />
@@ -138,7 +140,7 @@ function NavBar({ token, categoriesSlot }: {
                     <div className="border-t border-gray-200" />
 
                     <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                        Categories
+                        {t('categories')}
                     </p>
 
                     {categoriesSlot}

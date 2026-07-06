@@ -21,5 +21,10 @@
   "english": "English",
   "arabic": "العربية",
   "closeBanner": "إغلاق الشريط",
-  "shoppingCart": "سلة التسوق"
+  "shoppingCart": "سلة التسوق",
+  "manageAccount": "إدارة حسابي",
+  "myOrder": "طلباتي",
+  "myCancellations": "إلغاءاتي",
+  "myReviews": "تقييماتي",
+  "navigationMenu": "قائمة التصفح"
 }

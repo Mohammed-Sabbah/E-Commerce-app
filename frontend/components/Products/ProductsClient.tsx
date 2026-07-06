@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from 'next-intl';
 import { useState, useTransition, useOptimistic } from "react";
 import { useRouter, usePathname } from "@/i18n/navigation";
 import ProductCard from "@/components/ProductCard";
@@ -23,6 +24,8 @@ export default function ProductsClient({
     total,
     initialParams,
 }: Props) {
+    const t = useTranslations('products');
+    const tc = useTranslations('common');
     const router = useRouter();
     const pathname = usePathname();
     const [isPending, startTransition] = useTransition();
@@ -215,8 +218,8 @@ export default function ProductsClient({
                         </div>
                     ) : allProducts.length === 0 ? (
                         <div className="flex flex-col items-center justify-center h-96 text-gray-400">
-                            <p className="text-lg font-medium">No products found</p>
-                            <p className="text-sm mt-1">Try adjusting your filters</p>
+                            <p className="text-lg font-medium">{t('noProductsFound')}</p>
+                            <p className="text-sm mt-1">{t('noProductsMatch')}</p>
                         </div>
                     ) : (
                         <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
@@ -234,7 +237,7 @@ export default function ProductsClient({
                                 disabled={loadingMore}
                                 className="bg-[#DB4444] text-white px-12 py-3 rounded-lg hover:bg-red-600 transition disabled:opacity-60 font-medium"
                             >
-                                {loadingMore ? "Loading..." : "Load More"}
+                                {loadingMore ? tc('loading') : t('loadMore')}
                             </button>
                         </div>
                     )}

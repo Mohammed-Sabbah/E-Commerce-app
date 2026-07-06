@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl';
+
 const COLOR_MAP: Record<string, string> = {
     red: '#ef4444',
     blue: '#3b82f6',
@@ -31,12 +33,13 @@ export default function ProductOptions({
     onColorChange,
     onSizeChange,
 }: Props) {
+    const t = useTranslations('products');
     return (
         <div className="flex flex-col gap-4">
             {/* Colors */}
             {colors.length > 0 && (
                 <div className="flex items-center gap-3">
-                    <span className="text-sm font-medium text-gray-700 w-14">Colours:</span>
+                    <span className="text-sm font-medium text-gray-700 w-14">{t('colours')}</span>
                     <div className="flex items-center gap-2">
                         {colors.map((color) => (
                             <button
@@ -57,7 +60,7 @@ export default function ProductOptions({
             {/* Sizes */}
             {sizes.length > 0 && (
                 <div className="flex items-center gap-3">
-                    <span className="text-sm font-medium text-gray-700 w-14">Size:</span>
+                    <span className="text-sm font-medium text-gray-700 w-14">{t('sizeLabel')}</span>
                     <div className="flex items-center gap-2">
                         {sizes.map((size) => (
                             <button

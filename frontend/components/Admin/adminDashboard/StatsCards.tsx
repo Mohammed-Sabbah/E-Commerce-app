@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { ShoppingCart, DollarSign, Users, Package } from "lucide-react";
 
 interface Props {
@@ -9,14 +10,16 @@ interface Props {
     totalProducts: number;
 }
 
-const cards = [
-    { label: "Total Orders", get: (s: Props) => s.totalOrders, icon: ShoppingCart, color: "text-blue-600 bg-blue-100" },
-    { label: "Revenue", get: (s: Props) => `$${s.totalRevenue.toLocaleString("en")}`, icon: DollarSign, color: "text-green-600 bg-green-100" },
-    { label: "Customers", get: (s: Props) => s.totalUsers, icon: Users, color: "text-purple-600 bg-purple-100" },
-    { label: "Products", get: (s: Props) => s.totalProducts, icon: Package, color: "text-orange-600 bg-orange-100" },
-];
-
 export default function StatsCards(props: Props) {
+    const t = useTranslations('admin');
+
+    const cards = [
+        { label: t('totalOrders'), get: () => props.totalOrders, icon: ShoppingCart, color: "text-blue-600 bg-blue-100" },
+        { label: t('totalRevenue'), get: () => `$${props.totalRevenue.toLocaleString("en")}`, icon: DollarSign, color: "text-green-600 bg-green-100" },
+        { label: t('totalUsers'), get: () => props.totalUsers, icon: Users, color: "text-purple-600 bg-purple-100" },
+        { label: t('totalProducts'), get: () => props.totalProducts, icon: Package, color: "text-orange-600 bg-orange-100" },
+    ];
+
     return (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {cards.map(({ label, get, icon: Icon, color }) => (
@@ -26,7 +29,7 @@ export default function StatsCards(props: Props) {
                     </div>
                     <div>
                         <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">{label}</p>
-                        <p className="text-xl font-bold text-gray-900 mt-0.5">{get(props)}</p>
+                        <p className="text-xl font-bold text-gray-900 mt-0.5">{get()}</p>
                     </div>
                 </div>
             ))}

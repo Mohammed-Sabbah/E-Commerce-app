@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from 'next-intl';
 import Container from "@/components/Container";
 import { useCart } from "@/hooks/useCart";
 import { useState } from "react";
@@ -13,6 +14,8 @@ import CartSummary from "@/components/Cart/CartSummary";
 
 
 export default function CartPage() {
+    const t = useTranslations('cart');
+    const tcommon = useTranslations('common');
     const router = useRouter();
     const { cart, isLoading, updateCartItem } = useCart();
     const [updates, setUpdates] = useState<Record<string, number>>({});
@@ -33,7 +36,7 @@ export default function CartPage() {
         router.push(`/checkout${params}`);
     };
 
-    if (isLoading) return <p className="text-center mt-10">Loading ...</p>;
+    if (isLoading) return <p className="text-center mt-10">{tcommon('loading')}</p>;
 
     if (!cart?.cartItems?.length) {
         return (
@@ -54,7 +57,7 @@ export default function CartPage() {
         <section className="py-10 min-h-[60vh]">
             <Container>
                 <h1 className="text-xl sm:text-2xl font-semibold mb-8">
-                    Cart ({cart.cartItems.length})
+                    {t('title', { count: cart.cartItems.length })}
                 </h1>
 
                 <CartDesktopTable

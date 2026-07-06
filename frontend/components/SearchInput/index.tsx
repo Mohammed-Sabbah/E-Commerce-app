@@ -1,11 +1,13 @@
 "use client";
 
+import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from '@/i18n/navigation';
 import { useState } from 'react';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
 function SearchInput() {
+    const t = useTranslations('nav');
     const router = useRouter();
     const searchParams = useSearchParams();
     const [keyword, setKeyword] = useState(() => searchParams.get('keyword') ?? '');
@@ -13,7 +15,7 @@ function SearchInput() {
     function handleSearch(e: React.FormEvent) {
         e.preventDefault();
         if (!keyword.trim()) {
-            router.push('/products'); // ← مسح الكلمة = رجوع لكل المنتجات
+            router.push('/products');
             return;
         }
         router.push(`/products?keyword=${encodeURIComponent(keyword.trim())}`);
@@ -26,7 +28,7 @@ function SearchInput() {
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
                 onKeyDown={(e) => e.key === 'Escape' && setKeyword('')}
-                placeholder="What are you looking for?"
+                placeholder={t('searchPlaceholder')}
                 className="bg-transparent text-sm outline-none flex-1"
             />
             <button type="submit" className="text-gray-400 hover:text-gray-700 transition">

@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from '@/i18n/navigation';
@@ -35,6 +36,7 @@ interface Order {
 
 
 function OrderSuccessContent() {
+    const t = useTranslations('checkout');
     const searchParams = useSearchParams();
     const router = useRouter();
     const orderId = searchParams.get('id');
@@ -65,7 +67,7 @@ function OrderSuccessContent() {
         return (
             <main><Container className="py-20 flex flex-col items-center gap-4">
                 <div className="w-8 h-8 border-4 border-[#DB4444] border-t-transparent rounded-full animate-spin" />
-                <p className="text-gray-500 text-sm">Loading your order...</p>
+                <p className="text-gray-500 text-sm">{t('loadingOrder')}</p>
             </Container></main>
         );
     }
@@ -73,12 +75,12 @@ function OrderSuccessContent() {
     if (error || !order) {
         return (
             <main><Container className="py-20 text-center">
-                <p className="text-gray-500 mb-4">Could not load order details.</p>
+                <p className="text-gray-500 mb-4">{t('couldNotLoadOrder')}</p>
                 <Link
                     href="/"
                     className="inline-block bg-[#DB4444] hover:bg-red-600 text-white px-6 py-2 rounded text-sm font-medium transition-colors"
                 >
-                    Back to Home
+                    {t('backToHome')}
                 </Link>
             </Container></main>
         );
@@ -89,7 +91,14 @@ function OrderSuccessContent() {
 
             {/* Breadcrumb */}
             <nav className="flex flex-wrap items-center gap-2 text-sm text-gray-500 mb-10">
-                {['Account', 'My Account', 'Product', 'View Cart', 'CheckOut', 'Order Placed'].map((crumb, i, arr) => (
+                {[
+                    t('breadcrumbAccount'),
+                    t('breadcrumbMyAccount'),
+                    t('breadcrumbProduct'),
+                    t('breadcrumbViewCart'),
+                    t('breadcrumbCheckout'),
+                    t('breadcrumbOrderPlaced'),
+                ].map((crumb, i, arr) => (
                     <span key={crumb} className="flex items-center gap-2">
                         <span className={i === arr.length - 1 ? 'text-gray-900 font-medium' : ''}>
                             {crumb}
@@ -106,12 +115,12 @@ function OrderSuccessContent() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                 </div>
-                <h1 className="text-2xl font-semibold text-gray-900 mb-1">Order Placed Successfully!</h1>
+                <h1 className="text-2xl font-semibold text-gray-900 mb-1">{t('orderPlacedSuccessfully')}</h1>
                 <p className="text-gray-500 text-sm">
-                    Thank you for your order. We&apos;ll start processing it right away.
+                    {t('thankYouOrder')}
                 </p>
                 <p className="text-xs text-gray-400 mt-2">
-                    Order ID:{' '}
+                    {t('orderId')}{' '}
                     <span className="font-mono text-gray-600">
                         {order._id}
                     </span>
@@ -122,7 +131,7 @@ function OrderSuccessContent() {
             <div className="border border-gray-200 rounded-lg overflow-hidden mb-6">
                 <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
                     <h2 className="text-sm font-semibold text-gray-700">
-                        Items Ordered ({order.cartItems.length})
+                        {t('itemsOrdered', { count: order.cartItems.length })}
                     </h2>
                 </div>
 
@@ -151,9 +160,9 @@ function OrderSuccessContent() {
                                         {item.product?.name}
                                     </p>
                                     {item.color && (
-                                        <p className="text-xs text-gray-400 mt-0.5">Color: {item.color}</p>
+                                        <p className="text-xs text-gray-400 mt-0.5">{t('color', { color: item.color })}</p>
                                     )}
-                                    <p className="text-xs text-gray-500 mt-0.5">Qty: {item.quantity}</p>
+                                    <p className="text-xs text-gray-500 mt-0.5">{t('qty', { quantity: item.quantity })}</p>
                                 </div>
                                 <p className="text-sm font-semibold text-gray-900 flex-shrink-0">
                                     ${(item.price * item.quantity).toFixed(2)}
@@ -169,26 +178,26 @@ function OrderSuccessContent() {
 
                 {/* Price Summary */}
                 <div className="border border-gray-200 rounded-lg p-4">
-                    <h2 className="text-sm font-semibold text-gray-700 mb-4">Order Summary</h2>
+                    <h2 className="text-sm font-semibold text-gray-700 mb-4">{t('orderSummary')}</h2>
                     <div className="flex flex-col gap-2 text-sm">
                         <div className="flex justify-between text-gray-600">
-                            <span>Subtotal</span>
+                            <span>{t('subtotal')}</span>
                             <span>${subtotal.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between text-gray-600">
-                            <span>Shipping</span>
+                            <span>{t('shipping')}</span>
                             <span>
                                 {order.shippingValue === 0
-                                    ? <span className="text-green-600">Free</span>
+                                    ? <span className="text-green-600">{t('free')}</span>
                                     : `$${order.shippingValue.toFixed(2)}`}
                             </span>
                         </div>
                         <div className="flex justify-between text-gray-600">
-                            <span>Tax</span>
+                            <span>{t('tax')}</span>
                             <span>${order.taxValue.toFixed(2)}</span>
                         </div>
                         <div className="border-t border-gray-200 pt-2 mt-1 flex justify-between font-semibold text-gray-900">
-                            <span>Total</span>
+                            <span>{t('total')}</span>
                             <span className="text-[#DB4444]">${order.totalOrderPrice.toFixed(2)}</span>
                         </div>
                     </div>
@@ -196,30 +205,30 @@ function OrderSuccessContent() {
 
                 {/* Order Status */}
                 <div className="border border-gray-200 rounded-lg p-4">
-                    <h2 className="text-sm font-semibold text-gray-700 mb-4">Order Status</h2>
+                    <h2 className="text-sm font-semibold text-gray-700 mb-4">{t('orderStatus')}</h2>
                     <div className="flex flex-col gap-3">
                         <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Payment</span>
+                            <span className="text-gray-600">{t('payment')}</span>
                             <span className="capitalize font-medium text-gray-900">
-                                {order.paymentMethod === 'cash' ? 'Cash on Delivery' : 'Card'}
+                                {order.paymentMethod === 'cash' ? t('cashOnDelivery') : t('card')}
                             </span>
                         </div>
                         <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Delivery</span>
+                            <span className="text-gray-600">{t('delivery')}</span>
                             <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium
                                 ${order.isDelivered ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                                {order.isDelivered ? '✓ Delivered' : '⏳ Processing'}
+                                {order.isDelivered ? t('delivered') : t('deliveryProcessing')}
                             </span>
                         </div>
                         <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Payment Status</span>
+                            <span className="text-gray-600">{t('paymentStatus')}</span>
                             <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium
                                 ${order.isPaid ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
-                                {order.isPaid ? '✓ Paid' : 'Pending'}
+                                {order.isPaid ? t('paid') : t('pending')}
                             </span>
                         </div>
                         <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Order Date</span>
+                            <span className="text-gray-600">{t('orderDate')}</span>
                             <span className="text-gray-900 text-xs">
                                 {new Date(order.createdAt).toLocaleDateString('en-US', {
                                     year: 'numeric', month: 'long', day: 'numeric'
@@ -237,30 +246,35 @@ function OrderSuccessContent() {
                     className="w-full sm:flex-1 h-14 sm:h-12 border border-gray-300 hover:border-gray-400 text-gray-700 font-medium rounded
                                flex items-center justify-center transition-colors text-sm"
                 >
-                    View My Orders
+                    {t('viewMyOrders')}
                 </Link>
                 <Link
                     href="/"
                     className="w-full sm:flex-1 h-14 sm:h-12 bg-[#DB4444] hover:bg-red-600 text-white font-medium rounded
                                flex items-center justify-center transition-colors text-sm"
                 >
-                    Continue Shopping
+                    {t('continueShopping')}
                 </Link>
             </div>
         </Container></main>
     );
 }
 
+function OrderSuccessFallback() {
+    const t = useTranslations('checkout');
+    return (
+        <main>
+            <Container className="py-20 flex flex-col items-center gap-4">
+                <div className="w-8 h-8 border-4 border-[#DB4444] border-t-transparent rounded-full animate-spin" />
+                <p className="text-gray-500 text-sm">{t('loadingOrder')}</p>
+            </Container>
+        </main>
+    );
+}
+
 export default function OrderSuccessPage() {
     return (
-        <Suspense fallback={
-            <main>
-                <Container className="py-20 flex flex-col items-center gap-4">
-                    <div className="w-8 h-8 border-4 border-[#DB4444] border-t-transparent rounded-full animate-spin" />
-                    <p className="text-gray-500 text-sm">Loading your order...</p>
-                </Container>
-            </main>
-        }>
+        <Suspense fallback={<OrderSuccessFallback />}>
             <OrderSuccessContent />
         </Suspense>
     );

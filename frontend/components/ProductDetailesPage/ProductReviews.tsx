@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from 'next-intl';
 import { apiClient } from "@/lib/apiClient";
 import { Review } from "@/types/api";
 import { StarsComponent } from "../ProductCard/StarsComponent";
@@ -13,6 +14,7 @@ interface Props {
 const INITIAL_VISIBLE = 4;
 
 export default function ProductReviews({ productId }: Props) {
+    const t = useTranslations('products');
     const [reviews, setReviews] = useState<Review[]>([]);
     const [loading, setLoading] = useState(true);
     const [userId, setUserId] = useState<string | null>(null);
@@ -63,7 +65,7 @@ export default function ProductReviews({ productId }: Props) {
 
     async function handleSubmit() {
         if (!rating || !comment.trim()) {
-            setError("Please add a rating and comment.");
+            setError(t('pleaseAddRatingAndComment'));
             return;
         }
         setSubmitting(true);
@@ -97,7 +99,7 @@ export default function ProductReviews({ productId }: Props) {
             }
         } catch (err: unknown) {
             const e = err as { response?: { data?: { message?: string } } };
-            setError(e?.response?.data?.message ?? "Something went wrong.");
+            setError(e?.response?.data?.message ?? t('somethingWentWrong'));
         } finally {
             setSubmitting(false);
         }
@@ -114,7 +116,7 @@ export default function ProductReviews({ productId }: Props) {
             setRating(0);
             setComment("");
         } catch {
-            setError("Failed to delete review.");
+            setError(t('failedToDeleteReview'));
         } finally {
             setSubmitting(false);
         }
@@ -130,7 +132,7 @@ export default function ProductReviews({ productId }: Props) {
             {/* Header */}
             <div className="flex items-center justify-between pt-8 mb-8">
                 <h3 className="text-lg font-semibold text-gray-900">
-                    Customer Reviews
+                    {t('customerReviews')}
                     <span className="ml-2 text-sm font-normal text-gray-400">({reviews.length})</span>
                 </h3>
                 {reviews.length > 0 && (
@@ -154,8 +156,8 @@ export default function ProductReviews({ productId }: Props) {
                     ) : reviews.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-16 text-center">
                             <Star size={32} className="text-gray-200 mb-3" fill="currentColor" />
-                            <p className="text-gray-400 text-sm">No reviews yet.</p>
-                            <p className="text-gray-300 text-xs mt-1">Be the first to share your experience!</p>
+                            <p className="text-gray-400 text-sm">{t('noReviewsYet')}</p>
+                            <p className="text-gray-300 text-xs mt-1">{t('beFirstToReview')}</p>
                         </div>
                     ) : (
                         <>
@@ -170,7 +172,7 @@ export default function ProductReviews({ productId }: Props) {
                                             <div>
                                                 <p className="text-sm font-medium text-gray-900">
                                                     {myReview.user.name}
-                                                    <span className="ml-2 text-[10px] font-medium text-white bg-[#DB4444] px-1.5 py-0.5 rounded-full">You</span>
+                                                    <span className="ml-2 text-[10px] font-medium text-white bg-[#DB4444] px-1.5 py-0.5 rounded-full">{t('you')}</span>
                                                 </p>
                                                 <StarsComponent rating={myReview.rating} size={13} />
                                             </div>
@@ -178,11 +180,11 @@ export default function ProductReviews({ productId }: Props) {
                                         <div className="flex gap-3 shrink-0">
                                             <button onClick={() => setEditMode(true)}
                                                 className="text-xs text-gray-400 hover:text-gray-700 transition">
-                                                Edit
+                                                {t('editReview')}
                                             </button>
                                             <button onClick={handleDelete} disabled={submitting}
                                                 className="text-xs text-red-400 hover:text-red-600 transition disabled:opacity-50">
-                                                Delete
+                                                {t('deleteReview')}
                                             </button>
                                         </div>
                                     </div>
@@ -223,8 +225,8 @@ export default function ProductReviews({ productId }: Props) {
                                     className="w-full py-2.5 text-sm text-gray-500 border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-gray-800 transition"
                                 >
                                     {showAll
-                                        ? "Show less"
-                                        : `Show ${otherReviews.length - visibleOthers.length} more review${otherReviews.length - visibleOthers.length > 1 ? "s" : ""}`
+                                        ? t('showLess')
+                                        : t('showMoreReviews', { count: otherReviews.length - visibleOthers.length })
                                     }
                                 </button>
                             )}
@@ -237,23 +239,23 @@ export default function ProductReviews({ productId }: Props) {
                     {myReview && !editMode ? (
                         <div className="flex flex-col items-center justify-center text-center py-8 px-6 border border-dashed border-gray-200 rounded-xl h-fit">
                             <Star size={28} className="text-[#FFAD33] mb-3" fill="currentColor" />
-                            <p className="text-sm text-gray-500">You already reviewed this product.</p>
+                            <p className="text-sm text-gray-500">{t('youAlreadyReviewed')}</p>
                             <button
                                 onClick={() => setEditMode(true)}
                                 className="mt-3 text-sm text-[#DB4444] hover:underline"
                             >
-                                Edit your review
+                                {t('editYourReview')}
                             </button>
                         </div>
                     ) : (
                         <div className="border border-gray-200 rounded-xl p-6">
                             <h4 className="text-sm font-semibold text-gray-800 mb-6">
-                                {editMode ? "Edit your review" : "Write a Review"}
+                                {editMode ? t('editYourReview') : t('writeReviewTitle')}
                             </h4>
 
                             {/* Star picker */}
                             <div className="mb-5">
-                                <p className="text-xs text-gray-400 mb-2 uppercase tracking-wide">Your Rating</p>
+                                <p className="text-xs text-gray-400 mb-2 uppercase tracking-wide">{t('yourRating')}</p>
                                 <div className="flex gap-1">
                                     {[1, 2, 3, 4, 5].map(star => (
                                         <button
@@ -273,22 +275,22 @@ export default function ProductReviews({ productId }: Props) {
                                 </div>
                                 {rating > 0 && (
                                     <p className="text-xs text-gray-400 mt-1.5">
-                                        {["", "Poor", "Fair", "Good", "Very Good", "Excellent"][rating]}
+                                        {["", t('poor'), t('fair'), t('good'), t('veryGood'), t('excellent')][rating]}
                                     </p>
                                 )}
                             </div>
 
                             {/* Comment */}
                             <div className="mb-5">
-                                <p className="text-xs text-gray-400 mb-2 uppercase tracking-wide">Your Comment</p>
+                                <p className="text-xs text-gray-400 mb-2 uppercase tracking-wide">{t('yourComment')}</p>
                                 <textarea
                                     value={comment}
                                     onChange={e => setComment(e.target.value)}
                                     rows={4}
-                                    placeholder="Share your experience with this product..."
+                                    placeholder={t('commentPlaceholder')}
                                     className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 resize-none focus:outline-none focus:border-[#DB4444] transition placeholder:text-gray-300"
                                 />
-                                <p className="text-xs text-gray-300 text-right mt-1">{comment.length} chars</p>
+                                <p className="text-xs text-gray-300 text-right mt-1">{t('chars', { count: comment.length })}</p>
                             </div>
 
                             {error && (
@@ -303,7 +305,7 @@ export default function ProductReviews({ productId }: Props) {
                                     disabled={submitting}
                                     className="flex-1 bg-[#DB4444] text-white text-sm font-medium py-2.5 rounded-lg hover:bg-[#c03a3a] transition disabled:opacity-50"
                                 >
-                                    {submitting ? "Saving..." : editMode ? "Update Review" : "Submit Review"}
+                                    {submitting ? t('saving') : editMode ? t('updateReview') : t('submitReview')}
                                 </button>
                                 {editMode && (
                                     <button
@@ -315,7 +317,7 @@ export default function ProductReviews({ productId }: Props) {
                                         }}
                                         className="px-4 py-2.5 text-sm text-gray-500 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
                                     >
-                                        Cancel
+                                        {t('cancel')}
                                     </button>
                                 )}
                             </div>

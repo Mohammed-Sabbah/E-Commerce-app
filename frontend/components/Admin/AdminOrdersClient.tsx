@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
+import { useTranslations } from 'next-intl';
 import { ChevronDown } from "lucide-react";
 import { apiClient } from "@/lib/apiClient";
 import { parseError } from "@/lib/adminUtils";
@@ -30,6 +31,7 @@ const TRANSITIONS: Record<string, string[]> = {
 };
 
 export default function AdminOrdersClient({ initial }: { initial: AdminOrder[] }) {
+    const t = useTranslations('admin');
     const queryClient = useQueryClient();
     const [filter, setFilter] = useState("all");
     const [page, setPage] = useState(1);
@@ -62,13 +64,13 @@ export default function AdminOrdersClient({ initial }: { initial: AdminOrder[] }
     const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
     const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-    const statusLabels: Record<string, string> = {
-        pending: "Pending",
-        processing: "Processing",
-        delivered: "Delivered",
-        cancelled: "Cancelled",
-        returned: "Returned",
-    };
+    const statusLabels: Record<string, string> = useMemo(() => ({
+        pending: t('pending'),
+        processing: t('processing'),
+        delivered: t('delivered'),
+        cancelled: t('cancelled'),
+        returned: t('returned'),
+    }), [t]);
 
     const actionMutation = useMutation({
         mutationFn: async ({ id, status }: { id: string; status: string }) => {
@@ -81,7 +83,7 @@ export default function AdminOrdersClient({ initial }: { initial: AdminOrder[] }
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["admin", "orders"] });
             setConfirm(null);
-            toast.success("Order updated");
+            toast.success(t('orderUpdated'));
         },
         onError: (e: unknown) => {
             toast.error(parseError(e));
@@ -115,7 +117,7 @@ export default function AdminOrdersClient({ initial }: { initial: AdminOrder[] }
                                 : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                         }`}
                     >
-                        {s === "all" ? "All" : statusLabels[s] ?? s}
+                        {s === "all" ? t('all') : statusLabels[s] ?? s}
                     </button>
                 ))}
             </div>
@@ -124,13 +126,13 @@ export default function AdminOrdersClient({ initial }: { initial: AdminOrder[] }
                 <table className="w-full text-sm">
                     <thead className="bg-gray-50 text-left text-gray-500">
                         <tr>
-                            <th className="px-4 py-3 font-medium">Order</th>
-                            <th className="px-4 py-3 font-medium">Customer</th>
-                            <th className="px-4 py-3 font-medium">Date</th>
-                            <th className="px-4 py-3 font-medium">Total</th>
-                            <th className="px-4 py-3 font-medium">Payment</th>
-                            <th className="px-4 py-3 font-medium">Status</th>
-                            <th className="px-4 py-3 font-medium">Actions</th>
+                            <th className="px-4 py-3 font-medium">{t('order')}</th>
+                            <th className="px-4 py-3 font-medium">{t('customer')}</th>
+                            <th className="px-4 py-3 font-medium">{t('orderDate')}</th>
+                            <th className="px-4 py-3 font-medium">{t('orderTotal')}</th>
+                            <th className="px-4 py-3 font-medium">{t('payment')}</th>
+                            <th className="px-4 py-3 font-medium">{t('orderStatus')}</th>
+                            <th className="px-4 py-3 font-medium">{t('actions')}</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -140,7 +142,7 @@ export default function AdminOrdersClient({ initial }: { initial: AdminOrder[] }
                                     {formatId(order._id)}
                                 </td>
                                 <td className="px-4 py-3 text-gray-900">
-                                    {order.user?.name ?? "Unknown"}
+                                    {order.user?.name ?? t('unknown')}
                                 </td>
                                 <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
                                     {formatDate(order.createdAt)}
@@ -156,7 +158,7 @@ export default function AdminOrdersClient({ initial }: { initial: AdminOrder[] }
                                                 ? "bg-green-100 text-green-700"
                                                 : "bg-yellow-100 text-yellow-700"
                                         }`}>
-                                            {order.isPaid ? "Paid" : "Unpaid"}
+                                            {order.isPaid ? t('paid') : t('unpaid')}
                                         </span>
                                     </div>
                                 </td>
@@ -178,7 +180,7 @@ export default function AdminOrdersClient({ initial }: { initial: AdminOrder[] }
                                                 onClick={() => doAction(order._id, "paid")}
                                                 className="h-7 px-2.5 rounded-md bg-blue-600 text-white text-[11px] font-semibold hover:bg-blue-700 disabled:opacity-40 transition-colors cursor-pointer"
                                             >
-                                                {actionMutation.isPending && actionMutation.variables?.id === order._id ? "..." : "Pay"}
+                                                {actionMutation.isPending && actionMutation.variables?.id === order._id ? "..." : t('pay')}
                                             </button>
                                         )}
 
@@ -202,7 +204,7 @@ export default function AdminOrdersClient({ initial }: { initial: AdminOrder[] }
                                                                 : "border border-gray-300 text-gray-600 hover:bg-gray-50"
                                                         }`}
                                                     >
-                                                        <span>Actions</span>
+                                                        <span>{t('actions')}</span>
                                                         <ChevronDown className={`w-3 h-3 transition-transform ${openId === order._id ? "rotate-180" : ""}`} />
                                                     </button>
 
@@ -215,7 +217,7 @@ export default function AdminOrdersClient({ initial }: { initial: AdminOrder[] }
                                                                     onClick={() => { setOpenId(null); doAction(order._id, s); }}
                                                                     className="w-full text-left px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
                                                                 >
-                                                                    Mark {statusLabels[s]}
+                                                                    {t('markAs', { status: statusLabels[s] })}
                                                                 </button>
                                                             ))}
                                                             {safe.length > 0 && danger.length > 0 && (
@@ -228,7 +230,7 @@ export default function AdminOrdersClient({ initial }: { initial: AdminOrder[] }
                                                                     onClick={() => { setOpenId(null); requestAction(order._id, s); }}
                                                                     className="w-full text-left px-3 py-1.5 text-xs text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
                                                                 >
-                                                                    {s === "cancelled" ? "Cancel" : statusLabels[s]}
+                                                                    {s === "cancelled" ? t('cancel') : statusLabels[s]}
                                                                 </button>
                                                             ))}
                                                         </div>
@@ -243,7 +245,7 @@ export default function AdminOrdersClient({ initial }: { initial: AdminOrder[] }
                     </tbody>
                 </table>
                 {paged.length === 0 && (
-                    <p className="text-center text-sm text-gray-400 py-10">No orders found</p>
+                    <p className="text-center text-sm text-gray-400 py-10">{t('noOrders')}</p>
                 )}
             </div>
 
@@ -253,16 +255,16 @@ export default function AdminOrdersClient({ initial }: { initial: AdminOrder[] }
                 open={!!confirm}
                 title={
                     confirm?.status === "cancelled"
-                        ? "Cancel order?"
+                        ? t('cancelOrderTitle')
                         : confirm?.status === "returned"
-                        ? "Return order?"
+                        ? t('returnOrderTitle')
                         : ""
                 }
                 message={
                     confirm?.status === "cancelled"
-                        ? "This will cancel the order. This action cannot be undone."
+                        ? t('cancelOrderMessage')
                         : confirm?.status === "returned"
-                        ? "This will process a return for this order."
+                        ? t('returnOrderMessage')
                         : ""
                 }
                 confirmLabel={confirm ? statusLabels[confirm.status] ?? confirm.status : ""}

@@ -21,5 +21,10 @@
   "english": "English",
   "arabic": "العربية",
   "closeBanner": "Close banner",
-  "shoppingCart": "Shopping cart"
+  "shoppingCart": "Shopping cart",
+  "manageAccount": "Manage My Account",
+  "myOrder": "My Order",
+  "myCancellations": "My Cancellations",
+  "myReviews": "My Reviews",
+  "navigationMenu": "Navigation menu"
 }

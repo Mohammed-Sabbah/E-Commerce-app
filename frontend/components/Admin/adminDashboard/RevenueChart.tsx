@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 
 interface Props {
@@ -7,11 +8,12 @@ interface Props {
 }
 
 export default function RevenueChart({ data }: Props) {
-    if (!data.length) return <p className="text-sm text-gray-400">No revenue data</p>;
+    const t = useTranslations('admin');
+    if (!data.length) return <p className="text-sm text-gray-400">{t('noOrders')}</p>;
 
     return (
         <div className="bg-white border border-gray-200 rounded-xl p-5">
-            <h3 className="text-sm font-semibold text-gray-900 mb-4">Revenue</h3>
+            <h3 className="text-sm font-semibold text-gray-900 mb-4">{t('revenueOverview')}</h3>
             <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={data}>
@@ -26,7 +28,7 @@ export default function RevenueChart({ data }: Props) {
                         <YAxis tick={{ fontSize: 11 }} stroke="#9ca3af" />
                         <Tooltip
                             contentStyle={{ borderRadius: 8, border: "1px solid #e5e7eb", fontSize: 13 }}
-                            formatter={(v) => [`$${Number(v).toLocaleString("en")}`, "Revenue"]}
+                            formatter={(v) => [`$${Number(v).toLocaleString("en")}`, t('totalRevenue')]}
                         />
                         <Area
                             type="monotone"

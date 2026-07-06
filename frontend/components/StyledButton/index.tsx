@@ -1,3 +1,6 @@
+'use client';
+
+import { useTranslations } from 'next-intl';
 import { Link } from "@/i18n/navigation"
 import { cn } from '@/lib/utils'
 import LoadingSvg from '../LoadingSvg'
@@ -8,19 +11,20 @@ export default function StyledButton({
     type,
     isLoading,
     loadingText,
-    href,        // ← أضفت هاد
+    href,
 }: {
     title: string
     ClassName?: string
     type?: "button" | "reset" | "submit"
     isLoading?: boolean
     loadingText?: string
-    href?: string   // ← اختياري
+    href?: string
 }) {
+    const t = useTranslations('common');
     const content = isLoading ? (
         <span className="flex items-center gap-2">
             <LoadingSvg />
-            {loadingText ?? "Loading..."}
+            {loadingText ?? t('loading')}
         </span>
     ) : title
 

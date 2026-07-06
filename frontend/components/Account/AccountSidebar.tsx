@@ -1,8 +1,8 @@
 "use client";
-// frontend/components/Account/AccountSidebar.tsx
 
 import { Link } from "@/i18n/navigation";
 import { usePathname } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import {
     User,
     BookMarked,
@@ -12,14 +12,15 @@ import {
 } from "lucide-react";
 
 const navItems = [
-    { label: "My Profile", href: "/account", icon: User },
-    { label: "Address Book", href: "/account/address", icon: BookMarked },
-    { label: "My Orders", href: "/account/orders", icon: ShoppingBag },
-    { label: "My Reviews", href: "/account/reviews", icon: Star },
-    { label: "My WishList", href: "/wishlist", icon: Heart },
+    { key: "myProfile", href: "/account", icon: User },
+    { key: "myAddressBook", href: "/account/address", icon: BookMarked },
+    { key: "myOrders", href: "/account/orders", icon: ShoppingBag },
+    { key: "myReviews", href: "/account/reviews", icon: Star },
+    { key: "myWishlist", href: "/wishlist", icon: Heart },
 ];
 
 export default function AccountSidebar() {
+    const t = useTranslations("account");
     const pathname = usePathname();
 
     function isActive(href: string) {
@@ -30,7 +31,7 @@ export default function AccountSidebar() {
         <aside className="w-full lg:w-[220px] shrink-0">
             <nav>
                 <ul className="space-y-1">
-                    {navItems.map(({ label, href, icon: Icon }) => {
+                    {navItems.map(({ key, href, icon: Icon }) => {
                         const active = isActive(href);
                         return (
                             <li key={href}>
@@ -47,7 +48,7 @@ export default function AccountSidebar() {
                                         className={active ? "text-[#DB4444]" : "text-gray-400"}
                                         strokeWidth={active ? 2.2 : 1.8}
                                     />
-                                    {label}
+                                    {t(key)}
                                 </Link>
                             </li>
                         );

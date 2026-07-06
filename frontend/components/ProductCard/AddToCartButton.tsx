@@ -1,11 +1,13 @@
 "use client"
 
+import { useTranslations } from 'next-intl';
 import Cookies from 'js-cookie';
 import { useCart } from "@/hooks/useCart"
 import LoadingSvg from "../LoadingSvg"
 import { ProductCardData } from "."
 
 function AddToCartButton({ product, showAddToCart }: { product: ProductCardData, showAddToCart: boolean }) {
+    const t = useTranslations('products');
     const hasToken = !!Cookies.get('token');
     const { addToCart, isAdding } = useCart(hasToken)
 
@@ -17,7 +19,7 @@ function AddToCartButton({ product, showAddToCart }: { product: ProductCardData,
                         ${showAddToCart ? "opacity-100" : "opacity-0 group-hover:opacity-100"}
                     `}
         >
-            {isAdding ? <LoadingSvg /> : "Add To Cart"}
+            {isAdding ? <LoadingSvg /> : t('addToCart')}
         </button>
     )
 }
