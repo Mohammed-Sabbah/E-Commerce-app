@@ -1,52 +1,40 @@
-// frontend/middleware.ts
+import createMiddleware from "next-intl/middleware";
+import { NextRequest, NextResponse } from "next/server";
+import { routing } from "./i18n/routing";
 
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+const handleI18n = createMiddleware(routing);
 
-const protectedRoutes = [
-    '/wishlist',
-    '/cart',
-    '/checkout',
-    '/account',
-    '/admin',   // ← إضافة
-];
+const protectedRoutes = ["/wishlist", "/cart", "/checkout", "/account", "/admin"];
+const authRoutes = ["/login", "/register"];
 
-const authRoutes = ['/login', '/register'];
+export default async function middleware(request: NextRequest) {
+  const response = handleI18n(request);
 
-export function middleware(request: NextRequest) {
-    const token = request.cookies.get('token')?.value;
-    const { pathname } = request.nextUrl;
+  if (!response.ok) return response;
 
-    const isProtectedRoute = protectedRoutes.some((route) =>
-        pathname === route || pathname.startsWith(`${route}/`)
-    );
+  const pathname = response.headers.get("x-middleware-rewrite")
+    ? new URL(response.headers.get("x-middleware-rewrite")!).pathname
+    : request.nextUrl.pathname;
 
-    // 1. غير مسجل دخول يحاول يفتح صفحة محمية → redirect للـ login
-    if (!token && isProtectedRoute) {
-        return NextResponse.redirect(new URL('/login', request.url));
-    }
+  const pathWithoutLocale = pathname.replace(/^\/(en|ar)(\/|$)/, "/$2") || "/";
 
-    // 2. مسجل دخول يحاول يفتح login/register → redirect للـ home
-    if (token && authRoutes.includes(pathname)) {
-        return NextResponse.redirect(new URL('/', request.url));
-    }
+  const token = request.cookies.get("token")?.value;
 
-    return NextResponse.next();
+  const isProtectedRoute = protectedRoutes.some(
+    (route) => pathWithoutLocale === route || pathWithoutLocale.startsWith(`${route}/`)
+  );
+
+  if (!token && isProtectedRoute) {
+    return NextResponse.redirect(new URL(`/en${pathWithoutLocale}`, request.url));
+  }
+
+  if (token && authRoutes.some((r) => pathWithoutLocale === r)) {
+    return NextResponse.redirect(new URL("/en/", request.url));
+  }
+
+  return response;
 }
 
 export const config = {
-    matcher: [
-        '/wishlist',
-        '/wishlist/:path*',
-        '/cart',
-        '/cart/:path*',
-        '/checkout',
-        '/checkout/:path*',
-        '/account',
-        '/account/:path*',
-        '/admin',          // ← إضافة
-        '/admin/:path*',   // ← إضافة
-        '/login',
-        '/register',
-    ],
+  matcher: "/((?!api|_next|_vercel|.*\\..*).*)",
 };

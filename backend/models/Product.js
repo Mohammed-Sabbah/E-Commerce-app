@@ -4,19 +4,16 @@ const fs = require("fs");
 let productSchema = new mongoose.Schema(
     {
         name: {
-            type: String,
-            required: [true, "Product name is required"],
-            minlength: [3, "Too short product name"],
-            trim: true
+            en: { type: String, required: [true, "Product name (English) is required"], minlength: [3, "Too short product name"], trim: true },
+            ar: { type: String, required: [true, "Product name (Arabic) is required"], minlength: [3, "Too short product name"], trim: true }
         },
         slug: {
             type: String,
             lowercase: true
         },
         description: {
-            type: String,
-            required: [true, "Product description is required"],
-            minlength: [20, "Too short product description"],
+            en: { type: String, required: [true, "Product description (English) is required"], minlength: [20, "Too short product description"] },
+            ar: { type: String, required: [true, "Product description (Arabic) is required"], minlength: [20, "Too short product description"] }
         },
         quantity: {
             type: Number,
@@ -91,15 +88,15 @@ productSchema.index({ category: 1, createdAt: -1 });
 productSchema.pre(/^find/, function (next) {
     this.populate({
         path: "category",
-        select: "name"
+        select: "name.en name.ar"
     });
     this.populate({
         path: "subCategory",
-        select: "name"
+        select: "name.en name.ar"
     });
     this.populate({
         path: "brand",
-        select: "name"
+        select: "name.en name.ar"
     });
     next()
 });

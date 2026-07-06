@@ -1,14 +1,14 @@
 "use client";
 
 import Container from '../Container'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import SearchInput from '../SearchInput'
 import UserMenu from "../UserMenu";
 import HeaderHeartButton from './HeaderHeartButton';
 import HeaderCartButton from './HeaderCartButton';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useState, useCallback, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname } from '@/i18n/navigation';
 import type { ReactNode } from 'react';
 
 const navLinks = [

@@ -4,11 +4,8 @@ const fs = require("fs");
 let brandSchema = new mongoose.Schema(
     {
         name: {
-            type: String,
-            required: [true, "name is required"],
-            unique: [true, "brand name must be unique"],
-            minlength: [3, "name length must br larger than 3"],
-            maxlength: [32, "name length must br less than 32"]
+            en: { type: String, required: [true, "brand name (English) is required"], unique: true, minlength: [3, "name length must be larger than 3"], maxlength: [32, "name length must be less than 32"], trim: true },
+            ar: { type: String, required: [true, "brand name (Arabic) is required"], unique: true, minlength: [3, "name length must be larger than 3"], maxlength: [32, "name length must be less than 32"], trim: true }
         },
         slug: {
             type: String,

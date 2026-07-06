@@ -11,7 +11,7 @@ import {
     Cog6ToothIcon,
 } from "@heroicons/react/24/outline";
 import LogoutButton from "../StyledButton/LogoutButton";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 
 const menuItems = [
     { href: "/account", icon: Cog6ToothIcon, label: "Manage My Account" },

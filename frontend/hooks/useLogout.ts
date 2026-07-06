@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { logout } from "@/services/authService";
 import { QUERY_KEYS } from "@/constants/queryKeys";
 

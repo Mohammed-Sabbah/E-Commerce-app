@@ -2,7 +2,8 @@
 
 import { Fragment, useState } from "react";
 import Image from "next/image";
-import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useRouter, usePathname } from "@/i18n/navigation";
 import { apiClient } from "@/lib/apiClient";
 import { Order, OrderFilter } from "@/types/Order";
 import { STATUS_STYLES, formatId } from "@/constants/orders";

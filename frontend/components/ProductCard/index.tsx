@@ -3,7 +3,7 @@ import { EyeIcon, TrashIcon } from '@heroicons/react/24/outline';
 import HearIconButton from './HeartIconButton';
 import DeleteIconButton from './DeleteIconButton';
 import AddToCartButton from './AddToCartButton';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
 
 export type ProductCardData = {

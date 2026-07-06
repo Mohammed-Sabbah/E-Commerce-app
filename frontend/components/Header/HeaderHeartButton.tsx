@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { HeartIcon } from "@heroicons/react/24/outline";
 import { useWishlist } from "@/hooks/useWishlist";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 
 function HeaderHeartButton({ token }: { token?: string }) {
     const { wishlist } = useWishlist(!!token);

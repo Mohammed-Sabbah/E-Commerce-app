@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/i18n/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import type { PaymentMethod } from '@/types/checkout';
 import { placeOrder } from '@/services/client/orderService';

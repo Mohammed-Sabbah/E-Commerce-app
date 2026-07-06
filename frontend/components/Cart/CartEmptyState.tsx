@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";
 
 export default function CartEmptyState() {

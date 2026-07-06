@@ -19,7 +19,7 @@ const createCheckoutSession = asyncErrorHandler(async (req, res) => {
         price_data: {
             currency: 'ils',
             product_data: {
-                name: item.product.name,
+                name: typeof item.product.name === 'object' ? (item.product.name.en || item.product.name) : item.product.name,
             },
             unit_amount: Math.round(item.price * 100),
         },

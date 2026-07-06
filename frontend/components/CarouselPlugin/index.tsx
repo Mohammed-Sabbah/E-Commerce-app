@@ -12,7 +12,7 @@ import {
     type CarouselApi,
 } from "@/components/ui/carousel"
 import Autoplay from "embla-carousel-autoplay"
-import Link from "next/link"
+import { Link } from "@/i18n/navigation"
 
 type Slide = {
     id: number

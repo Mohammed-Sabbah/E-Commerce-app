@@ -4,11 +4,8 @@ const fs = require("fs");
 let subCategorySchema = new mongoose.Schema(
     {
         name: {
-            type: String,
-            required: [true, "subCategory name is required"],
-            unique: [true, "subCategory name must be unique"],
-            minlength: [3, "subCategory name must be larger than 3"],
-            maxlength: [32, "subCategory name must be less than 32"]
+            en: { type: String, required: [true, "subCategory name (English) is required"], unique: true, minlength: [3, "subCategory name must be larger than 3"], maxlength: [32, "subCategory name must be less than 32"], trim: true },
+            ar: { type: String, required: [true, "subCategory name (Arabic) is required"], unique: true, minlength: [3, "subCategory name must be larger than 3"], maxlength: [32, "subCategory name must be less than 32"], trim: true }
         },
         slug: {
             type: String,

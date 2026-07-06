@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { StarIcon } from "@heroicons/react/24/solid";
 import { StarIcon as StarOutlineIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { apiClient } from "@/lib/apiClient";
-import type { UserReview } from "@/app/account/reviews/page";
+import type { UserReview } from "@/app/[locale]/account/reviews/page";
 
 // ─── Stars ────────────────────────────────────────────────────────────────────
 function Stars({

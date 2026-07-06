@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition, useOptimistic } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname } from "@/i18n/navigation";
 import ProductCard from "@/components/ProductCard";
 import FilterSidebar from "./FilterSideBar";
 import MobileFilterDrawer from "./MobileFilterDrawer";

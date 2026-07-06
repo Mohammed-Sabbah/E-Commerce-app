@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";
 import { useCart } from "@/hooks/useCart";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 
 function HeaderCartButton({ token }: { token?: string }) {
     const { cart } = useCart(!!token);
