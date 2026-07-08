@@ -99,10 +99,13 @@ const getAdminStats = asyncErrorHandler(async (req, res) => {
     }));
 
     let recentOrders = get(5, []);
-    recentOrders = recentOrders.map((o) => ({
-        ...o,
-        user: o.user ? { ...o.user, name: typeof o.user.name === "object" ? localizeField(o.user.name, lang) : o.user.name } : o.user,
-    }));
+    recentOrders = recentOrders.map((order) => {
+        const o = typeof order.toObject === "function" ? order.toObject({ virtuals: true }) : order;
+        return {
+            ...o,
+            user: o.user ? { ...o.user, name: typeof o.user.name === "object" ? localizeField(o.user.name, lang) : o.user.name } : o.user,
+        };
+    });
 
     res.status(200).json({
         status: "success",

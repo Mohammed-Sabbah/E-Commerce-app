@@ -69,7 +69,9 @@ const updateAddress = asyncErrorHandler(async function (req, res) {
     if (!req.body.postalCode)
         req.body.postalCode = user.addresses[index].postalCode;
 
-    user.addresses[index] = { ...user.addresses[index], ...req.body };
+    const addressDoc = user.addresses[index];
+    const plainAddress = typeof addressDoc.toObject === "function" ? addressDoc.toObject() : addressDoc;
+    user.addresses[index] = { ...plainAddress, ...req.body };
 
     if (user.profileImage) {
         if (user.profileImage.startsWith("http"))

@@ -30,7 +30,9 @@ let getAll = function (model) {
 
         let docs = await qm.query;
         docs = docs.map((d) => (typeof d.toObject === "function" ? d.toObject({ virtuals: true }) : d));
-        docs = localizeDocs(docs, lang);
+
+        if (req.query.raw !== "true")
+            docs = localizeDocs(docs, lang);
 
         res.status(200).json({
             status: "success",
@@ -52,7 +54,9 @@ let createOne = function (model) {
 
         let newDoc = await model.create(req.body);
         newDoc = newDoc.toObject({ virtuals: true });
-        newDoc = localizeDocs(newDoc, lang);
+
+        if (req.query.raw !== "true")
+            newDoc = localizeDocs(newDoc, lang);
 
         res.status(201).json({
             status: "success",
@@ -78,7 +82,9 @@ let getOne = function (model, modelName = "", populateOption = "") {
             throw new CustomError(`There is no ${modelName} with id : ${req.params.id}`, 404);
 
         doc = doc.toObject({ virtuals: true });
-        doc = localizeDocs(doc, lang);
+
+        if (req.query.raw !== "true")
+            doc = localizeDocs(doc, lang);
 
         res.status(200).json({
             status: "success",
@@ -107,7 +113,9 @@ let updateOne = function (model, modelName) {
             throw new CustomError(`There is no ${modelName} with id : ${req.params.id}`, 404);
 
         updatedDoc = updatedDoc.toObject({ virtuals: true });
-        updatedDoc = localizeDocs(updatedDoc, lang);
+
+        if (req.query.raw !== "true")
+            updatedDoc = localizeDocs(updatedDoc, lang);
 
         res.status(200).json({
             status: "success",
