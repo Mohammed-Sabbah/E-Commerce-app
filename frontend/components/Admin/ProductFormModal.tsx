@@ -9,8 +9,10 @@ import { toast } from "sonner";
 import type { Product, Category, Brand, PopulatedRef } from "@/types/api";
 
 interface FormState {
-    name: string;
-    description: string;
+    nameEn: string;
+    nameAr: string;
+    descriptionEn: string;
+    descriptionAr: string;
     price: string;
     priceAfterDiscount: string;
     quantity: string;
@@ -20,7 +22,8 @@ interface FormState {
 }
 
 const EMPTY_FORM: FormState = {
-    name: "", description: "", price: "", priceAfterDiscount: "",
+    nameEn: "", nameAr: "", descriptionEn: "", descriptionAr: "",
+    price: "", priceAfterDiscount: "",
     quantity: "1", category: "", brand: "", colors: "",
 };
 
@@ -153,19 +156,25 @@ export default function ProductFormModal({ open, onClose, product, categories, b
         if (open) {
             el.showModal();
             if (product) {
-                setForm({
-                    name: product.name,
-                    description: product.description,
-                    price: String(product.price),
-                    priceAfterDiscount: product.priceAfterDiscount ? String(product.priceAfterDiscount) : "",
-                    quantity: String(product.quantity),
-                    category: refId(product.category),
-                    brand: refId(product.brand),
-                    colors: (product.colors ?? []).join(", "),
-                });
-                setCoverFile(null);
-                setExtraFiles([]);
-                setExistingImages(product.images ?? []);
+                (async () => {
+                    const res = await apiClient.get(`/api/v1/products/${product._id}?raw=true`);
+                    const raw = res.data?.data?.doc;
+                    setForm({
+                        nameEn: raw.name?.en ?? "",
+                        nameAr: raw.name?.ar ?? "",
+                        descriptionEn: raw.description?.en ?? "",
+                        descriptionAr: raw.description?.ar ?? "",
+                        price: String(product.price),
+                        priceAfterDiscount: product.priceAfterDiscount ? String(product.priceAfterDiscount) : "",
+                        quantity: String(product.quantity),
+                        category: refId(product.category),
+                        brand: refId(product.brand),
+                        colors: (product.colors ?? []).join(", "),
+                    });
+                    setCoverFile(null);
+                    setExtraFiles([]);
+                    setExistingImages(product.images ?? []);
+                })();
             } else {
                 setForm(EMPTY_FORM);
                 setCoverFile(null);
@@ -185,7 +194,8 @@ export default function ProductFormModal({ open, onClose, product, categories, b
         return () => el.removeEventListener("close", handleClose);
     }, [onClose]);
 
-    const descError = form.description.trim() && form.description.trim().length < 20;
+    const descErrorEn = form.descriptionEn.trim().length > 0 && form.descriptionEn.trim().length < 20;
+    const descErrorAr = form.descriptionAr.trim().length > 0 && form.descriptionAr.trim().length < 20;
 
     const validatePrice = (): string | null => {
         const price = Number(form.price);
@@ -200,11 +210,14 @@ export default function ProductFormModal({ open, onClose, product, categories, b
         mutationFn: async () => {
             const priceErr = validatePrice();
             if (priceErr) throw new Error(priceErr);
-            if (descError) throw new Error(t('descriptionMinLength'));
+            if (descErrorEn) throw new Error(t('descriptionMinLength') + ' (EN)');
+            if (descErrorAr) throw new Error(t('descriptionMinLength') + ' (AR)');
 
             const fd = new FormData();
-            fd.append("name", form.name);
-            fd.append("description", form.description);
+            fd.append("name_en", form.nameEn);
+            fd.append("name_ar", form.nameAr);
+            fd.append("description_en", form.descriptionEn);
+            fd.append("description_ar", form.descriptionAr);
             fd.append("price", form.price);
             fd.append("quantity", form.quantity);
             fd.append("category", form.category);
@@ -262,9 +275,13 @@ export default function ProductFormModal({ open, onClose, product, categories, b
 
             <div className="px-6 py-5 space-y-4 max-h-[70vh] overflow-y-auto">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
-                    <div className="md:col-span-1">
-                        <label className="block text-xs font-medium text-gray-500 mb-1">{t('productName')}</label>
-                        <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder={t('productName')} className="h-9 px-3 border border-gray-200 rounded-lg text-sm w-full focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400 transition-all" />
+                    <div>
+                        <label className="block text-xs font-medium text-gray-500 mb-1">{t('productName')} (EN)</label>
+                        <input value={form.nameEn} onChange={(e) => setForm({ ...form, nameEn: e.target.value })} placeholder={t('productName') + ' (EN)'} className="h-9 px-3 border border-gray-200 rounded-lg text-sm w-full focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400 transition-all" />
+                    </div>
+                    <div>
+                        <label className="block text-xs font-medium text-gray-500 mb-1">{t('productName')} (AR)</label>
+                        <input value={form.nameAr} onChange={(e) => setForm({ ...form, nameAr: e.target.value })} placeholder={t('productName') + ' (AR)'} className="h-9 px-3 border border-gray-200 rounded-lg text-sm w-full focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400 transition-all" />
                     </div>
                     <div>
                         <label className="block text-xs font-medium text-gray-500 mb-1">{t('productPrice')}</label>
@@ -298,10 +315,15 @@ export default function ProductFormModal({ open, onClose, product, categories, b
                     </div>
                 </div>
 
-                <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-1">{t('productDescription')}</label>
-                    <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder={t('descriptionPlaceholder')} rows={3} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400 transition-all resize-none" />
-                    {descError && <p className="text-xs text-red-500 mt-1">{t('descriptionMinLength')}</p>}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
+                    <div>
+                        <label className="block text-xs font-medium text-gray-500 mb-1">{t('productDescription')} (EN)</label>
+                        <textarea value={form.descriptionEn} onChange={(e) => setForm({ ...form, descriptionEn: e.target.value })} placeholder={t('descriptionPlaceholder') + ' (EN)'} rows={3} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400 transition-all resize-none" />
+                    </div>
+                    <div>
+                        <label className="block text-xs font-medium text-gray-500 mb-1">{t('productDescription')} (AR)</label>
+                        <textarea value={form.descriptionAr} onChange={(e) => setForm({ ...form, descriptionAr: e.target.value })} placeholder={t('descriptionPlaceholder') + ' (AR)'} rows={3} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400 transition-all resize-none" />
+                    </div>
                 </div>
 
                 <div>
@@ -337,7 +359,7 @@ export default function ProductFormModal({ open, onClose, product, categories, b
                 <button
                     type="button"
                     onClick={() => saveMutation.mutate()}
-                    disabled={!form.name || !form.price || saveMutation.isPending}
+                    disabled={!form.nameEn || !form.nameAr || !form.price || saveMutation.isPending}
                     className="h-9 px-5 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 disabled:opacity-40 transition-all cursor-pointer flex items-center gap-1.5"
                 >
                     {saveMutation.isPending && (

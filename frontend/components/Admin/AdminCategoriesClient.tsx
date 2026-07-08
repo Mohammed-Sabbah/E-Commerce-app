@@ -69,11 +69,13 @@ export default function AdminCategoriesClient({ initial }: Props) {
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
     const [editing, setEditing] = useState<string | null>(null);
-    const [editName, setEditName] = useState("");
+    const [editNameEn, setEditNameEn] = useState("");
+    const [editNameAr, setEditNameAr] = useState("");
     const [editFile, setEditFile] = useState<File | null>(null);
     const [editCurrentPhoto, setEditCurrentPhoto] = useState<string | undefined>(undefined);
     const [creating, setCreating] = useState(false);
-    const [createName, setCreateName] = useState("");
+    const [createNameEn, setCreateNameEn] = useState("");
+    const [createNameAr, setCreateNameAr] = useState("");
     const [createFile, setCreateFile] = useState<File | null>(null);
     const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
@@ -97,9 +99,12 @@ export default function AdminCategoriesClient({ initial }: Props) {
 
     const activeCategory = editing ? items.find((c: Category) => c._id === editing) : null;
 
-    const handleEdit = (c: Category) => {
+    const handleEdit = async (c: Category) => {
+        const res = await apiClient.get(`/api/v1/categories/${c._id}?raw=true`);
+        const raw = res.data?.data?.doc;
         setEditing(c._id);
-        setEditName(c.name);
+        setEditNameEn(raw.name?.en ?? "");
+        setEditNameAr(raw.name?.ar ?? "");
         setEditFile(null);
         setEditCurrentPhoto(c.photo);
         setCreating(false);
@@ -107,9 +112,10 @@ export default function AdminCategoriesClient({ initial }: Props) {
 
     const saveEditMutation = useMutation({
         mutationFn: async () => {
-            if (!editing || !editName.trim()) return;
+            if (!editing) return;
             const fd = new FormData();
-            fd.append("name", editName.trim());
+            fd.append("name_en", editNameEn.trim());
+            fd.append("name_ar", editNameAr.trim());
             if (editFile) fd.append("photo", editFile);
             else if (!editCurrentPhoto) fd.append("photo", "");
             await apiClient.patch(`/api/v1/categories/${editing}`, fd);
@@ -124,16 +130,17 @@ export default function AdminCategoriesClient({ initial }: Props) {
 
     const createMutation = useMutation({
         mutationFn: async () => {
-            if (!createName.trim()) return;
             const fd = new FormData();
-            fd.append("name", createName.trim());
+            fd.append("name_en", createNameEn.trim());
+            fd.append("name_ar", createNameAr.trim());
             if (createFile) fd.append("photo", createFile);
             await apiClient.post("/api/v1/categories", fd);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["admin", "categories"] });
             setCreating(false);
-            setCreateName("");
+            setCreateNameEn("");
+            setCreateNameAr("");
             setCreateFile(null);
             toast.success(t("categorySaved"));
         },
@@ -167,7 +174,7 @@ export default function AdminCategoriesClient({ initial }: Props) {
                 />
                 <button
                     type="button"
-                    onClick={() => { setCreating(true); setEditing(null); setCreateName(""); setCreateFile(null); }}
+                    onClick={() => { setCreating(true); setEditing(null); setCreateNameEn(""); setCreateNameAr(""); setCreateFile(null); }}
                     className="h-10 px-4 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors cursor-pointer"
                 >
                     + {t('addCategory')}
@@ -178,21 +185,25 @@ export default function AdminCategoriesClient({ initial }: Props) {
                 <div className="border border-gray-200 rounded-xl bg-white p-5 mb-4">
                     <div className="flex flex-wrap items-end gap-3">
                         <div>
-                            <label className="block text-xs text-gray-500 mb-1">{t('categoryName')}</label>
-                            <input value={createName} onChange={(e) => setCreateName(e.target.value)} placeholder={t('categoryName')} className="h-10 px-3 border border-gray-300 rounded-lg text-sm w-48" />
+                            <label className="block text-xs text-gray-500 mb-1">{t('categoryName')} (EN)</label>
+                            <input value={createNameEn} onChange={(e) => setCreateNameEn(e.target.value)} placeholder={t('categoryName') + ' (EN)'} className="h-10 px-3 border border-gray-300 rounded-lg text-sm w-40" />
+                        </div>
+                        <div>
+                            <label className="block text-xs text-gray-500 mb-1">{t('categoryName')} (AR)</label>
+                            <input value={createNameAr} onChange={(e) => setCreateNameAr(e.target.value)} placeholder={t('categoryName') + ' (AR)'} className="h-10 px-3 border border-gray-300 rounded-lg text-sm w-40" />
                         </div>
                         <div>
                             <label className="block text-xs text-gray-500 mb-1">{t('categoryPhoto')}</label>
                             <FileInput t={t} file={createFile} onChange={setCreateFile} onRemove={() => setCreateFile(null)} />
                         </div>
-                        <button type="button" onClick={() => createMutation.mutate()} disabled={!createName.trim() || createMutation.isPending} className="h-10 px-4 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 disabled:opacity-40 transition-colors cursor-pointer">{createMutation.isPending ? t('creating') : t('create')}</button>
+                        <button type="button" onClick={() => createMutation.mutate()} disabled={!createNameEn.trim() || !createNameAr.trim() || createMutation.isPending} className="h-10 px-4 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 disabled:opacity-40 transition-colors cursor-pointer">{createMutation.isPending ? t('creating') : t('create')}</button>
                         <button type="button" onClick={() => setCreating(false)} className="h-10 px-4 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors cursor-pointer">{t('cancel')}</button>
                     </div>
                 </div>
             )}
 
             <div className="overflow-x-auto border border-gray-200 rounded-xl bg-white">
-                <table className="w-full text-sm">
+                <table className="admin-table w-full text-sm">
                     <thead className="bg-gray-50 text-start text-gray-500">
                         <tr>
                             <th className="px-4 py-3 font-medium">{t('categoryName')}</th>
@@ -206,7 +217,10 @@ export default function AdminCategoriesClient({ initial }: Props) {
                                 {editing === c._id ? (
                                     <>
                                         <td className="px-4 py-3">
-                                            <input value={editName} onChange={(e) => setEditName(e.target.value)} className="h-8 px-2 border border-gray-300 rounded text-sm w-full" />
+                                            <div className="flex gap-2">
+                                                <input value={editNameEn} onChange={(e) => setEditNameEn(e.target.value)} placeholder="EN" className="h-8 px-2 border border-gray-300 rounded text-sm w-28" />
+                                                <input value={editNameAr} onChange={(e) => setEditNameAr(e.target.value)} placeholder="AR" className="h-8 px-2 border border-gray-300 rounded text-sm w-28" />
+                                            </div>
                                         </td>
                                         <td className="px-4 py-3">
                                             <FileInput

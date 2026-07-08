@@ -1,7 +1,8 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { chartTooltipStyle, isRtlLocale } from "./chartConfig";
 
 const COLORS: Record<string, string> = {
     pending: "#F59E0B",
@@ -17,6 +18,8 @@ interface Props {
 
 export default function StatusPie({ data }: Props) {
     const t = useTranslations('admin');
+    const locale = useLocale();
+    const isRtl = isRtlLocale(locale);
     if (!data.length) return <p className="text-sm text-gray-400">{t('noOrders')}</p>;
 
     return (
@@ -40,11 +43,12 @@ export default function StatusPie({ data }: Props) {
                             ))}
                         </Pie>
                         <Tooltip
-                            contentStyle={{ borderRadius: 8, border: "1px solid #e5e7eb", fontSize: 13 }}
+                            contentStyle={chartTooltipStyle(isRtl)}
                         />
                         <Legend
+                            wrapperStyle={{ direction: isRtl ? "rtl" : "ltr" }}
                             formatter={(value: string) => (
-                                <span className="text-sm text-gray-700 capitalize">{value}</span>
+                                <span dir="auto" className="text-sm text-gray-700 capitalize">{value}</span>
                             )}
                         />
                     </PieChart>

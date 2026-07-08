@@ -48,7 +48,7 @@ export default async function AdminDashboardPage() {
                 <div>
                     <h2 className="text-base font-semibold text-gray-900 mb-3">{t('recentOrders')}</h2>
                     <div className="overflow-x-auto border border-gray-200 rounded-xl bg-white">
-                        <table className="w-full text-sm">
+                        <table className="admin-table w-full text-sm">
                             <thead className="bg-gray-50 text-start text-gray-500">
                                 <tr>
                                     <th className="px-4 py-3 font-medium">{t('order')}</th>

@@ -84,7 +84,7 @@ export default function AdminUsersClient({ initial }: Props) {
             />
 
             <div className="overflow-x-auto border border-gray-200 rounded-xl bg-white">
-                <table className="w-full text-sm">
+                <table className="admin-table w-full text-sm">
                     <thead className="bg-gray-50 text-start text-gray-500">
                         <tr>
                             <th className="px-4 py-3 font-medium">{t('userName')}</th>

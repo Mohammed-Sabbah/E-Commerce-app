@@ -25,7 +25,7 @@ export default async function AdminLayout({
     try {
         const res = await fetch(`${API}/api/v1/users/myProfile`, {
             headers: { Cookie: `token=${token}` },
-            next: { revalidate: 300 },
+            cache: "no-store",
         });
         if (!res.ok) { redirect({ href: "/login", locale }); return null; }
         const data = await res.json();
