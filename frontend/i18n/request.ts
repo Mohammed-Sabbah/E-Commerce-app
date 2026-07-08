@@ -15,12 +15,16 @@ export default getRequestConfig(async ({ requestLocale }) => {
       products: (await import(`../messages/${locale}/products.json`)).default,
       cart: (await import(`../messages/${locale}/cart.json`)).default,
       checkout: (await import(`../messages/${locale}/checkout.json`)).default,
+      contact: (await import(`../messages/${locale}/contact.json`)).default,
       account: (await import(`../messages/${locale}/account.json`)).default,
+      about: (await import(`../messages/${locale}/about.json`)).default,
       auth: (await import(`../messages/${locale}/auth.json`)).default,
       admin: (await import(`../messages/${locale}/admin.json`)).default,
+      features: (await import(`../messages/${locale}/features.json`)).default,
       footer: (await import(`../messages/${locale}/footer.json`)).default,
       seo: (await import(`../messages/${locale}/seo.json`)).default,
       toasts: (await import(`../messages/${locale}/toasts.json`)).default,
+      wishlist: (await import(`../messages/${locale}/wishlist.json`)).default,
     };
     return { locale, messages };
   } catch {

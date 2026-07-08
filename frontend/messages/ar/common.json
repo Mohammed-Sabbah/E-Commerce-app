@@ -32,5 +32,7 @@
   "page": "صفحة",
   "of": "من",
   "pleaseTryAgain": "حدث خطأ ما. حاول مرة أخرى.",
-  "todays": "اليوم"
+  "todays": "اليوم",
+  "previousSlide": "الشريحة السابقة",
+  "nextSlide": "الشريحة التالية"
 }

@@ -32,5 +32,7 @@
   "page": "Page",
   "of": "of",
   "pleaseTryAgain": "Something went wrong. Please try again.",
-  "todays": "Today's"
+  "todays": "Today's",
+  "previousSlide": "Previous slide",
+  "nextSlide": "Next slide"
 }

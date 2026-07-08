@@ -5,6 +5,21 @@
 
 @custom-variant dark (&:is(.dark *));
 
+.admin-table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.admin-table th,
+.admin-table td {
+  text-align: start;
+  vertical-align: middle;
+}
+
+.admin-table th {
+  white-space: nowrap;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
