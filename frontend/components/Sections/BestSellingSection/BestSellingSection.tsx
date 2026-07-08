@@ -6,13 +6,14 @@ import StyledButton from "@/components/StyledButton"
 
 async function BestSellingSection({ children }: { children: React.ReactNode }) {
     const t = await getTranslations('common');
+    const tp = await getTranslations('products');
     return (
         <section>
             <Container>
                 <hr className="pb-12 md:pb-20" />
 
                 <div className="flex justify-between items-end">
-                    <SectionTitle Category="This Month" title="Best Selling Products" />
+                    <SectionTitle Category={tp('thisMonth')} title={tp('bestSelling')} />
                     <div className="hidden md:block">
                         <StyledButton title={t('viewAll')} href="/products?sort=-sold" ClassName="px-9 py-3.5 h-12" />
                     </div>

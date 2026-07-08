@@ -180,14 +180,14 @@ export default function OrdersTable({ orders: initialOrders }: { orders: Order[]
                                                 {order.status === "pending" && (
                                                     <button onClick={() => handleAction(order._id, "cancel")}
                                                         disabled={loadingId === order._id}
-                                                        className="text-xs text-red-500 hover:text-red-700 transition disabled:opacity-50">
+                                                        className="text-xs font-medium bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-md transition disabled:opacity-50 disabled:cursor-not-allowed">
                                         {loadingId === order._id ? "..." : t("cancelOrder")}
                                     </button>
                                 )}
                                 {order.status === "delivered" && (
                                     <button onClick={() => handleAction(order._id, "return")}
                                         disabled={loadingId === order._id}
-                                        className="text-xs text-gray-500 hover:text-gray-700 transition disabled:opacity-50">
+                                        className="text-xs font-medium border border-gray-300 hover:bg-gray-50 text-gray-700 px-3 py-1.5 rounded-md transition disabled:opacity-50 disabled:cursor-not-allowed">
                                         {loadingId === order._id ? "..." : t("returnOrder")}
                                                     </button>
                                                 )}
@@ -230,18 +230,18 @@ export default function OrdersTable({ orders: initialOrders }: { orders: Order[]
                                 {expandedId === order._id && (
                                     <div className="mb-3"><ExpandedItems order={order} tCheckout={tc} tAccount={t} /></div>
                                 )}
-                                <div className="flex justify-end">
+                                <div className="flex justify-end gap-2">
                                     {order.status === "pending" && (
                                         <button onClick={() => handleAction(order._id, "cancel")}
                                             disabled={loadingId === order._id}
-                                            className="text-xs text-red-500 hover:text-red-700 transition disabled:opacity-50">
+                                            className="text-xs font-medium bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-md transition disabled:opacity-50 disabled:cursor-not-allowed">
                                             {loadingId === order._id ? "..." : t("cancelOrder")}
                                         </button>
                                     )}
                                     {order.status === "delivered" && (
                                         <button onClick={() => handleAction(order._id, "return")}
                                             disabled={loadingId === order._id}
-                                            className="text-xs text-gray-500 hover:text-gray-700 transition disabled:opacity-50">
+                                            className="text-xs font-medium border border-gray-300 hover:bg-gray-50 text-gray-700 px-3 py-1.5 rounded-md transition disabled:opacity-50 disabled:cursor-not-allowed">
                                             {loadingId === order._id ? "..." : t("returnOrder")}
                                         </button>
                                     )}

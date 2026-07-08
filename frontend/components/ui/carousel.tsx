@@ -5,6 +5,7 @@ import useEmblaCarousel, {
   type UseEmblaCarouselType,
 } from "embla-carousel-react"
 import { ArrowLeft, ArrowRight } from "lucide-react"
+import { useLocale, useTranslations } from "next-intl"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -51,10 +52,13 @@ function Carousel({
   children,
   ...props
 }: React.ComponentProps<"div"> & CarouselProps) {
+  const locale = useLocale()
+  const direction = opts?.direction ?? (locale === "ar" ? "rtl" : "ltr")
   const [carouselRef, api] = useEmblaCarousel(
     {
       ...opts,
       axis: orientation === "horizontal" ? "x" : "y",
+      direction,
     },
     plugins
   )
@@ -178,6 +182,9 @@ function CarouselPrevious({
   ...props
 }: React.ComponentProps<typeof Button>) {
   const { orientation, scrollPrev, canScrollPrev } = useCarousel()
+  const locale = useLocale()
+  const t = useTranslations('common')
+  const Icon = locale === "ar" ? ArrowRight : ArrowLeft
 
   return (
     <Button
@@ -195,8 +202,8 @@ function CarouselPrevious({
       onClick={scrollPrev}
       {...props}
     >
-      <ArrowLeft />
-      <span className="sr-only">Previous slide</span>
+      <Icon />
+      <span className="sr-only">{t('previousSlide')}</span>
     </Button>
   )
 }
@@ -208,6 +215,9 @@ function CarouselNext({
   ...props
 }: React.ComponentProps<typeof Button>) {
   const { orientation, scrollNext, canScrollNext } = useCarousel()
+  const locale = useLocale()
+  const t = useTranslations('common')
+  const Icon = locale === "ar" ? ArrowLeft : ArrowRight
 
   return (
     <Button
@@ -225,8 +235,8 @@ function CarouselNext({
       onClick={scrollNext}
       {...props}
     >
-      <ArrowRight />
-      <span className="sr-only">Next slide</span>
+      <Icon />
+      <span className="sr-only">{t('nextSlide')}</span>
     </Button>
   )
 }

@@ -115,7 +115,9 @@ export default function ProductsClient({
     }
 
     function handleRemoveCategory() {
-        setOptimisticCategory("");
+        startTransition(() => {
+            setOptimisticCategory("");
+        });
         navigate({ category: "" });
     }
 
@@ -126,9 +128,11 @@ export default function ProductsClient({
     }
 
     function handleClearAll() {
-        setOptimisticCategory("");
         setPriceMin("");
         setPriceMax("");
+        startTransition(() => {
+            setOptimisticCategory("");
+        });
         navigate({ category: "", priceMin: "", priceMax: "", discount: "" });
     }
 

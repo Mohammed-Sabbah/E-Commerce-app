@@ -6,11 +6,12 @@ import StyledButton from "@/components/StyledButton"
 
 async function OurProductsSection({ children }: { children: React.ReactNode }) {
     const t = await getTranslations('common');
+    const tp = await getTranslations('products');
     return (
         <section className="py-17">
             <Container>
                 <div>
-                    <SectionTitle Category="Our Products" title="Explore Our Products" />
+                    <SectionTitle Category={tp('ourProducts')} title={tp('exploreOurProducts')} />
                 </div>
 
                 <div className="pt-8">

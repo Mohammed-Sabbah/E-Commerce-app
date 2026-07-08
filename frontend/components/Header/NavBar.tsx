@@ -73,7 +73,7 @@ function NavBar({ token, categoriesSlot }: {
                     {t('exclusive')}
                 </Link>
 
-                <ul className="hidden lg:flex items-center space-x-8">
+                <ul className="hidden lg:flex items-center space-x-8 ">
                     {navLinks.map((link) => (
                         <li key={link.href}>
                             <Link

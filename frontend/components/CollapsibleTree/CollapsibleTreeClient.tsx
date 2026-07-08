@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import {
     Collapsible,
@@ -70,6 +71,7 @@ function groupCategories(categories: Category[]): GroupedCategories {
 }
 
 export function CollapsibleTreeClient({ categories, className }: Props) {
+    const t = useTranslations('nav');
     const router = useRouter();
     const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
 
@@ -93,7 +95,7 @@ export function CollapsibleTreeClient({ categories, className }: Props) {
 
     return (
         <nav
-            aria-label="Categories"
+            aria-label={t('categories')}
             className={`flex flex-col gap-4 ${className ?? ""}`}
             style={{ fontFamily: "'Poppins', sans-serif" }}
         >

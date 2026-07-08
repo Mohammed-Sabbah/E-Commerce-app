@@ -7,7 +7,7 @@ export default async function OrdersPage() {
     const orders = await getMyOrders();
     return (
         <div>
-            <h1 className="text-[#DB4444] font-medium text-xl mb-6">{t("myOrders")}</h1>
+            {/* <h1 className="text-[#DB4444] font-medium text-xl mb-6">{t("myOrders")}</h1> */}
             <OrdersTable orders={orders} />
         </div>
     );

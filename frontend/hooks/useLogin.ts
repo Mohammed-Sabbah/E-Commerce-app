@@ -8,6 +8,7 @@ interface User {
     id: string;
     name: string;
     email: string;
+    role?: "admin" | "user";
 }
 
 interface LoginResponse {
@@ -36,7 +37,7 @@ export const useLogin = () => {
         onSuccess: (data) => {
             toast.success(t("loginSuccess"));
             queryClient.setQueryData(["user"], data.user);
-            router.push("/");
+            router.push(data.user.role === "admin" ? "/admin" : "/");
             router.refresh();
         },
 

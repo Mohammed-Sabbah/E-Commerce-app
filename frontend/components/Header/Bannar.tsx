@@ -1,20 +1,13 @@
 "use client";
 import { useState } from "react";
-import { useTranslations, useLocale } from 'next-intl';
-import { useRouter, usePathname } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
 import Container from "../Container";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 
 export function Banner() {
     const t = useTranslations('nav');
-    const locale = useLocale();
-    const router = useRouter();
-    const pathname = usePathname();
     const [visible, setVisible] = useState(true);
     if (!visible) return null;
-
-    function handleLocaleChange(newLocale: string) {
-        router.push(pathname, { locale: newLocale });
-    }
 
     return (
         <div className="bg-black text-white">
@@ -30,17 +23,7 @@ export function Banner() {
                 </p>
 
                 <div className="absolute end-4 flex items-center gap-3">
-                    <select
-                        className="bg-transparent text-xs sm:text-sm text-gray-300 
-                                   hover:text-white transition cursor-pointer 
-                                   appearance-none border-none outline-none"
-                        value={locale}
-                        onChange={(e) => handleLocaleChange(e.target.value)}
-                        aria-label={t('selectLanguage')}
-                    >
-                        <option value="en" className="bg-black">{t('english')}</option>
-                        <option value="ar" className="bg-black">{t('arabic')}</option>
-                    </select>
+                    <LanguageSwitcher />
 
                     <button
                         onClick={() => setVisible(false)}

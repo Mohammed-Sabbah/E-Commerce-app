@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server';
 import { Truck, Headphones, ShieldCheck } from "lucide-react";
 
 // ────────────────────────────────────────
@@ -32,23 +33,24 @@ function FeatureItem({
 // Main Component
 // ────────────────────────────────────────
 
-function Features() {
+async function Features() {
+    const t = await getTranslations('features');
     return (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-12 py-16">
             <FeatureItem
                 icon={Truck}
-                title="FREE AND FAST DELIVERY"
-                description="Free delivery for all orders over $140"
+                title={t('freeDelivery')}
+                description={t('freeDeliveryDesc')}
             />
             <FeatureItem
                 icon={Headphones}
-                title="24/7 CUSTOMER SERVICE"
-                description="Friendly 24/7 customer support"
+                title={t('customerService')}
+                description={t('customerServiceDesc')}
             />
             <FeatureItem
                 icon={ShieldCheck}
-                title="MONEY BACK GUARANTEE"
-                description="We return money within 30 days"
+                title={t('moneyBack')}
+                description={t('moneyBackDesc')}
             />
         </div>
     );

@@ -1,3 +1,6 @@
+"use client"
+
+import { useTranslations } from 'next-intl';
 import { StarsComponent } from './StarsComponent'
 import { EyeIcon, TrashIcon } from '@heroicons/react/24/outline';
 import HearIconButton from './HeartIconButton';
@@ -25,6 +28,7 @@ interface ProductCardProps {
 }
 
 function ProductCard({ product, className, variant = "default" }: ProductCardProps) {
+    const t = useTranslations('products');
 
     const config = {
         default: {
@@ -86,7 +90,7 @@ function ProductCard({ product, className, variant = "default" }: ProductCardPro
 
                 {/* Eye */}
                 {current.showEye && (
-                    <Link href={`/products/${product._id}`} aria-label={`View ${product.name}`} className='bg-white/80 hover:bg-white w-9 h-9 rounded-full absolute top-13.5 end-2.5 cursor-pointer flex items-center justify-center'>
+                    <Link href={`/products/${product._id}`} aria-label={t('viewProductName', { name: product.name })} className='bg-white/80 hover:bg-white w-9 h-9 rounded-full absolute top-13.5 end-2.5 cursor-pointer flex items-center justify-center'>
                         <EyeIcon aria-hidden="true" className="h-6 w-6 text-center translate-y-[1px]" />
                     </Link>
                 )}
@@ -95,7 +99,7 @@ function ProductCard({ product, className, variant = "default" }: ProductCardPro
             <div className='pt-3'>
                 <h3 className='text-[1rem] font-[500]'>{product.name}</h3>
 
-                <p className='text-[1rem] font-[500] space-x-3 py-2'>
+                <p className='text-[1rem] font-[500] space-x-3 rtl:space-x-reverse py-2'>
                     <span className='text-[#DB4444]'>
                         ${product.priceAfterDiscount ?? product.price}
                     </span>

@@ -30,7 +30,7 @@ function Timer() {
 
     const t = useTranslations('products');
     return (
-        <div className='flex justify-center items-center space-x-2 md:space-x-4'>
+        <div className='flex justify-center items-center space-x-2 md:space-x-4 '>
             <TimerItem number={time.days} title={t('days')} />
             <Columns />
             <TimerItem number={time.hours} title={t('hours')} />

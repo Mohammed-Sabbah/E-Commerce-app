@@ -46,12 +46,16 @@ function CategoryCard({ category, className }: CategoryCardProps) {
 
         <Link href={`/products?category=${category._id}`}>
             <div className={`relative w-full h-36 overflow-hidden rounded-lg border border-gray-300 group cursor-pointer ${className}`}>
-                <Image
-                    src={category.photo}
-                    alt={category.name}
-                    fill
-                    className='object-cover transition-transform duration-300 group-hover:scale-105'
-                />
+                {category.photo ? (
+                    <Image
+                        src={category.photo}
+                        alt={category.name}
+                        fill
+                        className='object-cover transition-transform duration-300 group-hover:scale-105'
+                    />
+                ) : (
+                    <div className='w-full h-full bg-gray-100' />
+                )}
 
                 {/* الطبقة العادية - أسود */}
                 <div className='absolute bottom-0 start-0 end-0 h-16 

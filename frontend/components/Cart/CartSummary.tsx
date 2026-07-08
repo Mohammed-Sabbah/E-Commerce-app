@@ -13,10 +13,11 @@ export default function CartSummary({ subtotal, onCheckout }: CartSummaryProps) 
     const t = useTranslations('cart');
     const [code, setCode] = useState("");
     const [appliedCode, setAppliedCode] = useState<string | null>(null);
-    const [discount, setDiscount] = useState(0);
+    const [discountPercent, setDiscountPercent] = useState(0);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
+    const discount = parseFloat(((subtotal * discountPercent) / 100).toFixed(2));
     const total = subtotal - discount;
 
     const handleApply = async () => {
@@ -26,14 +27,13 @@ export default function CartSummary({ subtotal, onCheckout }: CartSummaryProps) 
             const res = await apiClient.post("/api/v1/coupons/validate", { code: code.trim() });
             const data = res.data?.data;
             if (data?.valid && data?.discount) {
-                const amount = parseFloat(((subtotal * data.discount) / 100).toFixed(2));
-                setDiscount(amount);
+                setDiscountPercent(data.discount);
                 setAppliedCode(code.trim());
             } else {
-                setError("Coupon could not be applied");
+                setError(t('invalidCoupon'));
             }
         } catch (err: any) {
-            setError(err?.response?.data?.message || "Invalid or expired coupon");
+            setError(err?.response?.data?.message || t('invalidCoupon'));
         } finally {
             setLoading(false);
         }
@@ -42,7 +42,7 @@ export default function CartSummary({ subtotal, onCheckout }: CartSummaryProps) 
     const handleRemove = () => {
         setCode("");
         setAppliedCode(null);
-        setDiscount(0);
+        setDiscountPercent(0);
         setError("");
     };
 
@@ -58,7 +58,7 @@ export default function CartSummary({ subtotal, onCheckout }: CartSummaryProps) 
                             setError("");
                             if (e.target.value !== appliedCode) {
                                 setAppliedCode(null);
-                                setDiscount(0);
+                                setDiscountPercent(0);
                             }
                         }}
                         placeholder={t('couponCode')}
