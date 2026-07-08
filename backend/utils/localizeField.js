@@ -5,6 +5,23 @@ function localizeField(field, lang) {
   return field;
 }
 
+function localizeProductRef(productObj, lang) {
+  if (!productObj || typeof productObj !== "object" || !productObj._id)
+    return productObj;
+
+  const obj = typeof productObj.toObject === "function"
+    ? productObj.toObject({ virtuals: true })
+    : productObj;
+
+  return {
+    ...obj,
+    name: localizeField(obj.name, lang),
+    description: obj.description
+      ? localizeField(obj.description, lang)
+      : obj.description,
+  };
+}
+
 function localizeDoc(doc, lang) {
   if (!doc || typeof doc !== "object") return doc;
 
@@ -25,6 +42,14 @@ function localizeDoc(doc, lang) {
     }
   }
 
+  if (Array.isArray(doc.cartItems)) {
+    doc.cartItems.forEach((item) => {
+      if (item.product && typeof item.product === "object" && item.product._id) {
+        item.product = localizeProductRef(item.product, lang);
+      }
+    });
+  }
+
   return doc;
 }
 
@@ -33,4 +58,4 @@ function localizeDocs(docs, lang) {
   return localizeDoc(docs, lang);
 }
 
-module.exports = { localizeField, localizeDoc, localizeDocs };
+module.exports = { localizeField, localizeProductRef, localizeDoc, localizeDocs };

@@ -11,7 +11,7 @@ module.exports = class QueryManipulater {
 
         let filter = JSON.parse(reqQueryStr);
 
-        ["sort", "select", "keyword", "page", "limit", "skip", "discount"].forEach(val => {
+        ["sort", "select", "keyword", "page", "limit", "skip", "discount", "lang"].forEach(val => {
             if (filter[val]) delete filter[val];
         });
 
@@ -47,7 +47,11 @@ module.exports = class QueryManipulater {
             let filter = {}
             filter.$or = [
                 { name: { $regex: this.req.query.keyword, $options: "i" } },
-                { description: { $regex: this.req.query.keyword, $options: "i" } }
+                { "name.en": { $regex: this.req.query.keyword, $options: "i" } },
+                { "name.ar": { $regex: this.req.query.keyword, $options: "i" } },
+                { description: { $regex: this.req.query.keyword, $options: "i" } },
+                { "description.en": { $regex: this.req.query.keyword, $options: "i" } },
+                { "description.ar": { $regex: this.req.query.keyword, $options: "i" } }
             ];
             this.query = this.query.find(filter);
         }

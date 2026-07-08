@@ -7,14 +7,19 @@ if (!dbUrl) {
   process.exit(1);
 }
 
-const models = ["Product", "Category", "Brand", "SubCategory"];
+const models = [
+  { name: "Product", collection: "products" },
+  { name: "Category", collection: "categories" },
+  { name: "Brand", collection: "brands" },
+  { name: "SubCategory", collection: "subcategories" },
+];
 
 async function migrate() {
   await mongoose.connect(dbUrl);
   console.log(`Connected to MongoDB: ${dbUrl}`);
 
-  for (const modelName of models) {
-    const Model = mongoose.model(modelName, new mongoose.Schema({}, { strict: false }), modelName.toLowerCase() + "s");
+  for (const { name: modelName, collection } of models) {
+    const Model = mongoose.model(modelName + "_migrate", new mongoose.Schema({}, { strict: false }), collection);
     const docs = await Model.find({});
     let updated = 0;
 

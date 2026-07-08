@@ -13,15 +13,23 @@ let getProductValidator = [
 ];
 
 let createProductValidator = [
-    validator.check("name")
+    validator.check("name.en")
         .trim()
-        .notEmpty().withMessage("product name is required.")
-        .isString().withMessage("product name must contain alphabets & number only.")
-        .isLength({ min: 3 }).withMessage("product name length must be larger than 3 characters."),
+        .notEmpty().withMessage("product English name is required.")
+        .isString().withMessage("product English name must contain alphabets & number only.")
+        .isLength({ min: 3 }).withMessage("product English name must be larger than 3 characters."),
+    validator.check("name.ar")
+        .trim()
+        .notEmpty().withMessage("product Arabic name is required.")
+        .isString().withMessage("product Arabic name must contain alphabets & number only.")
+        .isLength({ min: 3 }).withMessage("product Arabic name must be larger than 3 characters."),
 
-    validator.check("description")
-        .notEmpty().withMessage("product description is required.")
-        .isLength({ min: 20 }).withMessage("product description length must be larger than 20 characters."),
+    validator.check("description.en")
+        .notEmpty().withMessage("product English description is required.")
+        .isLength({ min: 20 }).withMessage("product English description must be larger than 20 characters."),
+    validator.check("description.ar")
+        .notEmpty().withMessage("product Arabic description is required.")
+        .isLength({ min: 20 }).withMessage("product Arabic description must be larger than 20 characters."),
 
     validator.check("quantity")
         .notEmpty().withMessage("product quantity is required.")
@@ -116,15 +124,23 @@ let createProductValidator = [
 ];
 
 let updateProductValidator = [
-    validator.check("name")
+    validator.check("name.en")
         .optional()
         .trim()
-        .isString().withMessage("product name must contain alphabets & number only.")
-        .isLength({ min: 3 }).withMessage("product name length must be larger than 3 characters."),
-
-    validator.check("description")
+        .isString().withMessage("product English name must contain alphabets & number only.")
+        .isLength({ min: 3 }).withMessage("product English name must be larger than 3 characters."),
+    validator.check("name.ar")
         .optional()
-        .isLength({ min: 20 }).withMessage("product description length must be larger than 20 characters."),
+        .trim()
+        .isString().withMessage("product Arabic name must contain alphabets & number only.")
+        .isLength({ min: 3 }).withMessage("product Arabic name must be larger than 3 characters."),
+
+    validator.check("description.en")
+        .optional()
+        .isLength({ min: 20 }).withMessage("product English description must be larger than 20 characters."),
+    validator.check("description.ar")
+        .optional()
+        .isLength({ min: 20 }).withMessage("product Arabic description must be larger than 20 characters."),
 
     validator.check("quantity")
         .optional()

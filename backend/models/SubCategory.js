@@ -5,7 +5,7 @@ let subCategorySchema = new mongoose.Schema(
     {
         name: {
             en: { type: String, required: [true, "subCategory name (English) is required"], unique: true, minlength: [3, "subCategory name must be larger than 3"], maxlength: [32, "subCategory name must be less than 32"], trim: true },
-            ar: { type: String, required: [true, "subCategory name (Arabic) is required"], unique: true, minlength: [3, "subCategory name must be larger than 3"], maxlength: [32, "subCategory name must be less than 32"], trim: true }
+            ar: { type: String, required: [true, "subCategory name (Arabic) is required"], minlength: [3, "subCategory name must be larger than 3"], maxlength: [32, "subCategory name must be less than 32"], trim: true }
         },
         slug: {
             type: String,

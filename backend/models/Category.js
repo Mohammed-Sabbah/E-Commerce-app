@@ -5,7 +5,7 @@ let categorySchema = new mongoose.Schema(
     {
         name: {
             en: { type: String, required: [true, "category name (English) is required"], unique: true, minlength: [3, "category name must be larger than 3"], maxlength: [32, "category name must be less than 32"], trim: true },
-            ar: { type: String, required: [true, "category name (Arabic) is required"], unique: true, minlength: [3, "category name must be larger than 3"], maxlength: [32, "category name must be less than 32"], trim: true }
+            ar: { type: String, required: [true, "category name (Arabic) is required"], minlength: [3, "category name must be larger than 3"], maxlength: [32, "category name must be less than 32"], trim: true }
         },
         slug: {
             type: String,

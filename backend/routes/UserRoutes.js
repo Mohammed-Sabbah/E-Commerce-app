@@ -6,6 +6,7 @@ const {
 } = require("../middlewares/authMiddleware");
 
 const Review = require("../models/Review");
+const { localizeProductRef } = require("../utils/localizeField");
 
 const {
     removePasswordFromReqBody,
@@ -105,6 +106,7 @@ router.route("/myReviews")
     .get(
         protect,
         asyncErrorHandler(async function (req, res) {
+            const lang = req.query.lang || "en";
             const reviews = await Review.find({ user: req.user.id })
                 .populate({
                     path: "product",
@@ -113,10 +115,15 @@ router.route("/myReviews")
                 .sort("-createdAt")
                 .lean();
 
+            const localized = reviews.map(r => ({
+                ...r,
+                product: r.product ? localizeProductRef(r.product, lang) : r.product
+            }));
+
             res.status(200).json({
                 status: "success",
-                count: reviews.length,
-                data: { docs: reviews }
+                count: localized.length,
+                data: { docs: localized }
             });
         })
     );
