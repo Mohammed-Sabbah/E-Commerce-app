@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl";
 import { StarIcon } from "@heroicons/react/24/solid";
 import { StarIcon as StarOutlineIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { apiClient } from "@/lib/apiClient";
-import type { UserReview } from "@/app/[locale]/account/reviews/page";
+import type { UserReview } from "@/app/[locale]/(main)/account/reviews/page";
 
 // ─── Stars ────────────────────────────────────────────────────────────────────
 function Stars({
