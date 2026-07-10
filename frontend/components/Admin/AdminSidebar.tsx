@@ -15,9 +15,10 @@ import {
     Store,
     Menu,
     X,
+    Languages,
 } from "lucide-react";
 import { apiClient } from "@/lib/apiClient";
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 interface Props {
     user: { name: string; email: string };
@@ -30,14 +31,22 @@ export default function AdminSidebar({ user }: Props) {
     const router = useRouter();
     const [open, setOpen] = useState(false);
 
+    const locale = useLocale();
+
+    function handleLanguageToggle() {
+        router.push(pathname, { locale: locale === "ar" ? "en" : "ar" });
+        setOpen(false);
+    }
+
+
     const NAV_ITEMS = [
-        { label: t('overview'),   href: "/admin",            icon: LayoutDashboard },
-        { label: t('orders'),     href: "/admin/orders",     icon: ShoppingCart },
-        { label: t('products'),   href: "/admin/products",   icon: Package },
+        { label: t('overview'), href: "/admin", icon: LayoutDashboard },
+        { label: t('orders'), href: "/admin/orders", icon: ShoppingCart },
+        { label: t('products'), href: "/admin/products", icon: Package },
         { label: t('categories'), href: "/admin/categories", icon: Grid3X3 },
-        { label: t('brands'),     href: "/admin/brands",     icon: Tag },
-        { label: t('coupons'),    href: "/admin/coupons",    icon: Ticket },
-        { label: t('users'),      href: "/admin/users",      icon: Users },
+        { label: t('brands'), href: "/admin/brands", icon: Tag },
+        { label: t('coupons'), href: "/admin/coupons", icon: Ticket },
+        { label: t('users'), href: "/admin/users", icon: Users },
     ];
 
     async function handleLogout() {
@@ -71,11 +80,10 @@ export default function AdminSidebar({ user }: Props) {
                             key={href}
                             href={href}
                             onClick={() => setOpen(false)}
-                            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
-                                isActive
-                                    ? "bg-[#DB4444] text-white shadow-sm shadow-[#DB4444]/20"
-                                    : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
-                            }`}
+                            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${isActive
+                                ? "bg-[#DB4444] text-white shadow-sm shadow-[#DB4444]/20"
+                                : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+                                }`}
                         >
                             <Icon size={17} />
                             {label}
@@ -86,6 +94,22 @@ export default function AdminSidebar({ user }: Props) {
 
             {/* User + Logout */}
             <div className="px-4 py-4 border-t border-gray-100">
+
+                <button
+                    type="button"
+                    onClick={handleLanguageToggle}
+                    className="mb-3 w-full flex items-center justify-between gap-3 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+                    aria-label={tNav('selectLanguage')}
+                >
+                    <span className="flex items-center gap-2">
+                        <Languages size={15} />
+                        {locale === "ar" ? tNav('arabic') : tNav('english')}
+                    </span>
+                    <span className="text-xs font-medium text-gray-400">
+                        {locale === "ar" ? "EN" : "AR"}
+                    </span>
+                </button>
+
                 <div className="flex items-center gap-3 mb-3 px-1">
                     <div className="w-8 h-8 rounded-full bg-[#DB4444]/15 text-[#DB4444] flex items-center justify-center text-sm font-semibold">
                         {user.name?.[0]?.toUpperCase() ?? "A"}
@@ -135,7 +159,7 @@ export default function AdminSidebar({ user }: Props) {
 
             <style jsx>{`
                 @keyframes slideIn {
-                    from { transform: translateX(-100%); }
+                    from { transform: translateX(${locale === "ar" ? "100%" : "-100%"}); }
                     to   { transform: translateX(0); }
                 }
                 .animate-slide-in {

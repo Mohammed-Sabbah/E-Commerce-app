@@ -21,5 +21,6 @@
   "logoutSuccess": "Logged out successfully",
   "couponApplied": "Coupon applied successfully",
   "couponRemoved": "Coupon removed",
-  "couponInvalid": "Invalid or expired coupon"
+  "couponInvalid": "Invalid or expired coupon",
+  "loginRequired": "Please log in to add this item"
 }

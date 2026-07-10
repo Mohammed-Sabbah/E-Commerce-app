@@ -1,6 +1,7 @@
 "use client"
 
 import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
 import Cookies from 'js-cookie';
 import { useCart } from "@/hooks/useCart"
 import LoadingSvg from "../LoadingSvg"
@@ -8,11 +9,20 @@ import { ProductCardData } from "."
 
 function AddToCartButton({ product, showAddToCart }: { product: ProductCardData, showAddToCart: boolean }) {
     const t = useTranslations('products');
+    const tToasts = useTranslations('toasts');
     const hasToken = !!Cookies.get('token');
     const { addToCart, isAdding } = useCart(hasToken)
 
+    function handleClick() {
+        if (!hasToken) {
+            tToasts && toast.error(tToasts('loginRequired'));
+            return;
+        }
+        addToCart({ productId: product._id, color: "black", quantity: 1 });
+    }
+
     return (
-        <button onClick={() => { addToCart({ productId: product._id, color: "black", quantity: 1 }) }}
+        <button onClick={handleClick}
             className={`
                         absolute bottom-0 end-0 w-full bg-black text-white text-center px-4 py-2 
                         rounded-none cursor-pointer transition-opacity

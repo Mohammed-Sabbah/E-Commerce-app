@@ -21,5 +21,6 @@
   "logoutSuccess": "تم تسجيل الخروج بنجاح",
   "couponApplied": "تم تطبيق الكوبون بنجاح",
   "couponRemoved": "تم إزالة الكوبون",
-  "couponInvalid": "كوبون غير صالح أو منتهي الصلاحية"
+  "couponInvalid": "كوبون غير صالح أو منتهي الصلاحية",
+  "loginRequired": "يجب تسجيل الدخول أولاً"
 }
