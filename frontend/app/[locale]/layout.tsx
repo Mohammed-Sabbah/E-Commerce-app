@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Poppins, Inter, Noto_Sans_Arabic } from "next/font/google";
 import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
@@ -61,6 +62,7 @@ export default async function LocaleLayout({
   setRequestLocale(locale);
 
   const messages = await getMessages();
+  const isAuthenticated = !!(await cookies()).get("token")?.value;
 
   return (
     <html lang={locale} dir={locale === "ar" ? "rtl" : "ltr"} suppressHydrationWarning>
@@ -68,7 +70,7 @@ export default async function LocaleLayout({
         className={`${locale === "ar" ? notoSansArabic.className : poppins.className} ${inter.variable} antialiased`}
       >
         <NextIntlClientProvider locale={locale} messages={messages}>
-          <Providers>
+          <Providers isAuthenticated={isAuthenticated}>
             {children}
           </Providers>
         </NextIntlClientProvider>

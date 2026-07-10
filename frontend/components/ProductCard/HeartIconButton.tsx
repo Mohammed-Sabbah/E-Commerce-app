@@ -6,12 +6,12 @@ import { useWishlist } from '@/hooks/useWishlist';
 import { HeartIcon as HeartOutline } from "@heroicons/react/24/outline";
 import { HeartIcon as HeartSolid } from "@heroicons/react/24/solid";
 import LoadingSvg from '../LoadingSvg';
-import Cookies from 'js-cookie';
+import { useAuth } from '@/context/AuthContext';
 import { useHasMounted } from '@/hooks/useHasMounted';
 
 function HeartIconButton({ productId }: { productId: string }) {
     const t = useTranslations('toasts');
-    const hasToken = !!Cookies.get('token');
+    const hasToken = useAuth();
     const { addToWishlist, removeFromWishlist, isInWishlist, isPending } = useWishlist(hasToken);
     const mounted = useHasMounted();
 

@@ -2,15 +2,15 @@
 
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
-import Cookies from 'js-cookie';
 import { useCart } from "@/hooks/useCart"
 import LoadingSvg from "../LoadingSvg"
+import { useAuth } from '@/context/AuthContext';
 import { ProductCardData } from "."
 
 function AddToCartButton({ product, showAddToCart }: { product: ProductCardData, showAddToCart: boolean }) {
     const t = useTranslations('products');
     const tToasts = useTranslations('toasts');
-    const hasToken = !!Cookies.get('token');
+    const hasToken = useAuth();
     const { addToCart, isAdding } = useCart(hasToken)
 
     function handleClick() {
