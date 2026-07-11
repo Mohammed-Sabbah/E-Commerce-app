@@ -13,6 +13,7 @@ export type ProductCardData = {
     _id: string;
     name: string;
     price: number;
+    quantity: number;
     priceAfterDiscount?: number;
     coverImage?: string;
     brand?: { name: string } | string | null;

@@ -12,7 +12,7 @@ const addToWishlist = asyncErrorHandler(async function (req, res) {
             new: true,
             runValidators: true
         }
-    ).populate("wishlist", "_id name price priceAfterDiscount coverImage avgRatings");
+    ).populate("wishlist", "_id name price priceAfterDiscount coverImage avgRatings quantity");
 
     const localizedWishlist = user.wishlist.map(p => localizeProductRef(p, lang));
 
@@ -34,7 +34,7 @@ const removeFromWishlist = asyncErrorHandler(async function (req, res) {
             new: true,
             runValidators: true
         }
-    ).populate("wishlist", "_id name price priceAfterDiscount coverImage avgRatings");
+    ).populate("wishlist", "_id name price priceAfterDiscount coverImage avgRatings quantity");
 
     const localizedWishlist = user.wishlist.map(p => localizeProductRef(p, lang));
 
