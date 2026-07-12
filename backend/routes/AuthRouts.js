@@ -16,52 +16,26 @@ const {
     verifyResetCodeValidator,
     resetPasswordValidator
 } = require("../utils/validators/authValidators");
-const { parseDuration } = require("../utils/parseDuration");
-
 const router = express.Router();
 
 // OAuth Handlers
 const oAuthCallbackHandler = (req, res) => {
-    let token = createToken(req.user.id);
-        let maxAge;
-    
-        try {
-            maxAge = parseDuration(process.env.JWT_EXPIRES_IN);
-        } catch (error) {
-            console.error('Error parsing JWT_EXPIRES_IN:', error.message);
-            maxAge = 7 * 24 * 60 * 60 * 1000; // fallback 7 days
-        }
-    
-        let options = {
-            httpOnly: true,
-            sameSite: 'strict',
-            maxAge
-        };
-    
-    
-        if (process.env.NODE_ENV === "production")
-            options.secure = true;
-    
-        res.cookie("token", token, options);
-    
-        res.status(200).json({
-            status: "success",
-            user:req.user,
-            token
-        });
+    const token = createToken(req.user.id);
+    const frontendUrl = process.env.FRONTEND_URL;
+    res.redirect(`${frontendUrl}/api/v1/auth/google-callback?token=${token}`);
 };
 
 // Google OAuth
 router.get("/google", passport.authenticate('google', { scope: ['profile', 'email'] }));
 router.get("/google/callback",
-    passport.authenticate('google', { session: false, failureRedirect: '/' }),
+    passport.authenticate('google', { session: false, failureRedirect: `${process.env.FRONTEND_URL}/login?error=oauth_failed` }),
     oAuthCallbackHandler
 );
 
 // Facebook OAuth
 router.get("/facebook", passport.authenticate('facebook', { scope: ['email'] }));
 router.get("/facebook/callback",
-    passport.authenticate('facebook', { session: false, failureRedirect: '/' }),
+    passport.authenticate('facebook', { session: false, failureRedirect: `${process.env.FRONTEND_URL}/login?error=oauth_failed` }),
     oAuthCallbackHandler
 );
 

@@ -166,7 +166,7 @@ export function CarouselPlugin({ ClassName }: { ClassName?: string }) {
                                         <span className="block h-px bg-[#FAFAFA] w-full" />
                                     </div>
                                     <ArrowRight
-                                        className="text-[#FAFAFA] w-4 h-4 lg:w-5 lg:h-5 xl:w-6 xl:h-6"
+                                        className="text-[#FAFAFA] w-4 h-4 lg:w-5 lg:h-5 xl:w-6 xl:h-6 rtl:rotate-180"
                                         strokeWidth={1.5}
                                     />
                                 </Link>

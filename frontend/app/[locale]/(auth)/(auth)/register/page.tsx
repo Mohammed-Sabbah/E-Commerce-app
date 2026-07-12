@@ -97,7 +97,7 @@ export default function Register() {
 
                 <StyledButton
                     title={t("signUpWithGoogle")}
-                    type="button"
+                    href={`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/google`}
                     ClassName="w-full border border-black bg-transparent text-black"
                 />
 

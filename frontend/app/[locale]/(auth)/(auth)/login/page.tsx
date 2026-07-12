@@ -75,6 +75,12 @@ export default function Login() {
                     {t("forgetPassword")}
                 </a>
             </div>
+
+            <StyledButton
+                title={t("logInWithGoogle")}
+                href={`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/google`}
+                ClassName="w-full border border-black bg-transparent text-black mt-3"
+            />
         </form>
     );
 }
