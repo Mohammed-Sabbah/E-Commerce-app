@@ -12,6 +12,7 @@ export default function StyledButton({
     isLoading,
     loadingText,
     href,
+    onClick,
 }: {
     title: string
     ClassName?: string
@@ -19,6 +20,7 @@ export default function StyledButton({
     isLoading?: boolean
     loadingText?: string
     href?: string
+    onClick?: () => void
 }) {
     const t = useTranslations('common');
     const content = isLoading ? (
@@ -29,7 +31,7 @@ export default function StyledButton({
     ) : title
 
     const classes = cn(
-        `bg-[#DB4444] text-white px-12 py-4 rounded-lg disabled:bg-[#e88080]`,
+        `inline-flex items-center justify-center bg-[#DB4444] text-white px-12 py-4 rounded-lg disabled:bg-[#e88080]`,
         ClassName
     )
 
@@ -42,7 +44,7 @@ export default function StyledButton({
     }
 
     return (
-        <button type={type} disabled={isLoading} className={classes}>
+        <button type={type} disabled={isLoading} onClick={onClick} className={classes}>
             {content}
         </button>
     )

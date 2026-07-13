@@ -22,5 +22,10 @@
   "couponApplied": "Coupon applied successfully",
   "couponRemoved": "Coupon removed",
   "couponInvalid": "Invalid or expired coupon",
-  "loginRequired": "Please log in to add this item"
+  "loginRequired": "Please log in to add this item",
+  "codeSent": "Verification code sent to your email",
+  "codeVerified": "Code verified successfully",
+  "passwordReset": "Password reset successfully",
+  "somethingWentWrong": "Something went wrong",
+  "invalidCode": "Invalid code. Please try again."
 }

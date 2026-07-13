@@ -1,5 +1,5 @@
 const protectedRoutes = ["/wishlist", "/cart", "/checkout", "/account", "/admin"];
-const authRoutes = ["/login", "/register"];
+const authRoutes = ["/login", "/register", "/forgot-password", "/reset-password"];
 const locales = ["en", "ar"] as const;
 
 export type AppLocale = (typeof locales)[number];

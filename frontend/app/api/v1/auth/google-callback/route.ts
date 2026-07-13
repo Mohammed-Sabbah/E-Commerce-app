@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
 
     response.cookies.set('token', token, {
         httpOnly: true,
-        sameSite: 'strict',
+        sameSite: 'lax',
         secure: process.env.NODE_ENV === 'production',
         maxAge: 7 * 24 * 60 * 60,
         path: '/',

@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import type { Metadata } from "next";
 import { Poppins, Inter, Noto_Sans_Arabic } from "next/font/google";
 import { notFound } from "next/navigation";

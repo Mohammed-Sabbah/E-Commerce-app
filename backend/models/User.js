@@ -30,7 +30,10 @@ let userSchema = new mongoose.Schema(
         profileImage: String,
         password: {
             type: String,
-            required: [true, 'Password is required'], // مهم جداً عشان ما يسجلش بدون باسورد
+            required: function () {
+                // إلزامي بس لو المستخدم مسجل بطريقة عادية (مش جوجل ولا فيسبوك)
+                return !this.googleId && !this.facebookId;
+            },
             minlength: [6, 'Password must be at least 6 characters long'],
             select: false,
         },

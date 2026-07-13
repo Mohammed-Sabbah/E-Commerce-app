@@ -80,11 +80,11 @@ let forgetPassword = asyncErrorHandler(async function (req, res) {
     let emailBody = `We receive your request to reset your password, use this code to reset your password\n\n${passwordResetCode}\n\nThe reset code is valid for 15 minutes`;
 
     let emailOptions = {
-        from: "eShop Support",
-        to: user.email,
-        subject: "rest password code",
-        emailBody
-    }
+    from: `"EXclusive E-commerce Support" <${process.env.EMAIL_USER}>`,
+    to: user.email,
+    subject: "Reset password code", // صلّح الخطأ الإملائي كمان
+    emailBody
+}
 
     try {
         await sendResetPasswordEmail(emailOptions);
