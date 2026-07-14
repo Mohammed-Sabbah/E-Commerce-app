@@ -23,6 +23,8 @@ const CustomError = require("./utils/CustomError");
 
 let app = express();
 
+app.set('trust proxy', 1);
+
 app.use(cookieParser());
 
 // ─── Compression ────────────────────────────────────────────
