@@ -53,6 +53,18 @@ const GROUP_ORDER = [
     "Home", "Groceries", "Sports", "Accessories", "Vehicles",
 ];
 
+const GROUP_TRANSLATION_KEY: Record<string, string> = {
+    Electronics: "groups.electronics",
+    Men: "groups.men",
+    Women: "groups.women",
+    Beauty: "groups.beauty",
+    Home: "groups.home",
+    Groceries: "groups.groceries",
+    Sports: "groups.sports",
+    Accessories: "groups.accessories",
+    Vehicles: "groups.vehicles",
+};
+
 function groupCategories(categories: Category[]): GroupedCategories {
     const grouped: Record<string, Category[]> = {};
     const ungrouped: Category[] = [];
@@ -93,6 +105,11 @@ export function CollapsibleTreeClient({ categories, className }: Props) {
         [router]
     );
 
+    const getGroupLabel = (group: string) => {
+        const key = GROUP_TRANSLATION_KEY[group];
+        return key ? t(key) : group;
+    };
+
     return (
         <nav
             aria-label={t('categories')}
@@ -112,11 +129,12 @@ export function CollapsibleTreeClient({ categories, className }: Props) {
                         <CollapsibleTrigger asChild>
                             <button className="flex w-full items-center justify-between gap-2 text-start outline-none transition-opacity duration-150 hover:opacity-60">
                                 <span style={{ fontSize: "16px", lineHeight: "24px", fontWeight: 400, color: "#000000" }}>
-                                    {group}
+                                    {getGroupLabel(group)}
                                 </span>
                                 <ChevronDownIcon
-                                    className="h-4 w-4 shrink-0 transition-transform duration-200"
-                                    style={{ color: "#000000", transform: isOpen ? "rotate(0deg)" : "rotate(-90deg)" }}
+                                    className={`h-4 w-4 shrink-0 text-black transition-transform duration-200 ${
+                                        isOpen ? "rotate-0" : "-rotate-90 rtl:rotate-90"
+                                    }`}
                                 />
                             </button>
                         </CollapsibleTrigger>

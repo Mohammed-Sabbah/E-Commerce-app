@@ -11,6 +11,17 @@
   "myAccount": "حسابي",
   "logout": "تسجيل الخروج",
   "categories": "التصنيفات",
+  "groups": {
+    "electronics": "إلكترونيات",
+    "men": "رجالي",
+    "women": "نسائي",
+    "beauty": "الجمال",
+    "home": "المنزل",
+    "groceries": "بقالة",
+    "sports": "رياضة",
+    "accessories": "إكسسوارات",
+    "vehicles": "مركبات"
+  },
   "searchPlaceholder": "ما الذي تبحث عنه؟",
   "openMenu": "فتح القائمة",
   "closeMenu": "إغلاق القائمة",

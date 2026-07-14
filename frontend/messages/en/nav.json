@@ -11,6 +11,17 @@
   "myAccount": "My Account",
   "logout": "Logout",
   "categories": "Categories",
+  "groups": {
+    "electronics": "Electronics",
+    "men": "Men",
+    "women": "Women",
+    "beauty": "Beauty",
+    "home": "Home",
+    "groceries": "Groceries",
+    "sports": "Sports",
+    "accessories": "Accessories",
+    "vehicles": "Vehicles"
+  },
   "searchPlaceholder": "What are you looking for?",
   "openMenu": "Open menu",
   "closeMenu": "Close menu",
