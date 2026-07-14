@@ -64,6 +64,7 @@ export interface WishlistProduct {
     _id: string;
     name: string;
     price: number;
+    quantity: number;
     priceAfterDiscount?: number;
     coverImage: string;
     category: PopulatedRef | string;

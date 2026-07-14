@@ -33,8 +33,8 @@ type CardsCarouselProps = ProductsProps | CategoriesProps
 export function CardsCarousel(props: CardsCarouselProps) {
     const { type, data, setApi, hideControls = false, controlsOffset = 12 } = props
 
-    const btnPrev = `"absolute -top-8 md:-top-14 right-10 left-auto translate-y-0`
-    const btnNext = `absolute -top-8 md:-top-14 right-0 left-auto translate-y-0`
+    const btnPrev = `"absolute -top-8 md:-top-14 end-10 start-auto translate-y-0`
+    const btnNext = `absolute -top-8 md:-top-14 end-0 start-auto translate-y-0`
 
     if (type === "products-grid") {
         const pairs: Product[][] = []

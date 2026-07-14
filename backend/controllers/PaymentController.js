@@ -6,8 +6,10 @@ const { asyncErrorHandler } = require("../middlewares/ErrorMiddleware");
 const Cart = require('../models/Cart');
 const Product = require('../models/Product');
 const Order = require('../models/Order');
+const { localizeProductRef } = require("../utils/localizeField");
 
 const createCheckoutSession = asyncErrorHandler(async (req, res) => {
+    const lang = req.query.lang || "en";
     const cart = await Cart.findOne({ user: req.user.id }).populate("cartItems.product");
 
     const orderPrice = cart.totalPriceAfterDiscount ? cart.totalPriceAfterDiscount : cart.totalPrice;
@@ -19,7 +21,7 @@ const createCheckoutSession = asyncErrorHandler(async (req, res) => {
         price_data: {
             currency: 'ils',
             product_data: {
-                name: item.product.name,
+                name: localizeProductRef(item.product, lang).name,
             },
             unit_amount: Math.round(item.price * 100),
         },

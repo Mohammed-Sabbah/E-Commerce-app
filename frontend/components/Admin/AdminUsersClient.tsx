@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { apiClient } from "@/lib/apiClient";
 import { parseError } from "@/lib/adminUtils";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -16,6 +17,7 @@ interface Props {
 const PAGE_SIZE = 15;
 
 export default function AdminUsersClient({ initial }: Props) {
+    const t = useTranslations('admin');
     const queryClient = useQueryClient();
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
@@ -77,19 +79,19 @@ export default function AdminUsersClient({ initial }: Props) {
             <input
                 value={search}
                 onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                placeholder="Search users by name or email..."
+                placeholder={t('searchPlaceholder')}
                 className="w-full max-w-sm h-10 px-3 border border-gray-300 rounded-lg text-sm mb-4"
             />
 
             <div className="overflow-x-auto border border-gray-200 rounded-xl bg-white">
-                <table className="w-full text-sm">
-                    <thead className="bg-gray-50 text-left text-gray-500">
+                <table className="admin-table w-full text-sm">
+                    <thead className="bg-gray-50 text-start text-gray-500">
                         <tr>
-                            <th className="px-4 py-3 font-medium">Name</th>
-                            <th className="px-4 py-3 font-medium">Email</th>
-                            <th className="px-4 py-3 font-medium">Role</th>
-                            <th className="px-4 py-3 font-medium">Status</th>
-                            <th className="px-4 py-3 font-medium">Actions</th>
+                            <th className="px-4 py-3 font-medium">{t('userName')}</th>
+                            <th className="px-4 py-3 font-medium">{t('userEmail')}</th>
+                            <th className="px-4 py-3 font-medium">{t('userRole')}</th>
+                            <th className="px-4 py-3 font-medium">{t('userStatus')}</th>
+                            <th className="px-4 py-3 font-medium">{t('actions')}</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -107,7 +109,7 @@ export default function AdminUsersClient({ initial }: Props) {
                                         u.isActive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
                                     }`}>
                                         {u.isActive ? <UserCheck size={12} /> : <UserX size={12} />}
-                                        {u.isActive ? "Active" : "Inactive"}
+                                        {u.isActive ? t('active') : t('inactive')}
                                     </span>
                                 </td>
                                 <td className="px-4 py-3">
@@ -120,14 +122,14 @@ export default function AdminUsersClient({ initial }: Props) {
                                                     onClick={() => setConfirm({ id: u._id, action: "toggle" })}
                                                     className="h-8 px-3 rounded-md border border-gray-300 text-xs font-medium text-gray-600 hover:bg-gray-100 disabled:opacity-40 transition-colors cursor-pointer"
                                                 >
-                                                    {actionId === u._id ? "..." : u.isActive ? "Deactivate" : "Activate"}
+                                                    {actionId === u._id ? "..." : u.isActive ? t('deactivate') : t('activate')}
                                                 </button>
                                                 <button
                                                     type="button"
                                                     disabled={actionId === u._id}
                                                     onClick={() => setConfirm({ id: u._id, action: "delete" })}
                                                     className="h-8 w-8 rounded-md border border-red-200 text-red-500 hover:bg-red-50 disabled:opacity-40 transition-colors flex items-center justify-center cursor-pointer"
-                                                    aria-label="Delete user"
+                                                    aria-label={t('delete')}
                                                 >
                                                     <Trash2 size={14} />
                                                 </button>
@@ -140,16 +142,16 @@ export default function AdminUsersClient({ initial }: Props) {
                         ))}
                     </tbody>
                 </table>
-                {paged.length === 0 && <p className="text-center text-sm text-gray-400 py-10">No users found</p>}
+                {paged.length === 0 && <p className="text-center text-sm text-gray-400 py-10">{t('noUsers')}</p>}
             </div>
 
             <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
 
             <ConfirmDialog
                 open={!!confirm}
-                title={confirm?.action === "delete" ? "Delete user?" : "Toggle user status?"}
-                message={confirm?.action === "delete" ? "This cannot be undone." : "Are you sure?"}
-                confirmLabel={confirm?.action === "delete" ? "Delete" : "Confirm"}
+                title={confirm?.action === "delete" ? t('confirmDeleteTitle') : t('toggleUserStatusTitle')}
+                message={confirm?.action === "delete" ? t('confirmDeleteMessage') : t('areYouSure')}
+                confirmLabel={confirm?.action === "delete" ? t('yesDelete') : t('confirm')}
                 danger={confirm?.action === "delete"}
                 onConfirm={doAction}
                 onCancel={() => setConfirm(null)}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from 'next-intl';
 import { apiClient } from "@/lib/apiClient";
 
 interface CartSummaryProps {
@@ -9,12 +10,14 @@ interface CartSummaryProps {
 }
 
 export default function CartSummary({ subtotal, onCheckout }: CartSummaryProps) {
+    const t = useTranslations('cart');
     const [code, setCode] = useState("");
     const [appliedCode, setAppliedCode] = useState<string | null>(null);
-    const [discount, setDiscount] = useState(0);
+    const [discountPercent, setDiscountPercent] = useState(0);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
+    const discount = parseFloat(((subtotal * discountPercent) / 100).toFixed(2));
     const total = subtotal - discount;
 
     const handleApply = async () => {
@@ -24,14 +27,13 @@ export default function CartSummary({ subtotal, onCheckout }: CartSummaryProps) 
             const res = await apiClient.post("/api/v1/coupons/validate", { code: code.trim() });
             const data = res.data?.data;
             if (data?.valid && data?.discount) {
-                const amount = parseFloat(((subtotal * data.discount) / 100).toFixed(2));
-                setDiscount(amount);
+                setDiscountPercent(data.discount);
                 setAppliedCode(code.trim());
             } else {
-                setError("Coupon could not be applied");
+                setError(t('invalidCoupon'));
             }
         } catch (err: any) {
-            setError(err?.response?.data?.message || "Invalid or expired coupon");
+            setError(err?.response?.data?.message || t('invalidCoupon'));
         } finally {
             setLoading(false);
         }
@@ -40,7 +42,7 @@ export default function CartSummary({ subtotal, onCheckout }: CartSummaryProps) 
     const handleRemove = () => {
         setCode("");
         setAppliedCode(null);
-        setDiscount(0);
+        setDiscountPercent(0);
         setError("");
     };
 
@@ -56,10 +58,10 @@ export default function CartSummary({ subtotal, onCheckout }: CartSummaryProps) 
                             setError("");
                             if (e.target.value !== appliedCode) {
                                 setAppliedCode(null);
-                                setDiscount(0);
+                                setDiscountPercent(0);
                             }
                         }}
-                        placeholder="Coupon Code"
+                        placeholder={t('couponCode')}
                         className="border px-4 py-2 w-full rounded-md h-14"
                     />
                     {appliedCode ? (
@@ -68,7 +70,7 @@ export default function CartSummary({ subtotal, onCheckout }: CartSummaryProps) 
                             onClick={handleRemove}
                             className="bg-gray-500 text-white px-14 rounded-md h-14 cursor-pointer"
                         >
-                            Remove
+                            {t('removeCoupon')}
                         </button>
                     ) : (
                         <button
@@ -77,7 +79,7 @@ export default function CartSummary({ subtotal, onCheckout }: CartSummaryProps) 
                             disabled={loading || !code.trim()}
                             className="bg-[#DB4444] text-white px-14 rounded-md h-14 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {loading ? "..." : "Apply"}
+                            {loading ? "..." : t('applyCoupon')}
                         </button>
                     )}
                 </div>
@@ -85,28 +87,28 @@ export default function CartSummary({ subtotal, onCheckout }: CartSummaryProps) 
             </div>
 
             {/* Totals */}
-            <div className="border rounded-xl p-6 w-full max-w-md md:ml-auto m-auto">
-                <h2 className="font-semibold mb-4">Cart Total</h2>
+            <div className="border rounded-xl p-6 w-full max-w-md md:ms-auto m-auto">
+                <h2 className="font-semibold mb-4">{t('cartTotal')}</h2>
 
                 <div className="flex justify-between mb-2">
-                    <span>Subtotal:</span>
+                    <span>{t('subtotal')}</span>
                     <span>${subtotal.toFixed(2)}</span>
                 </div>
 
                 {discount > 0 && (
                     <div className="flex justify-between mb-2">
-                        <span className="text-green-600">Discount:</span>
+                        <span className="text-green-600">{t('discount')}</span>
                         <span className="text-green-600">-${discount.toFixed(2)}</span>
                     </div>
                 )}
 
                 <div className="flex justify-between mb-2">
-                    <span>Shipping:</span>
-                    <span>Free</span>
+                    <span>{t('shipping')}</span>
+                    <span>{t('free')}</span>
                 </div>
 
                 <div className="flex justify-between border-t pt-3 font-bold">
-                    <span>Total:</span>
+                    <span>{t('total')}</span>
                     <span>${total.toFixed(2)}</span>
                 </div>
 
@@ -114,7 +116,7 @@ export default function CartSummary({ subtotal, onCheckout }: CartSummaryProps) 
                     onClick={() => onCheckout(appliedCode ?? undefined)}
                     className="mt-5 w-full bg-[#DB4444] text-white py-3 rounded-md cursor-pointer hover:bg-red-600 transition"
                 >
-                    Proceed to checkout
+                    {t('proceedToCheckout')}
                 </button>
             </div>
         </div>

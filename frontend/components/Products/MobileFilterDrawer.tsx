@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useTranslations } from 'next-intl';
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import type { Category } from "@/types/api";
 
@@ -19,6 +20,7 @@ export default function MobileFilterDrawer({
     activeCategory,
     onCategoryChange,
 }: MobileFilterDrawerProps) {
+    const t = useTranslations('products');
 
     useEffect(() => {
         const handleKey = (e: KeyboardEvent) => {
@@ -45,17 +47,18 @@ export default function MobileFilterDrawer({
 
             {/* Drawer */}
             <div
-                className={`fixed top-0 left-0 h-full w-72 bg-white z-50 lg:hidden shadow-xl
+                className={`fixed top-0 start-0 h-full w-72 bg-white z-50 lg:hidden shadow-xl
                     flex flex-col transition-transform duration-300 ease-in-out
-                    ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
+                    ${isOpen ? "translate-x-0" : "-translate-x-full rtl:translate-x-full"}`}
+
             >
                 {/* Header */}
                 <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-                    <h2 className="text-base font-semibold">Filters</h2>
+                    <h2 className="text-base font-semibold">{t('filters')}</h2>
                     <button
                         onClick={onClose}
                         className="p-1.5 rounded-lg hover:bg-gray-100 transition"
-                        aria-label="Close filters"
+                        aria-label={t('closeFilters')}
                     >
                         <XMarkIcon className="w-5 h-5 text-gray-500" />
                     </button>
@@ -64,23 +67,23 @@ export default function MobileFilterDrawer({
                 {/* Categories */}
                 <div className="flex-1 overflow-y-auto px-5 py-5">
                     <h3 className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">
-                        Category
+                        {t('category')}
                     </h3>
                     <ul className="space-y-0.5">
                         <li>
                             <button
                                 onClick={() => { onCategoryChange(""); onClose(); }}
-                                className={`w-full text-left text-sm px-3 py-2 rounded-lg transition-colors
+                                className={`w-full text-start text-sm px-3 py-2 rounded-lg transition-colors
                                     ${!activeCategory ? "bg-[#DB4444] text-white font-medium" : "text-gray-700 hover:bg-gray-100"}`}
                             >
-                                All
+                                {t('allCategories')}
                             </button>
                         </li>
                         {categories.map((cat) => (
                             <li key={cat._id}>
                                 <button
                                     onClick={() => { onCategoryChange(cat._id); onClose(); }}
-                                    className={`w-full text-left text-sm px-3 py-2 rounded-lg transition-colors
+                                    className={`w-full text-start text-sm px-3 py-2 rounded-lg transition-colors
                                         ${activeCategory === cat._id ? "bg-[#DB4444] text-white font-medium" : "text-gray-700 hover:bg-gray-100"}`}
                                 >
                                     {cat.name}

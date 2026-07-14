@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { BillingData } from '@/types/checkout';
 
 const inputCls =
@@ -18,7 +19,7 @@ function Field({
         <div className="flex flex-col gap-1.5">
             <label className="text-sm text-gray-700">
                 {label}
-                {required && <span className="text-red-500 ml-0.5">*</span>}
+                {required && <span className="text-red-500 ms-0.5">*</span>}
             </label>
             {children}
         </div>
@@ -30,33 +31,34 @@ interface Props {
 }
 
 export default function BillingForm({ value }: Props) {
+    const t = useTranslations('checkout');
     return (
         <div className="flex flex-col gap-5">
-            <Field label="First Name" required>
+            <Field label={t('firstName')} required>
                 <input readOnly name="firstName" value={value.firstName} className={inputCls} />
             </Field>
 
-            <Field label="Company Name">
+            <Field label={t('companyName')}>
                 <input readOnly name="companyName" value={value.companyName} className={inputCls} />
             </Field>
 
-            <Field label="Street Address" required>
+            <Field label={t('address')} required>
                 <input readOnly name="street" value={value.street} className={inputCls} />
             </Field>
 
-            <Field label="Apartment, floor, etc. (optional)">
+            <Field label={t('apartment')}>
                 <input readOnly name="apartment" value={value.apartment} className={inputCls} />
             </Field>
 
-            <Field label="Town / City" required>
+            <Field label={t('city')} required>
                 <input readOnly name="city" value={value.city} className={inputCls} />
             </Field>
 
-            <Field label="Phone Number" required>
+            <Field label={t('phone')} required>
                 <input readOnly name="phone" type="tel" value={value.phone} className={inputCls} />
             </Field>
 
-            <Field label="Email Address" required>
+            <Field label={t('email')} required>
                 <input readOnly name="email" type="email" value={value.email} className={inputCls} />
             </Field>
         </div>

@@ -1,23 +1,43 @@
 "use client"
 
-import Cookies from 'js-cookie';
+import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
 import { useCart } from "@/hooks/useCart"
 import LoadingSvg from "../LoadingSvg"
+import { useAuth } from '@/context/AuthContext';
 import { ProductCardData } from "."
 
 function AddToCartButton({ product, showAddToCart }: { product: ProductCardData, showAddToCart: boolean }) {
-    const hasToken = !!Cookies.get('token');
+    const t = useTranslations('products');
+    const tToasts = useTranslations('toasts');
+    const hasToken = useAuth();
     const { addToCart, isAdding } = useCart(hasToken)
+    const inStock = product.quantity > 0;
+
+    function handleClick() {
+        if (!hasToken) {
+            tToasts && toast.error(tToasts('loginRequired'));
+            return;
+        }
+        if (!inStock) {
+            toast.error(t('outOfStock'));
+            return;
+        }
+        addToCart({ productId: product._id, color: "black", quantity: 1 });
+    }
 
     return (
-        <button onClick={() => { addToCart({ productId: product._id, color: "black", quantity: 1 }) }}
+        <button onClick={handleClick}
+            disabled={isAdding}
+            aria-disabled={!inStock}
             className={`
-                        absolute bottom-0 right-0 w-full bg-black text-white text-center px-4 py-2 
+                        absolute bottom-0 end-0 w-full bg-black text-white text-center px-4 py-2 
                         rounded-none cursor-pointer transition-opacity
                         ${showAddToCart ? "opacity-100" : "opacity-0 group-hover:opacity-100"}
+                        ${!inStock ? "opacity-50 cursor-not-allowed" : ""}
                     `}
         >
-            {isAdding ? <LoadingSvg /> : "Add To Cart"}
+            {isAdding ? <LoadingSvg /> : inStock ? t('addToCart') : t('outOfStock')}
         </button>
     )
 }

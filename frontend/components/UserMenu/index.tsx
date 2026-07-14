@@ -1,6 +1,6 @@
 "use client";
-// frontend/components/UserMenu/index.tsx
 
+import { useTranslations } from 'next-intl';
 import { useState, useRef, useEffect } from "react";
 import {
     UserIcon,
@@ -11,16 +11,17 @@ import {
     Cog6ToothIcon,
 } from "@heroicons/react/24/outline";
 import LogoutButton from "../StyledButton/LogoutButton";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 
 const menuItems = [
-    { href: "/account", icon: Cog6ToothIcon, label: "Manage My Account" },
-    { href: "/account/orders", icon: ShoppingBagIcon, label: "My Order" },
-    { href: "/account/orders?filter=cancelled", icon: XCircleIcon, label: "My Cancellations" },
-    { href: "/account/reviews", icon: StarIcon, label: "My Reviews" },   // ← صُحِّح
+    { href: "/account", icon: Cog6ToothIcon, key: "manageAccount" },
+    { href: "/account/orders", icon: ShoppingBagIcon, key: "myOrder" },
+    { href: "/account/orders?filter=cancelled", icon: XCircleIcon, key: "myCancellations" },
+    { href: "/account/reviews", icon: StarIcon, key: "myReviews" },
 ];
 
 function UserMenu() {
+    const t = useTranslations('nav');
     const [open, setOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -46,7 +47,6 @@ function UserMenu() {
 
     return (
         <div className="relative flex items-center" ref={menuRef}>
-            {/* زر اليوزر */}
             <button
                 onClick={() => setOpen(prev => !prev)}
                 aria-expanded={open}
@@ -57,8 +57,7 @@ function UserMenu() {
                 <UserIcon className="h-6 w-6" />
             </button>
 
-            {/* القائمة */}
-            <div className={`absolute right-0 top-full mt-3 w-56 rounded-[5px] p-3
+            <div className={`absolute end-0 top-full mt-3 w-56 rounded-[5px] p-3
                 bg-black/40 backdrop-blur-xl border border-white/20
                 shadow-2xl text-white z-50
                 transition-all duration-200 origin-top-right
@@ -68,7 +67,7 @@ function UserMenu() {
                 }`}
             >
                 <ul className="space-y-1 text-sm">
-                    {menuItems.map(({ href, icon: Icon, label }) => (
+                    {menuItems.map(({ href, icon: Icon, key }) => (
                         <li key={href}>
                             <Link
                                 href={href}
@@ -78,19 +77,19 @@ function UserMenu() {
                                     transition-all duration-150"
                             >
                                 <Icon className="w-5 h-5 shrink-0" />
-                                {label}
+                                {t(key)}
                             </Link>
                         </li>
                     ))}
 
                     <li className="border-t border-white/20 pt-1 mt-1">
                         <LogoutButton
-                            className="flex items-center gap-2 w-full text-left px-2.5 py-2 rounded-md
+                            className="flex items-center gap-2 w-full text-start px-2.5 py-2 rounded-md
                                 text-white/75 hover:text-[rgb(250,40,40)] hover:bg-[#DB4444]/20
                                 transition-all duration-150 text-sm cursor-pointer"
                         >
                             <ArrowRightOnRectangleIcon className="w-5 h-5 shrink-0" />
-                            Logout
+                            {t('logout')}
                         </LogoutButton>
                     </li>
                 </ul>

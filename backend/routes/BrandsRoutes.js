@@ -22,6 +22,8 @@ const {
     allowedTo
 } = require("../middlewares/authMiddleware");
 
+const normalizeBilingualFields = require("../middlewares/normalizeBilingualFields");
+
 let router = express.Router();
 
 router.route("/")
@@ -31,6 +33,7 @@ router.route("/")
         allowedTo("admin"),
         uploadImage,
         resizeImage,
+        normalizeBilingualFields,
         createBrandValidator,
         createBrand
     );
@@ -42,6 +45,7 @@ router.route("/:id")
         allowedTo("admin"),
         uploadImage,
         resizeImage,
+        normalizeBilingualFields,
         updateBrandValidator,
         updateBrand
     )

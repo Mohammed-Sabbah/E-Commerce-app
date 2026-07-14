@@ -8,20 +8,28 @@ let getBrandValidator = [
 ];
 
 let createBrandValidator = [
-    validator.check("name")
-        .notEmpty().withMessage("Brand name is required.")
-        .isLength({ min: 3 }).withMessage("Brand name length must be larger than 3 characters.")
-        .isLength({ max: 32 }).withMessage("Brand name length must be less than 32 characters."),
+    validator.check("name.en")
+        .notEmpty().withMessage("Brand English name is required.")
+        .isLength({ min: 2 }).withMessage("Brand English name must be larger than 2 characters.")
+        .isLength({ max: 32 }).withMessage("Brand English name must be less than 32 characters."),
+    validator.check("name.ar")
+        .notEmpty().withMessage("Brand Arabic name is required.")
+        .isLength({ min: 2 }).withMessage("Brand Arabic name must be larger than 2 characters.")
+        .isLength({ max: 32 }).withMessage("Brand Arabic name must be less than 32 characters."),
     validationMiddleware
 ];
 
 let updateBrandValidator = [
     validator.check("id")
         .isMongoId().withMessage("Invalid Brand id format."),
-    validator.check("name").optional()
-        .notEmpty().withMessage("Brand name is required.")
-        .isLength({ min: 3 }).withMessage("Brand name length must be larger than 3 characters.")
-        .isLength({ max: 32 }).withMessage("Brand name length must be less than 32 characters."),
+    validator.check("name.en").optional()
+        .notEmpty().withMessage("Brand English name is required.")
+        .isLength({ min: 2 }).withMessage("Brand English name must be larger than 2 characters.")
+        .isLength({ max: 32 }).withMessage("Brand English name must be less than 32 characters."),
+    validator.check("name.ar").optional()
+        .notEmpty().withMessage("Brand Arabic name is required.")
+        .isLength({ min: 2 }).withMessage("Brand Arabic name must be larger than 2 characters.")
+        .isLength({ max: 32 }).withMessage("Brand Arabic name must be less than 32 characters."),
     validationMiddleware
 ];
 

@@ -2,9 +2,9 @@
   "name": "ecommerce-api",
   "version": "1.0.0",
   "main": "server.js",
-  "scripts": {
+  "scripts": {  
     "start:dev": "nodemon server.js",
-    "start": "SET NODE_ENV=production& nodemon server.js"
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "Ziad Morjan",

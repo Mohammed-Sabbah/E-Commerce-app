@@ -4,11 +4,8 @@ const fs = require("fs");
 let categorySchema = new mongoose.Schema(
     {
         name: {
-            type: String,
-            required: [true, "category name is required"],
-            unique: [true, "category name must be unique"],
-            minlength: [3, "category name length must be larger than 3 characters"],
-            maxlength: [32, "category name length must be less than 32 characters"]
+            en: { type: String, required: [true, "category name (English) is required"], unique: true, minlength: [3, "category name must be larger than 3"], maxlength: [32, "category name must be less than 32"], trim: true },
+            ar: { type: String, required: [true, "category name (Arabic) is required"], minlength: [3, "category name must be larger than 3"], maxlength: [32, "category name must be less than 32"], trim: true }
         },
         slug: {
             type: String,

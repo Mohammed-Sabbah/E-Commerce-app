@@ -1,11 +1,14 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 import { login } from "@/services/authService";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 
 interface User {
     id: string;
     name: string;
     email: string;
+    role?: "admin" | "user";
 }
 
 interface LoginResponse {
@@ -24,23 +27,22 @@ interface ApiError {
 }
 
 export const useLogin = () => {
+    const t = useTranslations("toasts");
     const queryClient = useQueryClient();
-    const router = useRouter(); // تعريف الراوتر
+    const router = useRouter();
 
     return useMutation<LoginResponse, ApiError, LoginRequest>({
         mutationFn: login,
 
-        // في هوك useLogin
         onSuccess: (data) => {
-
+            toast.success(t("loginSuccess"));
             queryClient.setQueryData(["user"], data.user);
-
-            router.push("/");
-            router.refresh(); // هنا Refresh هيخلي الـ Middleware يقرأ الكوكي الجديدة فوراً
+            router.push(data.user.role === "admin" ? "/admin" : "/");
+            router.refresh();
         },
 
-        onError: (error) => {
-            console.log("Login error", error.response?.data?.message || error.message);
+        onError: () => {
+            toast.error(t("loginFailed"));
         },
     });
 };

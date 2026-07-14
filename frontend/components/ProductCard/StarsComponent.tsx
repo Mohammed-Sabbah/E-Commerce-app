@@ -37,7 +37,7 @@ export function StarsComponent({ rating, maxStars = 5, size = 20, reviews }: Rat
                 )
             })}
             {reviews !== undefined && (
-                <span className="text-sm text-gray-500 ml-1">({reviews})</span>
+                <span className="text-sm text-gray-500 ms-1">({reviews})</span>
             )}
         </div>
     )

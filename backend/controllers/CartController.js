@@ -3,26 +3,51 @@ const Product = require("../models/Product");
 const Coupon = require("../models/Coupon");
 const { asyncErrorHandler } = require("../middlewares/ErrorMiddleware");
 const CustomError = require("../utils/CustomError");
+const { localizeProductRef } = require("../utils/localizeField");
 
+async function recalculateDiscount(cart) {
+    if (!cart.appliedCoupons || cart.appliedCoupons.length === 0) {
+        cart.totalPriceAfterDiscount = undefined;
+        return;
+    }
+    const coupons = await Coupon.find({ _id: { $in: cart.appliedCoupons } });
+    const totalDiscountPercent = coupons.reduce((sum, c) => sum + c.discount, 0);
+    cart.totalPriceAfterDiscount = parseFloat(
+        (cart.totalPrice - (cart.totalPrice * (totalDiscountPercent / 100))).toFixed(2)
+    );
+}
+
+function localizeCartItems(cart, lang) {
+    const cartObj = cart.toObject({ virtuals: true });
+    cartObj.cartItems = cartObj.cartItems.map(item => ({
+        ...item,
+        product: item.product && item.product._id
+            ? localizeProductRef(item.product, lang)
+            : item.product
+    }));
+    return cartObj;
+}
 
 const getLoggedUserCart = asyncErrorHandler(async function (req, res) {
+    const lang = req.query.lang || "en";
     let cart = await Cart.findOne({ user: req.user.id })
         .populate({
             path: "cartItems.product",
             select: "name price priceAfterDiscount coverImage slug",
         });
 
-        
     if (!cart) {
         cart = await Cart.create({
             user: req.user.id
         });
     }
 
+    const cartObj = localizeCartItems(cart, lang);
+
     res.status(200).json({
         status: "success",
         data: {
-            cart
+            cart: cartObj
         }
     });
 });
@@ -102,15 +127,23 @@ const addToCart = asyncErrorHandler(async function (req, res) {
         }
     }
 
+    await recalculateDiscount(cart);
+    await cart.save();
+
+    const lang = req.query.lang || "en";
+    cart = await Cart.findById(cart._id || cart.id).populate("cartItems.product");
+    const cartObj = localizeCartItems(cart, lang);
+
     res.status(201).json({
         status: "success",
         data: {
-            cart
+            cart: cartObj
         }
     });
 });
 
 const removeFromCart = asyncErrorHandler(async function (req, res) {
+    const lang = req.query.lang || "en";
     let cart = await Cart.findOne({ user: req.user });
 
     let index = cart.cartItems.findIndex(item => item.id === req.params.id);
@@ -118,13 +151,17 @@ const removeFromCart = asyncErrorHandler(async function (req, res) {
     if (index > -1) {
         cart.cartItems.pull(item);
         cart.totalPrice -= (item.price * item.quantity);
+        await recalculateDiscount(cart);
         await cart.save();
     }
+
+    cart = await Cart.findById(cart._id || cart.id).populate("cartItems.product");
+    const cartObj = localizeCartItems(cart, lang);
 
     res.status(200).json({
         status: "success",
         data: {
-            cart
+            cart: cartObj
         }
     });
 });
@@ -135,6 +172,7 @@ const clearCart = asyncErrorHandler(async function (req, res) {
 });
 
 const updateItemQuantity = asyncErrorHandler(async function (req, res) {
+    const lang = req.query.lang || "en";
     let cart = await Cart.findOne({ user: req.user });
 
     let index = cart.cartItems.findIndex(item => item.id === req.params.id);
@@ -143,18 +181,23 @@ const updateItemQuantity = asyncErrorHandler(async function (req, res) {
         cart.totalPrice -= (item.price * item.quantity);
         item.quantity = req.body.quantity;
         cart.totalPrice += (item.price * item.quantity);
+        await recalculateDiscount(cart);
         await cart.save();
     }
+
+    cart = await Cart.findById(cart._id || cart.id).populate("cartItems.product");
+    const cartObj = localizeCartItems(cart, lang);
 
     res.status(200).json({
         status: "success",
         data: {
-            cart
+            cart: cartObj
         }
     });
 });
 
 const applyCouponOnCart = asyncErrorHandler(async function (req, res) {
+    const lang = req.query.lang || "en";
     const coupon = await Coupon.findOne({ name: req.body.coupon, expire: { $gte: Date.now() } });
     if (!coupon)
         throw new CustomError("Invalid or expired coupon", 400);
@@ -164,14 +207,17 @@ const applyCouponOnCart = asyncErrorHandler(async function (req, res) {
     if (cart.appliedCoupons.includes(coupon.id))
         throw new CustomError(`You have applied this coupon '${coupon.name}' before!`, 400);
 
-    cart.totalPriceAfterDiscount = parseFloat((cart.totalPrice - (cart.totalPrice * (coupon.discount / 100))).toFixed(2));
     cart.appliedCoupons.push(coupon.id);
+    await recalculateDiscount(cart);
     await cart.save();
+
+    cart = await Cart.findById(cart._id || cart.id).populate("cartItems.product");
+    const cartObj = localizeCartItems(cart, lang);
 
     res.status(200).json({
         status: "success",
         data: {
-            cart
+            cart: cartObj
         }
     });
 });

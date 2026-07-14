@@ -1,11 +1,13 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useTranslations } from 'next-intl';
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";
 import { useCart } from "@/hooks/useCart";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 
 function HeaderCartButton({ token }: { token?: string }) {
+    const t = useTranslations('nav');
     const { cart } = useCart(!!token);
     const router = useRouter();
 
@@ -27,7 +29,7 @@ function HeaderCartButton({ token }: { token?: string }) {
     return (
         <button
             onClick={() => router.push("/cart")}
-            aria-label="Shopping cart"
+            aria-label={t('shoppingCart')}
             className="relative flex items-center justify-center cursor-pointer"
         >
             <ShoppingCartIcon className="h-6 w-6 transition-transform duration-200 hover:scale-120" />
@@ -35,7 +37,7 @@ function HeaderCartButton({ token }: { token?: string }) {
             {count > 0 && (
                 <span
                     className={`
-                        absolute -top-0 -right-1
+                        absolute -top-0 -end-1
                         bg-red-500 text-white text-[10px]
                         min-w-[16px] h-[16px] px-[3px]
                         flex items-center justify-center

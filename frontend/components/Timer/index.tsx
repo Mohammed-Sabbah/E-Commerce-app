@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from "react"
+import { useTranslations } from 'next-intl';
 
 const TARGET_DATE = new Date(Date.now() +
     11 * 86400000 +
@@ -27,15 +28,16 @@ function Timer() {
         return () => clearInterval(interval)
     }, [])
 
+    const t = useTranslations('products');
     return (
-        <div className='flex justify-center items-center space-x-2 md:space-x-4'>
-            <TimerItem number={time.days} title="Days" />
+        <div className='flex justify-center items-center space-x-2 md:space-x-4 '>
+            <TimerItem number={time.days} title={t('days')} />
             <Columns />
-            <TimerItem number={time.hours} title="Hours" />
+            <TimerItem number={time.hours} title={t('hours')} />
             <Columns />
-            <TimerItem number={time.minutes} title="Minutes" />
+            <TimerItem number={time.minutes} title={t('minutes')} />
             <Columns />
-            <TimerItem number={time.seconds} title="Seconds" />
+            <TimerItem number={time.seconds} title={t('seconds')} />
         </div>
     )
 }
@@ -45,7 +47,7 @@ export default Timer
 export function TimerItem({ number, title }: { number: number; title: string }) {
     return (
         <h3 className='text-xl md:text-4xl font-bold relative'>
-            <span className='text-[0.5rem] md:text-[0.7rem] font-medium font-poppins absolute top-[-50%] left-0'>
+            <span className='text-[0.5rem] md:text-[0.7rem] font-medium font-poppins absolute top-[-50%] start-0'>
                 {title}
             </span>
             {String(number).padStart(2, "0")}

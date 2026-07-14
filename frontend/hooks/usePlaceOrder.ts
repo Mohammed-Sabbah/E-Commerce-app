@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/i18n/navigation';
 import { useQueryClient } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
 import type { PaymentMethod } from '@/types/checkout';
 import { placeOrder } from '@/services/client/orderService';
 import { QUERY_KEYS } from '@/constants/queryKeys';
@@ -12,6 +13,8 @@ interface UsePlaceOrderParams {
 }
 
 export function usePlaceOrder() {
+    const t = useTranslations('checkout');
+    const tc = useTranslations('common');
     const router = useRouter();
     const queryClient = useQueryClient();
     const [loading, setLoading] = useState(false);
@@ -19,7 +22,7 @@ export function usePlaceOrder() {
 
     const submit = async ({ addressId, paymentMethod, couponCode }: UsePlaceOrderParams) => {
         if (!addressId) {
-            setError('Please select a shipping address.');
+            setError(t('selectAddress'));
             return false;
         }
         setLoading(true);
@@ -33,7 +36,7 @@ export function usePlaceOrder() {
         } catch (err: unknown) {
             const message =
                 (err as { response?: { data?: { message?: string } } })
-                    ?.response?.data?.message ?? 'Something went wrong. Please try again.';
+                    ?.response?.data?.message ?? tc('pleaseTryAgain');
             setError(message);
             return false;
         } finally {

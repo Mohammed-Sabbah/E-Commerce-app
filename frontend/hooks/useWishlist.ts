@@ -49,7 +49,7 @@ export const useWishlist = (enabled: boolean = true) => {
                         ...old.data,
                         wishlist: [
                             ...(old.data?.wishlist ?? []),
-                            { _id: productId, name: "", price: 0, avgRatings: 0 },
+                            { _id: productId, name: "", price: 0, quantity: 0, avgRatings: 0 },
                         ],
                     },
                 };

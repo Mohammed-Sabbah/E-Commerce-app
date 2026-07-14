@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { Link } from "@/i18n/navigation";
+import { usePathname, useRouter } from "@/i18n/navigation";
 import {
     LayoutDashboard,
     ShoppingCart,
@@ -15,27 +15,39 @@ import {
     Store,
     Menu,
     X,
+    Languages,
 } from "lucide-react";
 import { apiClient } from "@/lib/apiClient";
-
-const NAV_ITEMS = [
-    { label: "Overview",    href: "/admin",            icon: LayoutDashboard },
-    { label: "Orders",      href: "/admin/orders",     icon: ShoppingCart },
-    { label: "Products",    href: "/admin/products",   icon: Package },
-    { label: "Categories",  href: "/admin/categories", icon: Grid3X3 },
-    { label: "Brands",      href: "/admin/brands",     icon: Tag },
-    { label: "Coupons",     href: "/admin/coupons",    icon: Ticket },
-    { label: "Users",       href: "/admin/users",      icon: Users },
-];
+import { useLocale, useTranslations } from 'next-intl';
 
 interface Props {
     user: { name: string; email: string };
 }
 
 export default function AdminSidebar({ user }: Props) {
+    const t = useTranslations('admin');
+    const tNav = useTranslations('nav');
     const pathname = usePathname();
     const router = useRouter();
     const [open, setOpen] = useState(false);
+
+    const locale = useLocale();
+
+    function handleLanguageToggle() {
+        router.push(pathname, { locale: locale === "ar" ? "en" : "ar" });
+        setOpen(false);
+    }
+
+
+    const NAV_ITEMS = [
+        { label: t('overview'), href: "/admin", icon: LayoutDashboard },
+        { label: t('orders'), href: "/admin/orders", icon: ShoppingCart },
+        { label: t('products'), href: "/admin/products", icon: Package },
+        { label: t('categories'), href: "/admin/categories", icon: Grid3X3 },
+        { label: t('brands'), href: "/admin/brands", icon: Tag },
+        { label: t('coupons'), href: "/admin/coupons", icon: Ticket },
+        { label: t('users'), href: "/admin/users", icon: Users },
+    ];
 
     async function handleLogout() {
         try {
@@ -53,7 +65,7 @@ export default function AdminSidebar({ user }: Props) {
                     <Store size={20} />
                     <span>Exclusive</span>
                 </Link>
-                <p className="text-xs text-gray-400 mt-0.5">Admin Panel</p>
+                <p className="text-xs text-gray-400 mt-0.5">{t('adminTitle')}</p>
             </div>
 
             {/* Nav */}
@@ -68,11 +80,10 @@ export default function AdminSidebar({ user }: Props) {
                             key={href}
                             href={href}
                             onClick={() => setOpen(false)}
-                            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${
-                                isActive
-                                    ? "bg-[#DB4444] text-white shadow-sm shadow-[#DB4444]/20"
-                                    : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
-                            }`}
+                            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${isActive
+                                ? "bg-[#DB4444] text-white shadow-sm shadow-[#DB4444]/20"
+                                : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+                                }`}
                         >
                             <Icon size={17} />
                             {label}
@@ -83,6 +94,22 @@ export default function AdminSidebar({ user }: Props) {
 
             {/* User + Logout */}
             <div className="px-4 py-4 border-t border-gray-100">
+
+                <button
+                    type="button"
+                    onClick={handleLanguageToggle}
+                    className="mb-3 w-full flex items-center justify-between gap-3 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+                    aria-label={tNav('selectLanguage')}
+                >
+                    <span className="flex items-center gap-2">
+                        <Languages size={15} />
+                        {locale === "ar" ? tNav('arabic') : tNav('english')}
+                    </span>
+                    <span className="text-xs font-medium text-gray-400">
+                        {locale === "ar" ? "EN" : "AR"}
+                    </span>
+                </button>
+
                 <div className="flex items-center gap-3 mb-3 px-1">
                     <div className="w-8 h-8 rounded-full bg-[#DB4444]/15 text-[#DB4444] flex items-center justify-center text-sm font-semibold">
                         {user.name?.[0]?.toUpperCase() ?? "A"}
@@ -97,7 +124,7 @@ export default function AdminSidebar({ user }: Props) {
                     className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
                 >
                     <LogOut size={15} />
-                    Logout
+                    {tNav('logout')}
                 </button>
             </div>
         </>
@@ -109,14 +136,14 @@ export default function AdminSidebar({ user }: Props) {
             <button
                 type="button"
                 onClick={() => setOpen(!open)}
-                className="fixed top-4 left-4 z-50 md:hidden bg-white border border-gray-200 rounded-xl p-2.5 shadow-sm cursor-pointer hover:bg-gray-50 transition-colors"
-                aria-label="Toggle sidebar"
+                className="fixed top-4 start-4 z-50 md:hidden bg-white border border-gray-200 rounded-xl p-2.5 shadow-sm cursor-pointer hover:bg-gray-50 transition-colors"
+                aria-label={t('toggleSidebar')}
             >
                 {open ? <X size={18} /> : <Menu size={18} />}
             </button>
 
             {/* Desktop sidebar */}
-            <aside className="hidden md:flex w-60 shrink-0 bg-white border-r border-gray-200 flex-col h-screen sticky top-0">
+            <aside className="hidden md:flex w-60 shrink-0 bg-white border-e border-gray-200 flex-col h-screen sticky top-0">
                 {nav}
             </aside>
 
@@ -132,7 +159,7 @@ export default function AdminSidebar({ user }: Props) {
 
             <style jsx>{`
                 @keyframes slideIn {
-                    from { transform: translateX(-100%); }
+                    from { transform: translateX(${locale === "ar" ? "100%" : "-100%"}); }
                     to   { transform: translateX(0); }
                 }
                 .animate-slide-in {

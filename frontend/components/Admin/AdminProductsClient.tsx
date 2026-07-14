@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { apiClient } from "@/lib/apiClient";
 import { parseError } from "@/lib/adminUtils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -25,6 +26,7 @@ function refName(v: PopulatedRef | string | null | undefined): string {
 const PAGE_SIZE = 15;
 
 export default function AdminProductsClient({ initialProducts, categories, brands }: Props) {
+    const t = useTranslations('admin');
     const queryClient = useQueryClient();
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
@@ -69,7 +71,7 @@ export default function AdminProductsClient({ initialProducts, categories, brand
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["admin", "products"] });
             setDeleteTarget(null);
-            toast.success("Product deleted");
+            toast.success(t('productDeleted'));
         },
         onError: (e: unknown) => {
             toast.error(parseError(e));
@@ -83,7 +85,7 @@ export default function AdminProductsClient({ initialProducts, categories, brand
                 <input
                     value={search}
                     onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                    placeholder="Search products..."
+                    placeholder={t('searchPlaceholder')}
                     className="flex-1 min-w-[200px] h-10 px-3 border border-gray-300 rounded-lg text-sm"
                 />
                 <button
@@ -91,21 +93,21 @@ export default function AdminProductsClient({ initialProducts, categories, brand
                     onClick={openCreate}
                     className="h-10 px-4 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors cursor-pointer"
                 >
-                    + New Product
+                    + {t('addProduct')}
                 </button>
             </div>
 
             <div className="overflow-x-auto border border-gray-200 rounded-xl bg-white">
-                <table className="w-full text-sm">
-                    <thead className="bg-gray-50 text-left text-gray-500">
+                <table className="admin-table w-full text-sm">
+                    <thead className="bg-gray-50 text-start text-gray-500">
                         <tr>
-                            <th className="px-4 py-3 font-medium">Image</th>
-                            <th className="px-4 py-3 font-medium">Name</th>
-                            <th className="px-4 py-3 font-medium">Category</th>
-                            <th className="px-4 py-3 font-medium">Brand</th>
-                            <th className="px-4 py-3 font-medium">Price</th>
-                            <th className="px-4 py-3 font-medium">Stock</th>
-                            <th className="px-4 py-3 font-medium">Actions</th>
+                            <th className="px-4 py-3 font-medium">{t('image')}</th>
+                            <th className="px-4 py-3 font-medium">{t('productName')}</th>
+                            <th className="px-4 py-3 font-medium">{t('productCategory')}</th>
+                            <th className="px-4 py-3 font-medium">{t('productBrand')}</th>
+                            <th className="px-4 py-3 font-medium">{t('productPrice')}</th>
+                            <th className="px-4 py-3 font-medium">{t('stock')}</th>
+                            <th className="px-4 py-3 font-medium">{t('actions')}</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -132,7 +134,7 @@ export default function AdminProductsClient({ initialProducts, categories, brand
                                     {p.priceAfterDiscount ? (
                                         <>
                                             <span className="font-medium">${p.priceAfterDiscount}</span>
-                                            <span className="text-xs text-gray-400 line-through ml-1">${p.price}</span>
+                                            <span className="text-xs text-gray-400 line-through ms-1">${p.price}</span>
                                         </>
                                     ) : (
                                         <span className="font-medium">${p.price}</span>
@@ -140,25 +142,25 @@ export default function AdminProductsClient({ initialProducts, categories, brand
                                 </td>
                                 <td className="px-4 py-3">
                                     <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${p.quantity > 0 ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
-                                        {p.quantity > 0 ? `${p.quantity} in stock` : "Out of stock"}
+                                        {p.quantity > 0 ? t('inStock', { count: p.quantity }) : t('outOfStock')}
                                     </span>
                                 </td>
                                 <td className="px-4 py-3">
                                     <div className="flex gap-2">
-                                        <button type="button" onClick={() => openEdit(p)} className="h-8 px-3 rounded-md bg-blue-600 text-white text-xs font-medium hover:bg-blue-700 transition-colors cursor-pointer">Edit</button>
-                                        <button type="button" onClick={() => setDeleteTarget(p._id)} className="h-8 px-3 rounded-md bg-red-500 text-white text-xs font-medium hover:bg-red-600 transition-colors cursor-pointer">Delete</button>
+                                        <button type="button" onClick={() => openEdit(p)} className="h-8 px-3 rounded-md bg-blue-600 text-white text-xs font-medium hover:bg-blue-700 transition-colors cursor-pointer">{t('edit')}</button>
+                                        <button type="button" onClick={() => setDeleteTarget(p._id)} className="h-8 px-3 rounded-md bg-red-500 text-white text-xs font-medium hover:bg-red-600 transition-colors cursor-pointer">{t('delete')}</button>
                                     </div>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
-                {paged.length === 0 && <p className="text-center text-sm text-gray-400 py-10">No products found</p>}
+                {paged.length === 0 && <p className="text-center text-sm text-gray-400 py-10">{t('noProducts')}</p>}
             </div>
 
             <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
 
-            <ConfirmDialog open={!!deleteTarget} title="Delete product?" message="This cannot be undone." confirmLabel="Delete" danger onConfirm={() => deleteMutation.mutate()} onCancel={() => setDeleteTarget(null)} loading={deleteMutation.isPending} />
+            <ConfirmDialog open={!!deleteTarget} title={t('confirmDeleteTitle')} message={t('confirmDeleteMessage')} confirmLabel={t('yesDelete')} danger onConfirm={() => deleteMutation.mutate()} onCancel={() => setDeleteTarget(null)} loading={deleteMutation.isPending} />
 
             <ProductFormModal
                 open={modalOpen}

@@ -1,14 +1,17 @@
+import { getTranslations } from 'next-intl/server';
 import React from 'react'
 import Container from '../../Container'
 import SectionTitle from '../SectionTitel'
 import Timer from '../../Timer'
 import StyledButton from '@/components/StyledButton'
 
-function FlashSalesSection({ children }: { children: React.ReactNode }) {
+async function FlashSalesSection({ children }: { children: React.ReactNode }) {
+    const t = await getTranslations('common');
+    const tp = await getTranslations('products');
     return (
         <section className="mb-16 md:mb-20">
             <Container className="relative">
-                <SectionTitle Category="Today's" title="Flash Sales">
+                <SectionTitle Category={t('todays')} title={tp('flashSales')}>
                     <Timer />
                 </SectionTitle>
 
@@ -17,7 +20,7 @@ function FlashSalesSection({ children }: { children: React.ReactNode }) {
                 </div>
 
                 <div className="flex justify-center pt-16">
-                    <StyledButton title="View All Products" href="/products?discount=true" />
+                    <StyledButton title={t('viewAll')} href="/products?discount=true" />
                 </div>
             </Container>
         </section>

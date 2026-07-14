@@ -2,6 +2,7 @@ const Order = require("../models/Order");
 const User = require("../models/User");
 const Product = require("../models/Product");
 const { asyncErrorHandler } = require("../middlewares/ErrorMiddleware");
+const { localizeField } = require("../utils/localizeField");
 
 const getAdminStats = asyncErrorHandler(async (req, res) => {
     const twelveMonthsAgo = new Date();
@@ -89,6 +90,23 @@ const getAdminStats = asyncErrorHandler(async (req, res) => {
     const get = (index, fallback = null) =>
         results[index]?.status === "fulfilled" ? results[index].value : fallback;
 
+    const lang = req.query.lang || "en";
+
+    let topProducts = get(8, []);
+    topProducts = topProducts.map((p) => ({
+        ...p,
+        name: localizeField(p.name, lang),
+    }));
+
+    let recentOrders = get(5, []);
+    recentOrders = recentOrders.map((order) => {
+        const o = typeof order.toObject === "function" ? order.toObject({ virtuals: true }) : order;
+        return {
+            ...o,
+            user: o.user ? { ...o.user, name: typeof o.user.name === "object" ? localizeField(o.user.name, lang) : o.user.name } : o.user,
+        };
+    });
+
     res.status(200).json({
         status: "success",
         data: {
@@ -97,10 +115,10 @@ const getAdminStats = asyncErrorHandler(async (req, res) => {
             ordersByStatus: get(2, []),
             totalUsers: get(3, 0),
             totalProducts: get(4, 0),
-            recentOrders: get(5, []),
+            recentOrders,
             monthlyRevenue: get(6, []),
             monthlyOrders: get(7, []),
-            topProducts: get(8, []),
+            topProducts,
         }
     });
 });

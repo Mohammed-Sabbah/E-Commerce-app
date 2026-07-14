@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { apiClient } from "@/lib/apiClient";
 import { parseError } from "@/lib/adminUtils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -32,6 +33,7 @@ const EMPTY: FormState = { name: "", discount: "", expire: "" };
 const PAGE_SIZE = 15;
 
 export default function AdminCouponsClient({ initial }: Props) {
+    const t = useTranslations('admin');
     const queryClient = useQueryClient();
     const [page, setPage] = useState(1);
     const [editing, setEditing] = useState<string | null>(null);
@@ -75,7 +77,7 @@ export default function AdminCouponsClient({ initial }: Props) {
             queryClient.invalidateQueries({ queryKey: ["admin", "coupons"] });
             setEditing(null);
             resetForm();
-            toast.success(editing === "new" ? "Coupon created" : "Coupon updated");
+            toast.success(t("couponSaved"));
         },
         onError: (e: unknown) => toast.error(parseError(e)),
     });
@@ -88,7 +90,7 @@ export default function AdminCouponsClient({ initial }: Props) {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["admin", "coupons"] });
             setDeleteTarget(null);
-            toast.success("Coupon deleted");
+            toast.success(t("couponDeleted"));
         },
         onError: (e: unknown) => {
             toast.error(parseError(e));
@@ -104,7 +106,7 @@ export default function AdminCouponsClient({ initial }: Props) {
                     onClick={() => { setEditing("new"); resetForm(); }}
                     className="h-10 px-4 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors cursor-pointer"
                 >
-                    + New Coupon
+                    + {t('addCoupon')}
                 </button>
             </div>
 
@@ -112,26 +114,26 @@ export default function AdminCouponsClient({ initial }: Props) {
             {editing && (
                 <div className="border border-gray-200 rounded-xl bg-white p-5 mb-4 space-y-3">
                     <div className="flex flex-wrap gap-3">
-                        <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Code" className="h-10 px-3 border border-gray-300 rounded-lg text-sm w-40" />
-                        <input value={form.discount} onChange={(e) => setForm({ ...form, discount: e.target.value })} placeholder="Discount %" type="number" min={1} max={100} className="h-10 px-3 border border-gray-300 rounded-lg text-sm w-36" />
+                        <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder={t('couponName')} className="h-10 px-3 border border-gray-300 rounded-lg text-sm w-40" />
+                        <input value={form.discount} onChange={(e) => setForm({ ...form, discount: e.target.value })} placeholder={t('couponDiscount')} type="number" min={1} max={100} className="h-10 px-3 border border-gray-300 rounded-lg text-sm w-36" />
                         <input value={form.expire} onChange={(e) => setForm({ ...form, expire: e.target.value })} type="date" className="h-10 px-3 border border-gray-300 rounded-lg text-sm w-40" />
                         <button type="button" onClick={() => saveMutation.mutate()} disabled={!form.name || !form.discount || !form.expire || saveMutation.isPending} className="h-10 px-4 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 disabled:opacity-40 transition-colors cursor-pointer">
-                            {saveMutation.isPending ? "Saving..." : editing === "new" ? "Create" : "Update"}
+                            {saveMutation.isPending ? t('saving') : editing === "new" ? t('create') : t('update')}
                         </button>
-                        <button type="button" onClick={() => { setEditing(null); resetForm(); }} className="h-10 px-4 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors cursor-pointer">Cancel</button>
+                        <button type="button" onClick={() => { setEditing(null); resetForm(); }} className="h-10 px-4 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors cursor-pointer">{t('cancel')}</button>
                     </div>
                 </div>
             )}
 
             <div className="overflow-x-auto border border-gray-200 rounded-xl bg-white">
-                <table className="w-full text-sm">
-                    <thead className="bg-gray-50 text-left text-gray-500">
+                <table className="admin-table w-full text-sm">
+                    <thead className="bg-gray-50 text-start text-gray-500">
                         <tr>
-                            <th className="px-4 py-3 font-medium">Code</th>
-                            <th className="px-4 py-3 font-medium">Discount</th>
-                            <th className="px-4 py-3 font-medium">Expires</th>
-                            <th className="px-4 py-3 font-medium">Status</th>
-                            <th className="px-4 py-3 font-medium">Actions</th>
+                            <th className="px-4 py-3 font-medium">{t('couponName')}</th>
+                            <th className="px-4 py-3 font-medium">{t('couponDiscount')}</th>
+                            <th className="px-4 py-3 font-medium">{t('couponExpire')}</th>
+                            <th className="px-4 py-3 font-medium">{t('status')}</th>
+                            <th className="px-4 py-3 font-medium">{t('actions')}</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -144,25 +146,25 @@ export default function AdminCouponsClient({ initial }: Props) {
                                     <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${
                                         isExpired(c.expire) ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"
                                     }`}>
-                                        {isExpired(c.expire) ? "Expired" : "Active"}
+                                        {isExpired(c.expire) ? t('expired') : t('active')}
                                     </span>
                                 </td>
                                 <td className="px-4 py-3">
                                     <div className="flex gap-2">
-                                        <button type="button" onClick={() => openEdit(c)} className="h-8 px-3 rounded-md bg-blue-600 text-white text-xs font-medium hover:bg-blue-700 transition-colors cursor-pointer">Edit</button>
-                                        <button type="button" onClick={() => setDeleteTarget(c._id)} className="h-8 px-3 rounded-md bg-red-500 text-white text-xs font-medium hover:bg-red-600 transition-colors cursor-pointer">Delete</button>
+                                        <button type="button" onClick={() => openEdit(c)} className="h-8 px-3 rounded-md bg-blue-600 text-white text-xs font-medium hover:bg-blue-700 transition-colors cursor-pointer">{t('edit')}</button>
+                                        <button type="button" onClick={() => setDeleteTarget(c._id)} className="h-8 px-3 rounded-md bg-red-500 text-white text-xs font-medium hover:bg-red-600 transition-colors cursor-pointer">{t('delete')}</button>
                                     </div>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
-                {paged.length === 0 && <p className="text-center text-sm text-gray-400 py-10">No coupons found</p>}
+                {paged.length === 0 && <p className="text-center text-sm text-gray-400 py-10">{t('noCoupons')}</p>}
             </div>
 
             <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
 
-            <ConfirmDialog open={!!deleteTarget} title="Delete coupon?" message="This cannot be undone." confirmLabel="Delete" danger onConfirm={() => deleteMutation.mutate()} onCancel={() => setDeleteTarget(null)} loading={deleteMutation.isPending} />
+            <ConfirmDialog open={!!deleteTarget} title={t('confirmDeleteTitle')} message={t('confirmDeleteMessage')} confirmLabel={t('yesDelete')} danger onConfirm={() => deleteMutation.mutate()} onCancel={() => setDeleteTarget(null)} loading={deleteMutation.isPending} />
         </div>
     );
 }

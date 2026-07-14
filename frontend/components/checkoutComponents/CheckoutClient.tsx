@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useCart } from '@/hooks/useCart';
 import { usePlaceOrder } from '@/hooks/usePlaceOrder';
 import { PaymentMethod, BillingData } from '@/types/checkout';
@@ -18,6 +19,7 @@ interface Props {
 }
 
 export default function CheckoutClient({ addresses, initialBilling, initialCoupon }: Props) {
+    const t = useTranslations('checkout');
     const [selectedAddressId, setSelectedAddressId] = useState<string>(
         addresses[0]?._id ?? ''
     );
@@ -52,12 +54,12 @@ export default function CheckoutClient({ addresses, initialBilling, initialCoupo
 
             {/* LEFT */}
             <div>
-                <h1 className="text-2xl font-semibold text-gray-900 mb-8">Billing Details</h1>
+                <h1 className="text-2xl font-semibold text-gray-900 mb-8">{t('billingDetails')}</h1>
 
                 {addresses.length > 0 ? (
                     <div className="mb-6">
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Shipping Address
+                            {t('shippingAddress')}
                         </label>
                         <div className="flex flex-col gap-3">
                             {addresses.map((addr) => (
@@ -88,8 +90,9 @@ export default function CheckoutClient({ addresses, initialBilling, initialCoupo
                     </div>
                 ) : (
                     <p className="text-sm text-red-500 mb-6">
-                        No saved addresses. Please add one in your{' '}
-                        <a href="/account/address" className="underline">account settings</a>.
+                        {t.rich('noAddresses', {
+                            link: (chunks) => <a href="/account/address" className="underline">{chunks}</a>,
+                        })}
                     </p>
                 )}
 
@@ -121,12 +124,12 @@ export default function CheckoutClient({ addresses, initialBilling, initialCoupo
                     {loading ? (
                         <>
                             <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                            Placing Order...
+                            {t('placingOrder')}
                         </>
                     ) : paymentMethod === 'card' ? (
-                        'Card Payment — Coming Soon'
+                        t('cardPaymentComingSoon')
                     ) : (
-                        'Place Order'
+                        t('placeOrder')
                     )}
                 </button>
             </div>

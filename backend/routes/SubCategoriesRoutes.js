@@ -21,6 +21,8 @@ const {
 } = require("../controllers/SubCategoriesController");
 const { protect, allowedTo } = require("../middlewares/authMiddleware");
 
+const normalizeBilingualFields = require("../middlewares/normalizeBilingualFields");
+
 let router = express.Router({ mergeParams: true });
 
 router.route("/")
@@ -33,6 +35,7 @@ router.route("/")
         allowedTo("admin"),
         uploadImage,
         resizeImage,
+        normalizeBilingualFields,
         addCategoryIdToReqBody,
         createSubCategoryValidator,
         createSubCategory
@@ -48,6 +51,7 @@ router.route("/:id")
         allowedTo("admin"),
         uploadImage,
         resizeImage,
+        normalizeBilingualFields,
         updateSubCategoryValidator,
         updateSubCategory
     )

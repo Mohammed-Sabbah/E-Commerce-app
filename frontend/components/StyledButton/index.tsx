@@ -1,4 +1,7 @@
-import Link from "next/link"
+'use client';
+
+import { useTranslations } from 'next-intl';
+import { Link } from "@/i18n/navigation"
 import { cn } from '@/lib/utils'
 import LoadingSvg from '../LoadingSvg'
 
@@ -8,24 +11,27 @@ export default function StyledButton({
     type,
     isLoading,
     loadingText,
-    href,        // ← أضفت هاد
+    href,
+    onClick,
 }: {
     title: string
     ClassName?: string
     type?: "button" | "reset" | "submit"
     isLoading?: boolean
     loadingText?: string
-    href?: string   // ← اختياري
+    href?: string
+    onClick?: () => void
 }) {
+    const t = useTranslations('common');
     const content = isLoading ? (
         <span className="flex items-center gap-2">
             <LoadingSvg />
-            {loadingText ?? "Loading..."}
+            {loadingText ?? t('loading')}
         </span>
     ) : title
 
     const classes = cn(
-        `bg-[#DB4444] text-white px-12 py-4 rounded-lg disabled:bg-[#e88080]`,
+        `inline-flex items-center justify-center bg-[#DB4444] text-white px-12 py-4 rounded-lg disabled:bg-[#e88080]`,
         ClassName
     )
 
@@ -38,7 +44,7 @@ export default function StyledButton({
     }
 
     return (
-        <button type={type} disabled={isLoading} className={classes}>
+        <button type={type} disabled={isLoading} onClick={onClick} className={classes}>
             {content}
         </button>
     )

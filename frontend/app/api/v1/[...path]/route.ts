@@ -9,7 +9,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ path
         headers: { Cookie: req.headers.get('cookie') || '' },
     });
     const data = await res.json();
-    return NextResponse.json(data, { status: res.status });
+    const response = NextResponse.json(data, { status: res.status });
+    const cookie = res.headers.get('set-cookie');
+    if (cookie) response.headers.set('set-cookie', cookie);
+    return response;
 }
 
 // ✅ إصلاح: يدعم الآن multipart/form-data (رفع الصور) وJSON
@@ -63,7 +66,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ pa
         body,
     });
     const data = await res.json();
-    return NextResponse.json(data, { status: res.status });
+    const response = NextResponse.json(data, { status: res.status });
+    const cookie = res.headers.get('set-cookie');
+    if (cookie) response.headers.set('set-cookie', cookie);
+    return response;
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
@@ -73,5 +79,8 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ p
         headers: { Cookie: req.headers.get('cookie') || '' },
     });
     const data = await res.json().catch(() => ({}));
-    return NextResponse.json(data, { status: res.status });
+    const response = NextResponse.json(data, { status: res.status });
+    const cookie = res.headers.get('set-cookie');
+    if (cookie) response.headers.set('set-cookie', cookie);
+    return response;
 }

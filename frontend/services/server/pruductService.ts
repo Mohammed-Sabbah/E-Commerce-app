@@ -1,9 +1,16 @@
 import type { Product, ProductsResponse, ProductParams, CategoriesResponse, SubCategoriesResponse } from "@/types/api";
+import { getLocale } from "next-intl/server";
 
 const API = process.env.API_URL;
 
+async function addLang(query: URLSearchParams): Promise<URLSearchParams> {
+    const locale = await getLocale();
+    query.append("lang", locale);
+    return query;
+}
+
 export async function getProducts(params: ProductParams = {}): Promise<ProductsResponse> {
-    const query = new URLSearchParams();
+    const query = await addLang(new URLSearchParams());
     Object.entries(params).forEach(([key, value]) => {
         if (value !== undefined) query.append(key, String(value));
     });
@@ -24,7 +31,8 @@ export async function getProducts(params: ProductParams = {}): Promise<ProductsR
 
 export async function getProductById(id: string): Promise<{ data: { doc: Product } }> {
     try {
-        const res = await fetch(`${API}/api/v1/products/${id}`, {
+        const lang = await getLocale();
+        const res = await fetch(`${API}/api/v1/products/${id}?lang=${lang}`, {
             next: { revalidate: 60 },
             signal: AbortSignal.timeout(15000),
         });
@@ -37,7 +45,8 @@ export async function getProductById(id: string): Promise<{ data: { doc: Product
 
 export async function getCategories(): Promise<CategoriesResponse> {
     try {
-        const res = await fetch(`${API}/api/v1/categories`, {
+        const lang = await getLocale();
+        const res = await fetch(`${API}/api/v1/categories?lang=${lang}`, {
             next: { revalidate: 3600 },
             signal: AbortSignal.timeout(15000),
         });
@@ -49,7 +58,8 @@ export async function getCategories(): Promise<CategoriesResponse> {
 }
 
 export async function getSubCategories(categoryId?: string): Promise<SubCategoriesResponse> {
-    const query = categoryId ? `?category=${categoryId}` : "";
+    const lang = await getLocale();
+    const query = categoryId ? `?category=${categoryId}&lang=${lang}` : `?lang=${lang}`;
     try {
         const res = await fetch(`${API}/api/v1/subcategories${query}`, {
             next: { revalidate: 3600 },

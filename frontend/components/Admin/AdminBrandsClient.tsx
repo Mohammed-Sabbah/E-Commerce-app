@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useRef } from "react";
+import { useTranslations } from "next-intl";
 import { apiClient } from "@/lib/apiClient";
 import { parseError } from "@/lib/adminUtils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -17,12 +18,13 @@ interface Props {
 const PAGE_SIZE = 15;
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-function FileInput({ current, file, onChange, onRemove, onRemoveCurrent }: {
+function FileInput({ current, file, onChange, onRemove, onRemoveCurrent, t }: {
     current?: string;
     file: File | null;
     onChange: (f: File | null) => void;
     onRemove: () => void;
     onRemoveCurrent?: () => void;
+    t: (key: string) => string;
 }) {
     const ref = useRef<HTMLInputElement>(null);
 
@@ -38,7 +40,7 @@ function FileInput({ current, file, onChange, onRemove, onRemoveCurrent }: {
         <div className="flex items-center gap-2">
             <input ref={ref} type="file" accept="image/*" onChange={(e) => onChange(e.target.files?.[0] ?? null)} className="hidden" />
             <button type="button" onClick={() => ref.current?.click()} className="h-8 px-3 rounded-md border border-gray-300 text-xs text-gray-600 hover:bg-gray-50 transition-colors cursor-pointer">
-                Choose Image
+                {t('chooseImage')}
             </button>
             {file ? (
                 <span className="text-xs text-blue-600">{file.name}</span>
@@ -50,11 +52,11 @@ function FileInput({ current, file, onChange, onRemove, onRemoveCurrent }: {
                     <span className="text-xs text-gray-500">{current.split("/").pop()}</span>
                 </div>
             ) : (
-                <span className="text-xs text-gray-400">No file chosen</span>
+                <span className="text-xs text-gray-400">{t('noFileChosen')}</span>
             )}
             {(file || current) && (
                 <button type="button" onClick={handleRemove} className="text-xs text-red-500 hover:text-red-700 underline cursor-pointer">
-                    Remove
+                    {t('imageRemove')}
                 </button>
             )}
         </div>
@@ -62,15 +64,18 @@ function FileInput({ current, file, onChange, onRemove, onRemoveCurrent }: {
 }
 
 export default function AdminBrandsClient({ initial }: Props) {
+    const t = useTranslations('admin');
     const queryClient = useQueryClient();
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
     const [editing, setEditing] = useState<string | null>(null);
-    const [editName, setEditName] = useState("");
+    const [editNameEn, setEditNameEn] = useState("");
+    const [editNameAr, setEditNameAr] = useState("");
     const [editFile, setEditFile] = useState<File | null>(null);
     const [editCurrentPhoto, setEditCurrentPhoto] = useState<string | undefined>(undefined);
     const [creating, setCreating] = useState(false);
-    const [createName, setCreateName] = useState("");
+    const [createNameEn, setCreateNameEn] = useState("");
+    const [createNameAr, setCreateNameAr] = useState("");
     const [createFile, setCreateFile] = useState<File | null>(null);
     const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
@@ -94,9 +99,12 @@ export default function AdminBrandsClient({ initial }: Props) {
 
     const activeBrand = editing ? items.find((b: Brand) => b._id === editing) : null;
 
-    const handleEdit = (b: Brand) => {
+    const handleEdit = async (b: Brand) => {
+        const res = await apiClient.get(`/api/v1/brands/${b._id}?raw=true`);
+        const raw = res.data?.data?.doc;
         setEditing(b._id);
-        setEditName(b.name);
+        setEditNameEn(raw.name?.en ?? "");
+        setEditNameAr(raw.name?.ar ?? "");
         setEditFile(null);
         setEditCurrentPhoto(b.photo);
         setCreating(false);
@@ -104,9 +112,10 @@ export default function AdminBrandsClient({ initial }: Props) {
 
     const saveEditMutation = useMutation({
         mutationFn: async () => {
-            if (!editing || !editName.trim()) return;
+            if (!editing) return;
             const fd = new FormData();
-            fd.append("name", editName.trim());
+            fd.append("name_en", editNameEn.trim());
+            fd.append("name_ar", editNameAr.trim());
             if (editFile) fd.append("photo", editFile);
             else if (!editCurrentPhoto) fd.append("photo", "");
             await apiClient.patch(`/api/v1/brands/${editing}`, fd);
@@ -114,25 +123,26 @@ export default function AdminBrandsClient({ initial }: Props) {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["admin", "brands"] });
             setEditing(null);
-            toast.success("Brand updated");
+            toast.success(t("brandSaved"));
         },
         onError: (e: unknown) => toast.error(parseError(e)),
     });
 
     const createMutation = useMutation({
         mutationFn: async () => {
-            if (!createName.trim()) return;
             const fd = new FormData();
-            fd.append("name", createName.trim());
+            fd.append("name_en", createNameEn.trim());
+            fd.append("name_ar", createNameAr.trim());
             if (createFile) fd.append("photo", createFile);
             await apiClient.post("/api/v1/brands", fd);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["admin", "brands"] });
             setCreating(false);
-            setCreateName("");
+            setCreateNameEn("");
+            setCreateNameAr("");
             setCreateFile(null);
-            toast.success("Brand created");
+            toast.success(t("brandSaved"));
         },
         onError: (e: unknown) => toast.error(parseError(e)),
     });
@@ -145,7 +155,7 @@ export default function AdminBrandsClient({ initial }: Props) {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["admin", "brands"] });
             setDeleteTarget(null);
-            toast.success("Brand deleted");
+            toast.success(t("brandDeleted"));
         },
         onError: (e: unknown) => {
             toast.error(parseError(e));
@@ -159,15 +169,15 @@ export default function AdminBrandsClient({ initial }: Props) {
                 <input
                     value={search}
                     onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                    placeholder="Search brands..."
+                    placeholder={t('searchPlaceholder')}
                     className="flex-1 min-w-[200px] h-10 px-3 border border-gray-300 rounded-lg text-sm"
                 />
                 <button
                     type="button"
-                    onClick={() => { setCreating(true); setEditing(null); setCreateName(""); setCreateFile(null); }}
+                    onClick={() => { setCreating(true); setEditing(null); setCreateNameEn(""); setCreateNameAr(""); setCreateFile(null); }}
                     className="h-10 px-4 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors cursor-pointer"
                 >
-                    + New Brand
+                    + {t('addBrand')}
                 </button>
             </div>
 
@@ -175,26 +185,30 @@ export default function AdminBrandsClient({ initial }: Props) {
                 <div className="border border-gray-200 rounded-xl bg-white p-5 mb-4">
                     <div className="flex flex-wrap items-end gap-3">
                         <div>
-                            <label className="block text-xs text-gray-500 mb-1">Name</label>
-                            <input value={createName} onChange={(e) => setCreateName(e.target.value)} placeholder="Brand name" className="h-10 px-3 border border-gray-300 rounded-lg text-sm w-48" />
+                            <label className="block text-xs text-gray-500 mb-1">{t('brandName')} (EN)</label>
+                            <input value={createNameEn} onChange={(e) => setCreateNameEn(e.target.value)} placeholder={t('brandName') + ' (EN)'} className="h-10 px-3 border border-gray-300 rounded-lg text-sm w-40" />
                         </div>
                         <div>
-                            <label className="block text-xs text-gray-500 mb-1">Photo</label>
-                            <FileInput file={createFile} onChange={setCreateFile} onRemove={() => setCreateFile(null)} />
+                            <label className="block text-xs text-gray-500 mb-1">{t('brandName')} (AR)</label>
+                            <input value={createNameAr} onChange={(e) => setCreateNameAr(e.target.value)} placeholder={t('brandName') + ' (AR)'} className="h-10 px-3 border border-gray-300 rounded-lg text-sm w-40" />
                         </div>
-                        <button type="button" onClick={() => createMutation.mutate()} disabled={!createName.trim() || createMutation.isPending} className="h-10 px-4 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 disabled:opacity-40 transition-colors cursor-pointer">{createMutation.isPending ? "Creating..." : "Create"}</button>
-                        <button type="button" onClick={() => setCreating(false)} className="h-10 px-4 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors cursor-pointer">Cancel</button>
+                        <div>
+                            <label className="block text-xs text-gray-500 mb-1">{t('brandPhoto')}</label>
+                            <FileInput t={t} file={createFile} onChange={setCreateFile} onRemove={() => setCreateFile(null)} />
+                        </div>
+                        <button type="button" onClick={() => createMutation.mutate()} disabled={!createNameEn.trim() || !createNameAr.trim() || createMutation.isPending} className="h-10 px-4 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 disabled:opacity-40 transition-colors cursor-pointer">{createMutation.isPending ? t('creating') : t('create')}</button>
+                        <button type="button" onClick={() => setCreating(false)} className="h-10 px-4 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors cursor-pointer">{t('cancel')}</button>
                     </div>
                 </div>
             )}
 
             <div className="overflow-x-auto border border-gray-200 rounded-xl bg-white">
-                <table className="w-full text-sm">
-                    <thead className="bg-gray-50 text-left text-gray-500">
+                <table className="admin-table w-full text-sm">
+                    <thead className="bg-gray-50 text-start text-gray-500">
                         <tr>
-                            <th className="px-4 py-3 font-medium">Name</th>
-                            <th className="px-4 py-3 font-medium">Image</th>
-                            <th className="px-4 py-3 font-medium">Actions</th>
+                            <th className="px-4 py-3 font-medium">{t('brandName')}</th>
+                            <th className="px-4 py-3 font-medium">{t('image')}</th>
+                            <th className="px-4 py-3 font-medium">{t('actions')}</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -203,10 +217,14 @@ export default function AdminBrandsClient({ initial }: Props) {
                                 {editing === b._id ? (
                                     <>
                                         <td className="px-4 py-3">
-                                            <input value={editName} onChange={(e) => setEditName(e.target.value)} className="h-8 px-2 border border-gray-300 rounded text-sm w-full" />
+                                            <div className="flex gap-2">
+                                                <input value={editNameEn} onChange={(e) => setEditNameEn(e.target.value)} placeholder="EN" className="h-8 px-2 border border-gray-300 rounded text-sm w-28" />
+                                                <input value={editNameAr} onChange={(e) => setEditNameAr(e.target.value)} placeholder="AR" className="h-8 px-2 border border-gray-300 rounded text-sm w-28" />
+                                            </div>
                                         </td>
                                         <td className="px-4 py-3">
                                             <FileInput
+                                                t={t}
                                                 current={editCurrentPhoto}
                                                 file={editFile}
                                                 onChange={setEditFile}
@@ -216,8 +234,8 @@ export default function AdminBrandsClient({ initial }: Props) {
                                         </td>
                                         <td className="px-4 py-3">
                                             <div className="flex gap-2">
-                                                <button type="button" onClick={() => saveEditMutation.mutate()} disabled={saveEditMutation.isPending} className="h-8 px-3 rounded-md bg-gray-900 text-white text-xs font-medium hover:bg-gray-800 disabled:opacity-40 transition-colors cursor-pointer">{saveEditMutation.isPending ? "Saving..." : "Save"}</button>
-                                                <button type="button" onClick={() => setEditing(null)} className="h-8 px-3 rounded-md border border-gray-300 text-xs text-gray-600 hover:bg-gray-50 transition-colors cursor-pointer">Cancel</button>
+                                                <button type="button" onClick={() => saveEditMutation.mutate()} disabled={saveEditMutation.isPending} className="h-8 px-3 rounded-md bg-gray-900 text-white text-xs font-medium hover:bg-gray-800 disabled:opacity-40 transition-colors cursor-pointer">{saveEditMutation.isPending ? t('saving') : t('save')}</button>
+                                                <button type="button" onClick={() => setEditing(null)} className="h-8 px-3 rounded-md border border-gray-300 text-xs text-gray-600 hover:bg-gray-50 transition-colors cursor-pointer">{t('cancel')}</button>
                                             </div>
                                         </td>
                                     </>
@@ -233,8 +251,8 @@ export default function AdminBrandsClient({ initial }: Props) {
                                         </td>
                                         <td className="px-4 py-3">
                                             <div className="flex gap-2">
-                                                <button type="button" onClick={() => handleEdit(b)} className="h-8 px-3 rounded-md bg-blue-600 text-white text-xs font-medium hover:bg-blue-700 transition-colors cursor-pointer">Edit</button>
-                                                <button type="button" onClick={() => setDeleteTarget(b._id)} className="h-8 px-3 rounded-md bg-red-500 text-white text-xs font-medium hover:bg-red-600 transition-colors cursor-pointer">Delete</button>
+                                                <button type="button" onClick={() => handleEdit(b)} className="h-8 px-3 rounded-md bg-blue-600 text-white text-xs font-medium hover:bg-blue-700 transition-colors cursor-pointer">{t('edit')}</button>
+                                                <button type="button" onClick={() => setDeleteTarget(b._id)} className="h-8 px-3 rounded-md bg-red-500 text-white text-xs font-medium hover:bg-red-600 transition-colors cursor-pointer">{t('delete')}</button>
                                             </div>
                                         </td>
                                     </>
@@ -243,12 +261,12 @@ export default function AdminBrandsClient({ initial }: Props) {
                         ))}
                     </tbody>
                 </table>
-                {paged.length === 0 && <p className="text-center text-sm text-gray-400 py-10">No brands found</p>}
+                {paged.length === 0 && <p className="text-center text-sm text-gray-400 py-10">{t('noBrands')}</p>}
             </div>
 
             <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
 
-            <ConfirmDialog open={!!deleteTarget} title="Delete brand?" message="This cannot be undone." confirmLabel="Delete" danger onConfirm={() => deleteMutation.mutate()} onCancel={() => setDeleteTarget(null)} loading={deleteMutation.isPending} />
+            <ConfirmDialog open={!!deleteTarget} title={t('confirmDeleteTitle')} message={t('confirmDeleteMessage')} confirmLabel={t('yesDelete')} danger onConfirm={() => deleteMutation.mutate()} onCancel={() => setDeleteTarget(null)} loading={deleteMutation.isPending} />
         </div>
     );
 }

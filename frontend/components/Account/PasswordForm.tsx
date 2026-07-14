@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from 'next-intl';
 import { apiClient } from "@/lib/apiClient";
 
 interface FormData {
@@ -16,23 +17,24 @@ interface FormErrors {
     general?: string;
 }
 
-function validate(data: FormData): FormErrors {
-    const errors: FormErrors = {};
-    if (!data.currentPassword) errors.currentPassword = "Current password is required";
-    if (!data.newPassword) {
-        errors.newPassword = "New password is required";
-    } else if (data.newPassword.length < 6) {
-        errors.newPassword = "Password must be at least 6 characters";
-    }
-    if (!data.confirmPassword) {
-        errors.confirmPassword = "Please confirm your new password";
-    } else if (data.newPassword !== data.confirmPassword) {
-        errors.confirmPassword = "Passwords do not match";
-    }
-    return errors;
-}
-
 export default function PasswordForm() {
+    const t = useTranslations('account');
+
+    function validate(data: FormData): FormErrors {
+        const errors: FormErrors = {};
+        if (!data.currentPassword) errors.currentPassword = t('currentPasswordRequired');
+        if (!data.newPassword) {
+            errors.newPassword = t('newPasswordRequired');
+        } else if (data.newPassword.length < 6) {
+            errors.newPassword = t('passwordMinLength');
+        }
+        if (!data.confirmPassword) {
+            errors.confirmPassword = t('confirmPasswordRequired');
+        } else if (data.newPassword !== data.confirmPassword) {
+            errors.confirmPassword = t('passwordsNotMatch');
+        }
+        return errors;
+    }
     const [formData, setFormData] = useState<FormData>({
         currentPassword: "",
         newPassword: "",
@@ -74,11 +76,11 @@ export default function PasswordForm() {
                 newPassword: formData.newPassword,
                 confirmNewPassword: formData.confirmPassword,
             });
-            setSuccessMessage("Password changed successfully!");
+            setSuccessMessage(t('passwordChanged'));
             setFormData({ currentPassword: "", newPassword: "", confirmPassword: "" });
         } catch (err: unknown) {
             const error = err as { response?: { data?: { message?: string } } };
-            setErrors({ general: error?.response?.data?.message ?? "Something went wrong." });
+            setErrors({ general: error?.response?.data?.message ?? t('somethingWentWrong') });
         } finally {
             setIsLoading(false);
         }
@@ -86,7 +88,7 @@ export default function PasswordForm() {
 
     return (
         <form onSubmit={handleSubmit} noValidate>
-            <h2 className="text-[#DB4444] font-medium text-xl mb-8">Change Password</h2>
+            <h2 className="text-[#DB4444] font-medium text-xl mb-8">{t('changePassword')}</h2>
 
             {errors.general && (
                 <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded text-red-600 text-sm">
@@ -102,19 +104,19 @@ export default function PasswordForm() {
             <div className="space-y-3 mb-8">
                 <div>
                     <input type="password" name="currentPassword" value={formData.currentPassword}
-                        onChange={handleChange} placeholder="Current Password"
+                        onChange={handleChange} placeholder={t('currentPassword')}
                         className={`w-full px-4 py-3 bg-[#F5F5F5] rounded text-sm outline-none focus:ring-2 focus:ring-[#DB4444] transition ${errors.currentPassword ? "ring-2 ring-red-400" : ""}`} />
                     {errors.currentPassword && <p className="text-red-500 text-xs mt-1">{errors.currentPassword}</p>}
                 </div>
                 <div>
                     <input type="password" name="newPassword" value={formData.newPassword}
-                        onChange={handleChange} placeholder="New Password"
+                        onChange={handleChange} placeholder={t('newPassword')}
                         className={`w-full px-4 py-3 bg-[#F5F5F5] rounded text-sm outline-none focus:ring-2 focus:ring-[#DB4444] transition ${errors.newPassword ? "ring-2 ring-red-400" : ""}`} />
                     {errors.newPassword && <p className="text-red-500 text-xs mt-1">{errors.newPassword}</p>}
                 </div>
                 <div>
                     <input type="password" name="confirmPassword" value={formData.confirmPassword}
-                        onChange={handleChange} placeholder="Confirm New Password"
+                        onChange={handleChange} placeholder={t('confirmPassword')}
                         className={`w-full px-4 py-3 bg-[#F5F5F5] rounded text-sm outline-none focus:ring-2 focus:ring-[#DB4444] transition ${errors.confirmPassword ? "ring-2 ring-red-400" : ""}`} />
                     {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
                 </div>
@@ -123,11 +125,11 @@ export default function PasswordForm() {
             <div className="flex items-center justify-end gap-4">
                 <button type="button" onClick={handleCancel}
                     className="text-sm text-gray-700 hover:text-gray-900 transition">
-                    Cancel
+                    {t('cancel')}
                 </button>
                 <button type="submit" disabled={isLoading}
                     className="px-8 py-3 bg-[#DB4444] text-white text-sm font-medium rounded hover:bg-[#c73c3c] transition disabled:opacity-60 disabled:cursor-not-allowed min-w-[140px]">
-                    {isLoading ? "Saving..." : "Save Changes"}
+                    {isLoading ? t('saving') : t('saveChanges')}
                 </button>
             </div>
         </form>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from 'next-intl';
 import { apiClient } from "@/lib/apiClient";
 import { UserProfile } from "@/services/server/userService";
 
@@ -30,20 +31,21 @@ function splitName(fullName: string) {
     };
 }
 
-function validate(data: FormData): FormErrors {
-    const errors: FormErrors = {};
-    if (!data.firstName.trim()) errors.firstName = "First name is required";
-    if (!data.lastName.trim()) errors.lastName = "Last name is required";
-    if (!data.email.trim()) {
-        errors.email = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-        errors.email = "Invalid email address";
-    }
-    return errors;
-}
-
 export default function PersonalInfoForm({ profile }: Props) {
+    const t = useTranslations('account');
     const { firstName, lastName } = splitName(profile.name);
+
+    function validate(data: FormData): FormErrors {
+        const errors: FormErrors = {};
+        if (!data.firstName.trim()) errors.firstName = t('firstNameRequired');
+        if (!data.lastName.trim()) errors.lastName = t('lastNameRequired');
+        if (!data.email.trim()) {
+            errors.email = t('emailRequired');
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+            errors.email = t('invalidEmail');
+        }
+        return errors;
+    }
 
     const [formData, setFormData] = useState<FormData>({
         firstName,
@@ -88,10 +90,10 @@ export default function PersonalInfoForm({ profile }: Props) {
                 ...(emailChanged && { email: formData.email.trim() }),
                 phone: formData.phone.trim(),
             });
-            setSuccessMessage("Profile updated successfully!");
+            setSuccessMessage(t('profileUpdated'));
         } catch (err: unknown) {
             const error = err as { response?: { data?: { message?: string } } };
-            setErrors({ general: error?.response?.data?.message ?? "Something went wrong." });
+            setErrors({ general: error?.response?.data?.message ?? t('somethingWentWrong') });
         } finally {
             setIsLoading(false);
         }
@@ -99,7 +101,7 @@ export default function PersonalInfoForm({ profile }: Props) {
 
     return (
         <form onSubmit={handleSubmit} noValidate>
-            <h2 className="text-[#DB4444] font-medium text-xl mb-8">Edit Your Profile</h2>
+            <h2 className="text-[#DB4444] font-medium text-xl mb-8">{t('editYourProfile')}</h2>
 
             {errors.general && (
                 <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded text-red-600 text-sm">
@@ -115,16 +117,16 @@ export default function PersonalInfoForm({ profile }: Props) {
             {/* Name */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('firstName')}</label>
                     <input type="text" name="firstName" value={formData.firstName} onChange={handleChange}
-                        placeholder="First Name"
+                        placeholder={t('firstName')}
                         className={`w-full px-4 py-3 bg-[#F5F5F5] rounded text-sm outline-none focus:ring-2 focus:ring-[#DB4444] transition ${errors.firstName ? "ring-2 ring-red-400" : ""}`} />
                     {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('lastName')}</label>
                     <input type="text" name="lastName" value={formData.lastName} onChange={handleChange}
-                        placeholder="Last Name"
+                        placeholder={t('lastName')}
                         className={`w-full px-4 py-3 bg-[#F5F5F5] rounded text-sm outline-none focus:ring-2 focus:ring-[#DB4444] transition ${errors.lastName ? "ring-2 ring-red-400" : ""}`} />
                     {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
                 </div>
@@ -133,16 +135,16 @@ export default function PersonalInfoForm({ profile }: Props) {
             {/* Email & Phone */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('email')}</label>
                     <input type="email" name="email" value={formData.email} onChange={handleChange}
-                        placeholder="Email"
+                        placeholder={t('email')}
                         className={`w-full px-4 py-3 bg-[#F5F5F5] rounded text-sm outline-none focus:ring-2 focus:ring-[#DB4444] transition ${errors.email ? "ring-2 ring-red-400" : ""}`} />
                     {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('phone')}</label>
                     <input type="text" name="phone" value={formData.phone} onChange={handleChange}
-                        placeholder="Phone number"
+                        placeholder={t('phone')}
                         className="w-full px-4 py-3 bg-[#F5F5F5] rounded text-sm outline-none focus:ring-2 focus:ring-[#DB4444] transition" />
                 </div>
             </div>
@@ -151,11 +153,11 @@ export default function PersonalInfoForm({ profile }: Props) {
             <div className="flex items-center justify-end gap-4">
                 <button type="button" onClick={handleCancel}
                     className="text-sm text-gray-700 hover:text-gray-900 transition">
-                    Cancel
+                    {t('cancel')}
                 </button>
                 <button type="submit" disabled={isLoading}
                     className="px-8 py-3 bg-[#DB4444] text-white text-sm font-medium rounded hover:bg-[#c73c3c] transition disabled:opacity-60 disabled:cursor-not-allowed min-w-[140px]">
-                    {isLoading ? "Saving..." : "Save Changes"}
+                    {isLoading ? t('saving') : t('saveChanges')}
                 </button>
             </div>
         </form>

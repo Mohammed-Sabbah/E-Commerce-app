@@ -5,7 +5,7 @@ function SectionTitle({ title, Category, children }: { title: string, Category: 
         <div className='section-header flex items-end gap-4 md:gap-25'>
             <div>
                 <p className='text-[#DB4444] text-sm md:text-[1rem] font-bold flex items-center justify-start'>
-                    <span className="w-4 h-8 md:w-5 md:h-10 mr-3 md:mr-3.5 rounded-[4px] bg-[#DB4444] inline-block" />
+                    <span className="w-4 h-8 md:w-5 md:h-10 me-3 md:me-3.5 rounded-[4px] bg-[#DB4444] inline-block" />
                     {Category}
                 </p>
                 <h2 className='text-2xl md:text-4xl pt-4 md:pt-6 font-semibold'>{title}</h2>

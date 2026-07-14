@@ -1,6 +1,8 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { chartTooltipStyle, isRtlLocale } from "./chartConfig";
 
 const COLORS: Record<string, string> = {
     pending: "#F59E0B",
@@ -15,11 +17,14 @@ interface Props {
 }
 
 export default function StatusPie({ data }: Props) {
-    if (!data.length) return <p className="text-sm text-gray-400">No order data</p>;
+    const t = useTranslations('admin');
+    const locale = useLocale();
+    const isRtl = isRtlLocale(locale);
+    if (!data.length) return <p className="text-sm text-gray-400">{t('noOrders')}</p>;
 
     return (
         <div className="bg-white border border-gray-200 rounded-xl p-5">
-            <h3 className="text-sm font-semibold text-gray-900 mb-4">Orders by Status</h3>
+            <h3 className="text-sm font-semibold text-gray-900 mb-4">{t('ordersByStatus')}</h3>
             <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
@@ -38,11 +43,12 @@ export default function StatusPie({ data }: Props) {
                             ))}
                         </Pie>
                         <Tooltip
-                            contentStyle={{ borderRadius: 8, border: "1px solid #e5e7eb", fontSize: 13 }}
+                            contentStyle={chartTooltipStyle(isRtl)}
                         />
                         <Legend
+                            wrapperStyle={{ direction: isRtl ? "rtl" : "ltr" }}
                             formatter={(value: string) => (
-                                <span className="text-sm text-gray-700 capitalize">{value}</span>
+                                <span dir="auto" className="text-sm text-gray-700 capitalize">{value}</span>
                             )}
                         />
                     </PieChart>

@@ -27,7 +27,7 @@ function ProductCardSkeleton() {
                         <div className="absolute inset-0 skeleton-shimmer" />
                     </div>
                 ))}
-                <div className="h-3 w-8 rounded bg-gray-200 ml-1 overflow-hidden relative">
+                <div className="h-3 w-8 rounded bg-gray-200 ms-1 overflow-hidden relative">
                     <div className="absolute inset-0 skeleton-shimmer" />
                 </div>
             </div>

@@ -1,52 +1,33 @@
-// frontend/middleware.ts
+import createMiddleware from "next-intl/middleware";
+import { NextRequest, NextResponse } from "next/server";
+import { routing } from "./i18n/routing";
+import { getAuthRedirect } from "./lib/authRedirect";
 
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+const handleI18n = createMiddleware(routing);
 
-const protectedRoutes = [
-    '/wishlist',
-    '/cart',
-    '/checkout',
-    '/account',
-    '/admin',   // ← إضافة
-];
+export default async function middleware(request: NextRequest) {
+  const response = handleI18n(request);
 
-const authRoutes = ['/login', '/register'];
+  if (!response.ok) return response;
 
-export function middleware(request: NextRequest) {
-    const token = request.cookies.get('token')?.value;
-    const { pathname } = request.nextUrl;
+  const pathname = response.headers.get("x-middleware-rewrite")
+    ? new URL(response.headers.get("x-middleware-rewrite")!).pathname
+    : request.nextUrl.pathname;
 
-    const isProtectedRoute = protectedRoutes.some((route) =>
-        pathname === route || pathname.startsWith(`${route}/`)
-    );
+  const token = request.cookies.get("token")?.value;
+  const { redirectPath } = getAuthRedirect({
+    pathname,
+    hasToken: Boolean(token),
+    defaultLocale: routing.defaultLocale,
+  });
 
-    // 1. غير مسجل دخول يحاول يفتح صفحة محمية → redirect للـ login
-    if (!token && isProtectedRoute) {
-        return NextResponse.redirect(new URL('/login', request.url));
-    }
+  if (redirectPath) {
+    return NextResponse.redirect(new URL(redirectPath, request.url));
+  }
 
-    // 2. مسجل دخول يحاول يفتح login/register → redirect للـ home
-    if (token && authRoutes.includes(pathname)) {
-        return NextResponse.redirect(new URL('/', request.url));
-    }
-
-    return NextResponse.next();
+  return response;
 }
 
 export const config = {
-    matcher: [
-        '/wishlist',
-        '/wishlist/:path*',
-        '/cart',
-        '/cart/:path*',
-        '/checkout',
-        '/checkout/:path*',
-        '/account',
-        '/account/:path*',
-        '/admin',          // ← إضافة
-        '/admin/:path*',   // ← إضافة
-        '/login',
-        '/register',
-    ],
+  matcher: "/((?!api|_next|_vercel|.*\\..*).*)",
 };

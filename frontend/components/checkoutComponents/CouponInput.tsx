@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { apiClient } from '@/lib/apiClient';
 
 interface Props {
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export default function CouponInput({ onApply, subtotal, initialCode }: Props) {
+    const t = useTranslations('checkout');
     const [code, setCode] = useState(initialCode ?? '');
     const [error, setError] = useState('');
     const [appliedCode, setAppliedCode] = useState<string | null>(null);
@@ -49,10 +51,10 @@ export default function CouponInput({ onApply, subtotal, initialCode }: Props) {
                 setAppliedCode(code.trim());
             } else {
                 onApply(0, '');
-                setError('Coupon could not be applied');
+                setError(t('couponApplyFailed'));
             }
         } catch (err: any) {
-            const msg = err?.response?.data?.message || 'Failed to validate coupon';
+            const msg = err?.response?.data?.message || t('couponValidateFailed');
             onApply(0, '');
             setError(msg);
             setAppliedCode(null);
@@ -81,7 +83,7 @@ export default function CouponInput({ onApply, subtotal, initialCode }: Props) {
                             onApply(0, '');
                         }
                     }}
-                    placeholder="Coupon Code"
+                    placeholder={t('couponCode')}
                     className="flex-1 h-11 px-4 border border-gray-300 rounded text-sm focus:outline-none focus:border-gray-500 transition-colors"
                 />
                 {appliedCode ? (
@@ -90,7 +92,7 @@ export default function CouponInput({ onApply, subtotal, initialCode }: Props) {
                         onClick={handleRemove}
                         className="h-11 px-6 bg-gray-500 hover:bg-gray-600 text-white text-sm font-medium rounded transition-colors whitespace-nowrap"
                     >
-                        Remove
+                        {t('remove')}
                     </button>
                 ) : (
                     <button
@@ -99,12 +101,12 @@ export default function CouponInput({ onApply, subtotal, initialCode }: Props) {
                         disabled={loading || !code.trim()}
                         className="h-11 px-6 bg-red-500 hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded transition-colors whitespace-nowrap"
                     >
-                        {loading ? 'Validating...' : 'Apply Coupon'}
+                        {loading ? t('validating') : t('applyCoupon')}
                     </button>
                 )}
             </div>
-            {error && <p className="text-xs text-red-500 pl-1">{error}</p>}
-            {appliedCode && <p className="text-xs text-green-600 pl-1">Coupon &quot;{appliedCode}&quot; applied — discount shown at checkout</p>}
+            {error && <p className="text-xs text-red-500 ps-1">{error}</p>}
+            {appliedCode && <p className="text-xs text-green-600 ps-1">{t('couponApplied', { code: appliedCode })}</p>}
         </div>
     );
 }

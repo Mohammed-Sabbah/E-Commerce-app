@@ -2,10 +2,16 @@ const { default: slugify } = require("slugify");
 const { asyncErrorHandler } = require("../middlewares/ErrorMiddleware");
 const QueryManipulater = require("../utils/QueryManipulater");
 const CustomError = require("../utils/CustomError");
+const { localizeDocs } = require("../utils/localizeField");
 
+function getSlug(name) {
+  if (name && typeof name === "object" && name.en) return slugify(name.en);
+  return slugify(name);
+}
 
 let getAll = function (model) {
     return asyncErrorHandler(async function (req, res) {
+        const lang = req.query.lang || "en";
 
         let qm = new QueryManipulater(req, model)
             .filter()
@@ -23,6 +29,10 @@ let getAll = function (model) {
         qm.paginate();
 
         let docs = await qm.query;
+        docs = docs.map((d) => (typeof d.toObject === "function" ? d.toObject({ virtuals: true }) : d));
+
+        if (req.query.raw !== "true")
+            docs = localizeDocs(docs, lang);
 
         res.status(200).json({
             status: "success",
@@ -37,10 +47,16 @@ let getAll = function (model) {
 
 let createOne = function (model) {
     return asyncErrorHandler(async function (req, res) {
+        const lang = req.query.lang || "en";
+
         if (req.body.name)
-            req.body.slug = slugify(req.body.name);
+            req.body.slug = getSlug(req.body.name);
 
         let newDoc = await model.create(req.body);
+        newDoc = newDoc.toObject({ virtuals: true });
+
+        if (req.query.raw !== "true")
+            newDoc = localizeDocs(newDoc, lang);
 
         res.status(201).json({
             status: "success",
@@ -53,6 +69,8 @@ let createOne = function (model) {
 
 let getOne = function (model, modelName = "", populateOption = "") {
     return asyncErrorHandler(async function (req, res) {
+        const lang = req.query.lang || "en";
+
         let query = model.findById(req.params.id);
 
         if (populateOption)
@@ -62,6 +80,12 @@ let getOne = function (model, modelName = "", populateOption = "") {
 
         if (!doc)
             throw new CustomError(`There is no ${modelName} with id : ${req.params.id}`, 404);
+
+        doc = doc.toObject({ virtuals: true });
+
+        if (req.query.raw !== "true")
+            doc = localizeDocs(doc, lang);
+
         res.status(200).json({
             status: "success",
             data: {
@@ -73,8 +97,10 @@ let getOne = function (model, modelName = "", populateOption = "") {
 
 let updateOne = function (model, modelName) {
     return asyncErrorHandler(async function (req, res) {
+        const lang = req.query.lang || "en";
+
         if (req.body.name)
-            req.body.slug = slugify(req.body.name);
+            req.body.slug = getSlug(req.body.name);
 
         let updatedDoc = await model.findByIdAndUpdate(req.params.id, req.body,
             {
@@ -85,6 +111,11 @@ let updateOne = function (model, modelName) {
 
         if (!updatedDoc)
             throw new CustomError(`There is no ${modelName} with id : ${req.params.id}`, 404);
+
+        updatedDoc = updatedDoc.toObject({ virtuals: true });
+
+        if (req.query.raw !== "true")
+            updatedDoc = localizeDocs(updatedDoc, lang);
 
         res.status(200).json({
             status: "success",

@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from 'next-intl';
 import {
     Table,
     TableBody,
@@ -15,15 +18,16 @@ interface CartDesktopTableProps {
 }
 
 export default function CartDesktopTable({ cartItems, onChange, updates }: CartDesktopTableProps) {
+    const t = useTranslations('cart');
     return (
         <div className="hidden md:block border rounded-xl overflow-hidden">
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead>Product</TableHead>
-                        <TableHead>Price</TableHead>
-                        <TableHead>Quantity</TableHead>
-                        <TableHead>Subtotal</TableHead>
+                        <TableHead>{t('product')}</TableHead>
+                        <TableHead>{t('price')}</TableHead>
+                        <TableHead>{t('quantity')}</TableHead>
+                        <TableHead>{t('totalPrice')}</TableHead>
                     </TableRow>
                 </TableHeader>
 
