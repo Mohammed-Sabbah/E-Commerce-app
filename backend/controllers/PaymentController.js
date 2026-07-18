@@ -94,8 +94,20 @@ const webhook = asyncErrorHandler(async (req, res) => {
             totalOrderPrice
         } = session.metadata;
 
+        // Idempotency: prevent duplicate processing on serverless retries
+        const existingOrder = await Order.findOne({ stripeEventId: event.id });
+        if (existingOrder) {
+            console.log(`Webhook event ${event.id} already processed, skipping.`);
+            return res.status(200).json({ status: "Already processed" });
+        }
+
         // 1- find cart
         const cart = await Cart.findById(cartId).populate("cartItems.product");
+
+        if (!cart) {
+            console.log(`Cart ${cartId} not found — may have been processed already.`);
+            return res.status(200).json({ status: "Cart not found" });
+        }
 
         // 2-create order
         await Order.create({
@@ -108,7 +120,8 @@ const webhook = asyncErrorHandler(async (req, res) => {
             shippingValue: parseFloat(shippingValue),
             totalOrderPrice: parseFloat(totalOrderPrice),
             isPaid: true,
-            paidAt: Date.now()
+            paidAt: Date.now(),
+            stripeEventId: event.id
         });
 
         // 3- decrement quantities & increment sold

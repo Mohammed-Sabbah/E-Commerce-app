@@ -50,6 +50,11 @@ const orderSchema = new mongoose.Schema(
             enum: ["pending", "processing", "delivered", "cancelled", "returned"],
             default: "pending"
         },
+        stripeEventId: {
+            type: String,
+            unique: true,
+            sparse: true  // sparse: cash orders don't have a stripe event ID
+        },
         isPaid: {
             type: Boolean,
             default: false
