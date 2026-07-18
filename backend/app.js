@@ -2,14 +2,12 @@ const express = require("express");
 const morgan = require("morgan");
 const passport = require('passport');
 const cors = require('cors');
-const toobusy = require('toobusy-js');
 const expressLimit = require("express-rate-limit");
 const hpp = require('hpp');
 const helmet = require("helmet");
 const sanitizer = require("express-mongo-sanitize");
 const xss = require("xss-clean");
 const cookieParser = require('cookie-parser');
-const compression = require("compression"); // ← مضاف
 
 // import strategy
 const strategies = require('./config/passport');
@@ -27,14 +25,6 @@ app.set('trust proxy', 1);
 
 app.use(cookieParser());
 
-// ─── Compression ────────────────────────────────────────────
-// يضغط كل الـ responses (JSON, HTML, etc.) — يوفّر 40-60% من حجم الـ responses
-// استثناء: الـ webhook route يحتاج raw body، لذلك يتعرّف عليه قبل الـ compression
-app.use(compression({
-    level: 6,          // توازن بين السرعة وحجم الضغط (1-9)
-    threshold: 1024,   // ما يضغطش responses أصغر من 1KB
-}));
-// ────────────────────────────────────────────────────────────
 
 // Health check
 app.get('/healthz', (req, res) => res.send('OK'));
@@ -76,10 +66,6 @@ app.use(morgan("dev"));
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 app.use(express.json({ limit: "10kb" }));
 
-app.use(function (req, res, next) {
-    if (toobusy()) throw new CustomError("Server Too Busy", 503);
-    else next();
-});
 
 app.use(hpp());
 app.use(sanitizer());
