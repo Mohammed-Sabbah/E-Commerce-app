@@ -64,7 +64,7 @@ export function generateStaticParams() {
 
 // PWA: Viewport & theme color (required for standalone mode on iOS/Android)
 export const viewport: Viewport = {
-  themeColor: "#db4444",
+  themeColor: "#000000",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
