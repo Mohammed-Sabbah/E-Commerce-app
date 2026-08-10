@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Poppins, Inter, Noto_Sans_Arabic } from "next/font/google";
 import { notFound } from "next/navigation";
 import { cookies } from "next/headers";
@@ -44,12 +44,32 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
         ar: "/ar",
       },
     },
+    // PWA: iOS Safari full-screen support
+    appleWebApp: {
+      capable: true,
+      title: "Exclusive",
+      statusBarStyle: "default",
+      startupImage: "/icons/apple-touch-icon.png",
+    },
+    // PWA: manifest link (Next.js auto-injects, but explicit for Safari)
+    other: {
+      "mobile-web-app-capable": "yes",
+    },
   };
 }
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
+
+// PWA: Viewport & theme color (required for standalone mode on iOS/Android)
+export const viewport: Viewport = {
+  themeColor: "#db4444",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
 
 export default async function LocaleLayout({
   children,
